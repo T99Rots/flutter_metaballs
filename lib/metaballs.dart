@@ -69,7 +69,7 @@ class _MetaBall {
   }
 }
 
-class MetaBalls extends StatefulWidget {
+class Metaballs extends StatefulWidget {
   final Color color1;
   final Color color2;
   final double glowRadius;
@@ -79,11 +79,13 @@ class MetaBalls extends StatefulWidget {
   final double speedMultiplier;
   final Alignment gradientAlignment;
   final Widget? child;
+  final Duration colorAnimationDuration;
 
-  const MetaBalls({
+  const Metaballs({
     Key? key,
     required this.color1,
     required this.color2,
+    this.colorAnimationDuration = const Duration(milliseconds: 200),
     this.speedMultiplier = 1,
     this.minBallRadius = 15,
     this.maxBallRadius = 40,
@@ -94,17 +96,26 @@ class MetaBalls extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MetaBalls> createState() => _MetaBallsState();
+  State<Metaballs> createState() => _MetaBallsState();
 }
 
-class _MetaBallsState extends State<MetaBalls> with TickerProviderStateMixin {
+class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
+  late AnimationController _colorController;
   late Future<FragmentProgram> _fragmentProgramFuture;
+  late Color _startColor1;
+  late Color _startColor2;
+  late Color _color1;
+  late Color _color2;
+
   double _lastFrame = 0;
 
   @override
   void initState() {
+    _startColor1 = _color1 = widget.color1;
+    _startColor2 = _color2 = widget.color2;
+    _colorController = AnimationController(vsync: this, duration: widget.colorAnimationDuration);
     _controller = AnimationController.unbounded(
       duration: const Duration(days: 365), vsync: this
     )..animateTo(const Duration(days: 365).inSeconds.toDouble());
@@ -116,6 +127,23 @@ class _MetaBallsState extends State<MetaBalls> with TickerProviderStateMixin {
 
     _metaBalls = List.generate(40, (_) => _MetaBall());
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant Metaballs oldWidget) {
+    if(oldWidget.color1 != widget.color1 || oldWidget.color2 != widget.color2) {
+      if(_colorController.isAnimating) {
+        _startColor1 = Color.lerp(_startColor1, _color1, _colorController.value)!;
+        _startColor2 = Color.lerp(_startColor2, _color2, _colorController.value)!;
+      } else {
+        _startColor1 = _color1;
+        _startColor2 = _color2;
+      }
+      _colorController.forward(from: 0);
+      _color1 = widget.color1;
+      _color2 = widget.color2;
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -143,11 +171,19 @@ class _MetaBallsState extends State<MetaBalls> with TickerProviderStateMixin {
                     speedMultiplier: widget.speedMultiplier
                   )).toList();
 
+                  Color color1 = _color1;
+                  Color color2 = _color2;
+
+                  if(_colorController.isAnimating) {
+                    color1 = Color.lerp(_startColor1, color1, _colorController.value)!;
+                    color2 = Color.lerp(_startColor2, color2, _colorController.value)!;
+                  }
+
                   return SizedBox.expand(
                     child: CustomPaint(
                       painter: _MetaBallPainter(
-                        color1: widget.color1,
-                        color2: widget.color2,
+                        color1: color1,
+                        color2: color2,
                         fragmentProgram: snapshot.data!,
                         metaBalls: computed,
                         glowRadius: widget.glowRadius,

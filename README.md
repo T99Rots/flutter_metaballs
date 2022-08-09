@@ -11,29 +11,32 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+# Animated Metaballs for Flutter
 
-## Features
+<p align="center">
+  <img src="https://raw.githubusercontent.com/T99Rots/readme_data/main/flutter/metaballs/metaballs.webp" width="360px">
+</p>
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
-```dart
-const like = 'sample';
+## Installing:
+```yaml
+dependencies:
+  metaballs: "^0.0.1"
 ```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+import 'package:metaballs/metaballs.dart';
+```
+## Usage:
+```dart
+Metaballs(
+  color1: const Color(0xffff54c2),
+  color2: const Color(0xffffc242),
+  colorAnimationDuration: const Duration(milliseconds: 200),
+  speedMultiplier: 1,
+  minBallRadius: 15,
+  maxBallRadius: 40,
+  glowRadius: 0.7,
+  glowIntensity: 0.6,
+  gradientAlignment: Alignment.bottomRight,
+  child: Text('META BALLS')
+)
+```

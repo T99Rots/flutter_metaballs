@@ -1,7 +1,7 @@
 name: metaballs
-description: A metaballs implementation based on the shader package
+description: A metaballs implementation for flutter based on the shader package
 version: 0.0.1
-homepage: null
+homepage: https://github.com/T99Rots/flutter_metaballs
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
