@@ -30,8 +30,9 @@ import 'package:metaballs/metaballs.dart';
 Metaballs(
   color1: const Color(0xffff54c2),
   color2: const Color(0xffffc242),
-  colorAnimationDuration: const Duration(milliseconds: 200),
+  colorChangeDuration: const Duration(milliseconds: 200),
   speedMultiplier: 1,
+  bounceStiffness: 3,
   minBallRadius: 15,
   maxBallRadius: 40,
   glowRadius: 0.7,
@@ -40,3 +41,17 @@ Metaballs(
   child: Text('META BALLS')
 )
 ```
+
+| property                       | default value                 | description                                                        |
+|--------------------------------|-------------------------------|--------------------------------------------------------------------|
+| `Color color1`                 |                               | The color at the start of the gradient used for coloring the balls |
+| `Color color2`                 |                               | The color at the end of the gradient used for coloring the balls   |
+| `Duration colorChangeDuration` | `Duration(milliseconds: 200)` | The duration of the color changing animation                       |
+| `double speedMultiplier`       | `1`                           | A multiplier of the ball movement speed                            |
+| `double bounceStiffness`       | `3`                           | A multiplier to change the speed at which balls change direction   |
+| `double minBallRadius`         | `15`                          | The minimum size of a ball                                         |
+| `double maxBallRadius`         | `40`                          | The maximum size of a ball                                         |
+| `double glowRadius`            | `0.7`                         | A multiplier to indicate the radius of the glow                    |
+| `double glowIntensity`         | `0.6`                         | The brightness of the glow around the ball                         |
+| `Alignment gradientAlignment`  | `Alignment.bottomRight`       | The alignment of the gradient used for coloring the balls          |
+| `Widget child`                 |                               | A widget to be placed on top of the Metaballs widget               |

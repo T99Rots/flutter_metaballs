@@ -24,13 +24,17 @@ class _MetaBall {
   late double _vx;
   late double _vy;
   late double _r;
+  late double _vxm;
+  late double _vym;
 
   _MetaBall() {
     final random = Random();
     _x = random.nextDouble();
     _y = random.nextDouble();
-    _vx = (random.nextDouble() - 0.5) * 2;
-    _vy = (random.nextDouble() - 0.5) * 2;
+    _vxm = random.nextBool()? 1: -1;
+    _vym = random.nextBool()? 1: -1;
+    _vx = random.nextDouble();
+    _vy = random.nextDouble();
     _r = random.nextDouble();
   }
 
@@ -39,24 +43,43 @@ class _MetaBall {
     required double maxRadius,
     required Size canvasSize,
     required double frameTime,
-    required double speedMultiplier
+    required double speedMultiplier,
+    required double bounceStiffness,
   }) {
     assert(maxRadius >= minRadius);
     
     // update the meta ball position
-    final speed = frameTime*speedMultiplier;
-    _x+=(_vx / canvasSize.aspectRatio)*0.1*speed;
-    _y+=_vy*0.1*speed;
-    final m = speed*400;
+    final speed = frameTime*speedMultiplier*sqrt(canvasSize.aspectRatio);
+    _x+=((_vx * _vxm) / canvasSize.aspectRatio)*0.07*speed;
+    _y+=(_vy * _vym)*0.07*speed;
+    final m = speed*100*bounceStiffness;
     if(_x < 0) {
-      _vx+=m*-_x;
+      _vxm+=m*-_x;
     } else if (_x > 1) {
-      _vx-=m*(_x-1);
+      _vxm-=m*(_x-1);
+    } else if (_vxm > 0 && _vxm < 1) {
+      _vxm+=m;
+    } else if (_vxm < 0 && _vxm > -1) {
+      _vxm-=m;
     }
     if(_y < 0) {
-      _vy+=m*-_y;
+      _vym+=m*-_y;
     } else if (_y > 1) {
-      _vy-=m*(_y-1);
+      _vym-=m*(_y-1);
+    } else if (_vym > 0 && _vym < 1) {
+      _vym+=m;
+    } else if (_vym < 0 && _vym > -1) {
+      _vym-=m;
+    }
+    if(_vxm > 1) {
+      _vxm = 1;
+    } else if(_vxm < -1) {
+      _vxm = -1;
+    }
+    if(_vym > 1) {
+      _vym = 1;
+    } else if(_vym < -1) {
+      _vym = -1;
     }
 
     // transform the local state relative to canvas
@@ -77,20 +100,22 @@ class Metaballs extends StatefulWidget {
   final double minBallRadius;
   final double maxBallRadius;
   final double speedMultiplier;
+  final double bounceStiffness;
   final Alignment gradientAlignment;
   final Widget? child;
-  final Duration colorAnimationDuration;
+  final Duration colorChangeDuration;
 
   const Metaballs({
     Key? key,
     required this.color1,
     required this.color2,
-    this.colorAnimationDuration = const Duration(milliseconds: 200),
+    this.colorChangeDuration = const Duration(milliseconds: 200),
     this.speedMultiplier = 1,
     this.minBallRadius = 15,
     this.maxBallRadius = 40,
     this.glowRadius = 0.7,
     this.glowIntensity = 0.6,
+    this.bounceStiffness = 3,
     this.gradientAlignment = Alignment.bottomRight,
     this.child
   }) : super(key: key);
@@ -115,7 +140,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   void initState() {
     _startColor1 = _color1 = widget.color1;
     _startColor2 = _color2 = widget.color2;
-    _colorController = AnimationController(vsync: this, duration: widget.colorAnimationDuration);
+    _colorController = AnimationController(vsync: this, duration: widget.colorChangeDuration);
     _controller = AnimationController.unbounded(
       duration: const Duration(days: 365), vsync: this
     )..animateTo(const Duration(days: 365).inSeconds.toDouble());
@@ -168,7 +193,8 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                     frameTime: frameTime,
                     maxRadius: widget.maxBallRadius,
                     minRadius: widget.minBallRadius,
-                    speedMultiplier: widget.speedMultiplier
+                    speedMultiplier: widget.speedMultiplier,
+                    bounceStiffness: widget.bounceStiffness
                   )).toList();
 
                   Color color1 = _color1;
