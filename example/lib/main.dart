@@ -72,6 +72,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: Container(
           decoration: BoxDecoration(
+            // color: Colors.amber
             gradient: const RadialGradient(
               center: Alignment(-0.5, 1),
               radius: 1.5,
@@ -91,8 +92,14 @@ class _HomePageState extends State<HomePage> {
           child: Metaballs(
             glowRadius: 1,
             glowIntensity: 0.6,
-            color1: colorPairs[index].color1,
-            color2: colorPairs[index].color2,
+            gradient: RadialGradient(
+              colors: [
+                colorPairs[index].color1,
+                colorPairs[index].color2
+              ],
+              center: Alignment.bottomRight,
+              radius: 2
+            ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
