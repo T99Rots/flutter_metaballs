@@ -10,12 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shader: ^1.0.1
 
 dependency_overrides:
   path: ">=1.8.2"
 
 dev_dependencies:
+  shader: ^1.0.1
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
