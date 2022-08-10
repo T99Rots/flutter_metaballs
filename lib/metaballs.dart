@@ -164,7 +164,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                     _lastFrame = currentFrame;
 
                     final List<double> doubles = [
-                      sqrt(size.width * size.width + size.height * size.height),
+                      _controller.value,
                       size.width,
                       size.height,
                       min(max(1-widget.glowRadius, 0), 1),
@@ -186,10 +186,10 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                     }
 
                     return ShaderMask(
-                      blendMode: BlendMode.dstIn,
+                      blendMode: BlendMode.dstATop,
                       shaderCallback: (bounds) {
                         return snapshot.data!.shader(
-                          floatUniforms: Float32List.fromList(doubles)
+                          floatUniforms: Float32List.fromList(doubles),
                         );
                       },
                       child: AnimatedContainer(

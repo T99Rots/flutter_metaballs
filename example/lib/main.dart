@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:metaballs/metaballs.dart';
 
-class ColorPair {
-  final Color color1;
-  final Color color2;
-
-  ColorPair({
-    required this.color1,
-    required this.color2
-  });
-}
-
-List<ColorPair> colorPairs = [
-  ColorPair(
-    color1: const Color.fromARGB(255, 255, 84, 194),
-    color2: const Color.fromARGB(255, 255, 194, 66),
-  ),
-  ColorPair(
-    color1: const Color.fromARGB(255, 0, 110, 255),
-    color2: const Color.fromARGB(255, 167, 240, 255)
-  ),
-  ColorPair(
-    color1: const Color.fromARGB(255, 0, 110, 255),
-    color2: const Color.fromARGB(255, 162, 0, 255)
-  ),
-  ColorPair(
-    color1: Color.fromARGB(255, 163, 255, 188),
-    color2: const Color.fromARGB(255, 17, 205, 36)
-  ),
+List<List<Color>> colorStops = [
+  [
+    Color(0xffffb000),
+    Color(0xffff00ff),
+    Color(0xff00ffff),
+  ],
+  [
+    Color(0xff51c26f),
+    Color(0xfff2e901),
+  ],
+  [
+    Color(0xff2c6cbc),
+    Color(0xff71c3f7),
+    Color(0xfff6f6f6),
+  ],
+  [
+    const Color(0xffe5f392),
+    const Color(0xffe49e71),
+    const Color(0xffd45f97),
+  ],
+  [
+    Color(0xffff00ff),
+    Color(0xff6000ff),
+    Color(0xff0080ff),
+    Color(0xff00ffff),
+  ],
 ];
 
 void main() {
@@ -63,16 +62,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
     return Material(
       child: GestureDetector(
         onTap: () {
           setState(() {
-            index=(index+1)%colorPairs.length;
+            index=(index+1)%colorStops.length;
           });
         },
         child: Container(
           decoration: BoxDecoration(
-            // color: Colors.amber
             gradient: const RadialGradient(
               center: Alignment(-0.5, 1),
               radius: 1.5,
@@ -92,13 +92,13 @@ class _HomePageState extends State<HomePage> {
           child: Metaballs(
             glowRadius: 1,
             glowIntensity: 0.6,
-            gradient: RadialGradient(
-              colors: [
-                colorPairs[index].color1,
-                colorPairs[index].color2
-              ],
-              center: Alignment.bottomRight,
-              radius: 2
+            maxBallRadius: 50,
+            minBallRadius: 20,
+            color: Colors.grey,
+            gradient: LinearGradient(
+              colors: colorStops[index],
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft
             ),
             child: Center(
               child: Column(
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'META BALLS',
+                    'METABALLS',
                     style: TextStyle(
                       shadows: [
                         Shadow(
@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                           blurRadius: 80
                         )
                       ],
-                      fontSize: 50,
+                      fontSize: 50 * width / 300,
                       fontWeight: FontWeight.w900
                     ),
                   ),
@@ -127,11 +127,10 @@ class _HomePageState extends State<HomePage> {
                           blurRadius: 80
                         )
                       ],
-                      fontSize: 20,
+                      fontSize: 18 * width / 300,
                       fontWeight: FontWeight.w900
                     ),
                   ),
-
                 ],
               ),
             ),
