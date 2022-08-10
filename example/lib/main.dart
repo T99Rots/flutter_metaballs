@@ -89,7 +89,6 @@ class _HomePageState extends State<HomePage> {
             ), 0)
           ),
           child: Metaballs(
-
             glowRadius: 1,
             glowIntensity: 0.6,
             color1: colorPairs[index].color1,
