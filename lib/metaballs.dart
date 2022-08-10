@@ -185,7 +185,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                 animation: _controller,
                 builder: (context, child) {
                   final currentFrame = _controller.value;
-                  final frameTime = currentFrame - _lastFrame;
+                  final frameTime = min(currentFrame - _lastFrame, 0.25);
                   _lastFrame = currentFrame;
 
                   final computed = _metaBalls.map((metaBall) => metaBall.update(
