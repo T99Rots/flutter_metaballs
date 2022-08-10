@@ -1,6 +1,6 @@
 name: metaballs
 description: A metaballs implementation for flutter based on the shader package
-version: 0.0.1
+version: 1.0.0
 homepage: https://github.com/T99Rots/flutter_metaballs
 
 environment:
@@ -11,11 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-dependency_overrides:
-  path: ">=1.8.2"
-
 dev_dependencies:
-  shader: ^1.0.1
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
