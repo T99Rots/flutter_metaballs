@@ -20,7 +20,7 @@ and the Flutter guide for
 ## Installing:
 ```yaml
 dependencies:
-  metaballs: "^2.0.0"
+  metaballs: "^1.1.0"
 ```
 ```dart
 import 'package:metaballs/metaballs.dart';
@@ -29,13 +29,13 @@ import 'package:metaballs/metaballs.dart';
 ```dart
 Metaballs(
   color: const Color.fromARGB(255, 66, 133, 244),
-  gradient: RadialGradient(
+  gradient: LinearGradient(
     colors: [
       const Color.fromARGB(255, 255, 84, 194),
       const Color.fromARGB(255, 255, 194, 66),
     ],
-    center: Alignment.bottomRight,
-    radius: 2
+    begin: Alignment.bottomRight,
+    end: Alignment.topLeft
   )
   colorChangeDuration: const Duration(milliseconds: 200),
   speedMultiplier: 1,

@@ -30,7 +30,7 @@ List<List<Color>> colorStops = [
 ];
 
 void main() {
-  // enable dithering to smooth out the gradients and meta balls
+  // enable dithering to smooth out the gradients and metaballs
   Paint.enableDithering = true;
   runApp(const MyApp());
 }
@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Meta Balls Demo',
+      title: 'Metaballs Demo',
       theme: ThemeData.dark(),
       home: const HomePage(),
       debugShowCheckedModeBanner: false,
@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                           blurRadius: 80
                         )
                       ],
-                      fontSize: 50 * width / 300,
+                      fontSize: 50 * width / 400,
                       fontWeight: FontWeight.w900
                     ),
                   ),
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                           blurRadius: 80
                         )
                       ],
-                      fontSize: 18 * width / 300,
+                      fontSize: 18 * width / 400,
                       fontWeight: FontWeight.w900
                     ),
                   ),

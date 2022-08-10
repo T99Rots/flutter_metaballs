@@ -6,6 +6,6 @@
 
 * Fixed issue with metaballs going offscreen with excessive frametimes 
 
-## 2.0.0
+## 1.1.0
 
 * Added more extensive coloring configuration options
