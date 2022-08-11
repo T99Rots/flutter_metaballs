@@ -125,7 +125,6 @@ class Metaballs extends StatefulWidget {
 class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
-  late AnimationController _colorController;
   late Future<FragmentProgram> _fragmentProgramFuture;
 
   double _lastFrame = 0;
