@@ -145,6 +145,12 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final futureBuilder = FutureBuilder<FragmentProgram>(
       future: _fragmentProgramFuture,
