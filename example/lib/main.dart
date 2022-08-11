@@ -3,30 +3,21 @@ import 'package:metaballs/metaballs.dart';
 
 List<List<Color>> colorStops = [
   [
-    Color(0xffffb000),
-    Color(0xffff00ff),
-    Color(0xff00ffff),
+    const Color.fromARGB(255, 255, 21, 0),
+    const Color.fromARGB(255, 255, 153, 0),
   ],
   [
-    Color(0xff51c26f),
-    Color(0xfff2e901),
+    const Color.fromARGB(255, 0, 255, 106),
+    const Color.fromARGB(255, 255, 251, 0),
   ],
   [
-    Color(0xff2c6cbc),
-    Color(0xff71c3f7),
-    Color(0xfff6f6f6),
+    const Color.fromARGB(255, 90, 60, 255),
+    const Color.fromARGB(255, 120, 255, 255),
   ],
   [
-    const Color(0xffe5f392),
-    const Color(0xffe49e71),
-    const Color(0xffd45f97),
-  ],
-  [
-    Color(0xffff00ff),
-    Color(0xff6000ff),
-    Color(0xff0080ff),
-    Color(0xff00ffff),
-  ],
+    const Color.fromARGB(255, 255, 60, 120),
+    const Color.fromARGB(255, 237, 120, 255),
+  ]
 ];
 
 void main() {

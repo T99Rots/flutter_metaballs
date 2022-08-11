@@ -31,8 +31,8 @@ Metaballs(
   color: const Color.fromARGB(255, 66, 133, 244),
   gradient: LinearGradient(
     colors: [
-      const Color.fromARGB(255, 255, 84, 194),
-      const Color.fromARGB(255, 255, 194, 66),
+      const Color.fromARGB(255, 90, 60, 255),
+      const Color.fromARGB(255, 120, 255, 255),
     ],
     begin: Alignment.bottomRight,
     end: Alignment.topLeft
