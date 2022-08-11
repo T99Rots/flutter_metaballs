@@ -20,7 +20,7 @@ and the Flutter guide for
 ## Installing:
 ```yaml
 dependencies:
-  metaballs: "^1.1.0"
+  metaballs: "^1.1.2"
 ```
 ```dart
 import 'package:metaballs/metaballs.dart';
@@ -37,7 +37,7 @@ Metaballs(
     begin: Alignment.bottomRight,
     end: Alignment.topLeft
   )
-  colorChangeDuration: const Duration(milliseconds: 200),
+  animationDuration: const Duration(milliseconds: 200),
   speedMultiplier: 1,
   bounceStiffness: 3,
   minBallRadius: 15,
@@ -48,16 +48,15 @@ Metaballs(
 )
 ```
 
-| property                        | default value                 | description                                                      |
-|---------------------------------|-------------------------------|------------------------------------------------------------------|
-| `Color? color`                  | `Color(0xff4285F4)`           | The color of the metaballs                                       |
-| `Gradient? gradient`            |                               | A gradient for coloring the metaballs, overwrites color          |
-| `Duration? colorChangeDuration` | `Duration(milliseconds: 200)` | The duration of the color changing animation                     |
-| `double? speedMultiplier`       | `1`                           | A multiplier of the ball movement speed                          |
-| `double? bounceStiffness`       | `3`                           | A multiplier to change the speed at which balls change direction |
-| `double? minBallRadius`         | `15`                          | The minimum size of a ball                                       |
-| `double? maxBallRadius`         | `40`                          | The maximum size of a ball                                       |
-| `double? glowRadius`            | `0.7`                         | A multiplier to indicate the radius of the glow                  |
-| `double? glowIntensity`         | `0.6`                         | The brightness of the glow around the ball                       |
-| `Alignment? gradientAlignment`  | `Alignment.bottomRight`       | The alignment of the gradient used for coloring the balls        |
-| `Widget? child`                 |                               | A widget to be placed on top of the Metaballs widget             |
+| property                      | default value                 | description                                                      |
+|-------------------------------|-------------------------------|------------------------------------------------------------------|
+| `Color? color`                | `Color(0xff4285F4)`           | The color of the metaballs                                       |
+| `Gradient? gradient`          |                               | A gradient for coloring the metaballs, overwrites color          |
+| `Duration? animationDuration` | `Duration(milliseconds: 200)` | The duration of the color changing animation                     |
+| `double? speedMultiplier`     | `1`                           | A multiplier of the ball movement speed                          |
+| `double? bounceStiffness`     | `3`                           | A multiplier to change the speed at which balls change direction |
+| `double? minBallRadius`       | `15`                          | The minimum size of a ball                                       |
+| `double? maxBallRadius`       | `40`                          | The maximum size of a ball                                       |
+| `double? glowRadius`          | `0.7`                         | A multiplier to indicate the radius of the glow                  |
+| `double? glowIntensity`       | `0.6`                         | The brightness of the glow around the ball                       |
+| `Widget? child`               |                               | A widget to be placed on top of the Metaballs widget             |
