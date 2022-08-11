@@ -20,7 +20,7 @@ and the Flutter guide for
 ## Installing:
 ```yaml
 dependencies:
-  metaballs: "^1.1.2"
+  metaballs: "^1.1.3"
 ```
 ```dart
 import 'package:metaballs/metaballs.dart';

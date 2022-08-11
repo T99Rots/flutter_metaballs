@@ -17,3 +17,7 @@
 ## 1.1.2
 
 * Fixed some outdated documentation part 2
+
+## 1.1.3
+
+* Fixed an issue with a missing dispose call on a animation controller
