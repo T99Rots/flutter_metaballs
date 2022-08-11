@@ -63,22 +63,15 @@ class _HomePageState extends State<HomePage> {
           });
         },
         child: Container(
-          decoration: BoxDecoration(
-            gradient: const RadialGradient(
-              center: Alignment(-0.5, 1),
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.bottomCenter,
               radius: 1.5,
               colors: [
                 Color.fromARGB(255, 13, 35, 61),
                 Colors.black,
               ]
-            ).lerpTo(const RadialGradient(
-              center: Alignment(0.5, 1),
-              radius: 1.5,
-              colors: [
-                Color.fromARGB(255, 71, 21, 58),
-                Colors.black,
-              ]
-            ), 0)
+            )
           ),
           child: Metaballs(
             glowRadius: 1,
