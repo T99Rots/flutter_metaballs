@@ -125,7 +125,7 @@ class Metaballs extends StatefulWidget {
     assert(minBallRadius >= 0),
     assert(glowRadius >= 0 && glowRadius <= 1),
     assert(glowIntensity >= 0 && glowIntensity <= 1),
-    assert(metaballs > 0 && metaballs < 128),
+    assert(metaballs > 0 && metaballs <= 128),
     super(key: key);
 
   @override
