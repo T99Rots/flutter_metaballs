@@ -103,6 +103,7 @@ class Metaballs extends StatefulWidget {
   final double bounceStiffness;
   final Widget? child;
   final Duration animationDuration;
+  final int metaballs;
 
   const Metaballs({
     Key? key,
@@ -115,8 +116,17 @@ class Metaballs extends StatefulWidget {
     this.glowRadius = 0.7,
     this.glowIntensity = 0.6,
     this.bounceStiffness = 3,
+    this.metaballs = 40,
     this.child
-  }) : super(key: key);
+  }) : 
+    assert(speedMultiplier >= 0),
+    assert(bounceStiffness > 0),
+    assert(maxBallRadius >= minBallRadius),
+    assert(minBallRadius >= 0),
+    assert(glowRadius >= 0 && glowRadius <= 1),
+    assert(glowIntensity >= 0 && glowIntensity <= 1),
+    assert(metaballs > 0 && metaballs <= 128),
+    super(key: key);
 
   @override
   State<Metaballs> createState() => _MetaBallsState();
@@ -140,7 +150,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
       print('shader error: $error');
     });
 
-    _metaBalls = List.generate(40, (_) => _MetaBall());
+    _metaBalls = List.generate(widget.metaballs, (_) => _MetaBall());
     super.initState();
   }
 
@@ -148,6 +158,21 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant Metaballs oldWidget) {
+    if(_metaBalls.length != widget.metaballs) {
+      final difference = widget.metaballs - _metaBalls.length;
+      if(difference < 0) {
+        _metaBalls.removeRange(_metaBalls.length + difference, _metaBalls.length);
+      } else {
+        for(int i = 0; i < difference; i++) {
+          _metaBalls.add(_MetaBall());
+        }
+      }
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -168,16 +193,15 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                     final frameTime = min(currentFrame - _lastFrame, 0.25);
                     _lastFrame = currentFrame;
 
-                    final List<double> doubles = [
-                      _controller.value,
-                      size.width,
-                      size.height,
-                      min(max(1-widget.glowRadius, 0), 1),
-                      min(max(widget.glowIntensity, 0), 1),
-                    ];
+                    final List<double> doubles = List.filled(4 + (128 * 3), 0.0);
 
-                    for(final metaBall in _metaBalls) {
-                      final computed = metaBall.update(
+                    doubles[0] = _controller.value;
+                    doubles[1] = min(max(1-widget.glowRadius, 0), 1);
+                    doubles[2] = min(max(widget.glowIntensity, 0), 1);
+                    doubles[3] = _metaBalls.length.toDouble();
+
+                    for(int i = 0; i < _metaBalls.length; i++) {
+                      final computed = _metaBalls[i].update(
                         canvasSize: size,
                         frameTime: frameTime,
                         maxRadius: widget.maxBallRadius,
@@ -185,9 +209,10 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                         speedMultiplier: widget.speedMultiplier,
                         bounceStiffness: widget.bounceStiffness
                       );
-                      doubles.add(computed.x);
-                      doubles.add(computed.y);
-                      doubles.add(computed.r);
+                      final int offset = (i*3)+4;
+                      doubles[offset] = computed.x;
+                      doubles[offset + 1] = computed.y;
+                      doubles[offset + 2] = computed.r;
                     }
 
                     return ShaderMask(

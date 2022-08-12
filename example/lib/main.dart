@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
             glowIntensity: 0.6,
             maxBallRadius: 50,
             minBallRadius: 20,
+            metaballs: 40,
             color: Colors.grey,
             gradient: LinearGradient(
               colors: colorStops[index],
