@@ -21,3 +21,7 @@
 ## 1.1.3
 
 * Fixed an issue with a missing dispose call on a animation controller
+
+## 1.2.0
+
+* Added support for a custom amount of metaballs
