@@ -12,6 +12,7 @@ and the Flutter guide for
 -->
 
 # Animated Metaballs for Flutter
+[![Pub Version](https://img.shields.io/pub/v/metaballs?color=3c90ff)](https://pub.dev/packages/metaballs)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/T99Rots/readme_data/main/flutter/metaballs/metaballs.webp" width="360px">
