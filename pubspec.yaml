@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  js: ^0.6.4
 
 dev_dependencies:
   flutter_lints: ^2.0.0
