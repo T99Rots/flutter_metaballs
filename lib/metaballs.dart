@@ -80,17 +80,39 @@ class _MetaBall {
   }
 }
 
+/// A metaballs implementation for flutter using webgl on the web and the shader package on other devices
 class Metaballs extends StatefulWidget {
+  /// The color of the metaballs
   final Color color;
+
+  /// A gradient for coloring the metaballs, overwrites color
   final Gradient? gradient;
+
+  /// A multiplier to indicate the radius of the glow
   final double glowRadius;
+
+  /// The brightness of the glow around the ball
   final double glowIntensity;
+
+  /// The minimum size of a ball
   final double minBallRadius;
+
+  /// The maximum size of a ball
   final double maxBallRadius;
+
+  /// A multiplier of the ball movement speed
   final double speedMultiplier;
+
+  /// A multiplier to change the speed at which balls change direction
   final double bounceStiffness;
+
+  /// A widget to be placed on top of the Metaballs widget
   final Widget? child;
+
+  /// The duration of the color changing animation
   final Duration animationDuration;
+  
+  /// The amount of metaballs
   final int metaballs;
 
   const Metaballs({
@@ -175,7 +197,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
 
               return MetaballsRenderer(
                 key: _key,
-                time: _controller.value,
+                time: currentFrame,
                 gradient: widget.gradient,
                 color: widget.color,
                 animationDuration: widget.animationDuration,

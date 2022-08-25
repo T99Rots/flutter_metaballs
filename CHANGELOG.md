@@ -33,3 +33,5 @@
 ## 1.3.1
 
 * Fixed gestures not being passed to widgets up the widget tree on web
+* Added more dart docs
+* Added live example to readme

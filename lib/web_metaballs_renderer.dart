@@ -11,15 +11,34 @@ import 'package:flutter/widgets.dart' hide Element;
 
 int _counter = 0;
 
+/// The native metaballs rendering widget
 class MetaballsRenderer extends StatefulWidget {
+  /// Value that increments over time used as a random component in dithering
   final double time;
+
+  /// A gradient for coloring the metaballs, overwrites color
   final Gradient? gradient;
+
+  /// The color of the metaballs
   final Color color;
+
+  /// A list with computed metaball states passed on to the shader
   final List<MetaBallComputedState> metaballs;
+
+  /// A multiplier to indicate the radius of the glow
   final double glowRadius;
+
+  /// The brightness of the glow around the ball
   final double glowIntensity;
+
+  /// The duration of the color changing animation
   final Duration animationDuration;
+
+  /// Size of the rendering canvas
   final Size size;
+
+  /// The device pixel ratio, only used on web to increase the resolution of
+  /// the output on the canvas
   final double pixelRatio;
 
   const MetaballsRenderer({
