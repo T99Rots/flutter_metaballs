@@ -29,3 +29,7 @@
 ## 1.3.0
 
 * Added partial support for web through webgl
+
+## 1.3.1
+
+* Fixed gestures not being passed to widgets up the widget tree on web
