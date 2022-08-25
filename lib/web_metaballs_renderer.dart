@@ -14,13 +14,13 @@ import 'package:metaballs/metaballs.dart';
 
 int counter = 0;
 
-class BiasScaleResult {
-  final double bias;
-  final double scale;
+class ColorAndGradient {
+  final Color color;
+  final Gradient? gradient;
 
-  BiasScaleResult({
-    required this.bias,
-    required this.scale,
+  ColorAndGradient({
+    this.gradient,
+    required this.color,
   });
 }
 
@@ -83,10 +83,12 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
   late UniformLocation _timeHandle;
   late Size _scaledSize;
 
-  late Color targetColor;
-  late Gradient? targetGradient;
-  late Color startColor;
-  late Gradient? startGradient;
+  late Color _targetColor;
+  late Gradient? _targetGradient;
+  late Color _startColor;
+  late Gradient? _startGradient;
+
+  late AnimationController _animationController;
 
   void _setScaledSize () {
     _scaledSize = widget.size * widget.pixelRatio;
@@ -94,8 +96,9 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
 
   @override
   void initState() {
-    targetColor = widget.color;
-    targetGradient = widget.gradient;
+    _startColor = _targetColor = widget.color;
+    _startGradient = _targetGradient = widget.gradient;
+    _animationController = AnimationController(vsync: this, duration: widget.animationDuration);
 
     _setScaledSize();
 
@@ -103,7 +106,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
       width: _scaledSize.width.toInt(),
       height: _scaledSize.height.toInt(),
     );
-    
+
     _gl = WebGL2RenderingContext(
       context: _canvasElement.getContext('webgl2')
     );
@@ -112,6 +115,8 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     _draw();
 
     _id = 'metaballs/instance:$counter';
+    _canvasElement.id = _id;
+    _canvasElement.style.pointerEvents = 'none';
     counter++;
     _canvasElement.width = _scaledSize.width.floor();
     _canvasElement.height = _scaledSize.height.floor();
@@ -122,6 +127,58 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     );
 
     super.initState();
+  }
+
+  ColorAndGradient _getCurrentColorAndGradient() {
+    Gradient? gradient;
+    Color color;
+
+    if(_animationController.isAnimating) {
+      if(_targetGradient != null) {
+        if(_startGradient != null) {
+          if(_startGradient is LinearGradient && _targetGradient is LinearGradient) {
+            gradient = (_startGradient as LinearGradient).lerpTo(_targetGradient as LinearGradient, _animationController.value);
+          } else if(_startGradient is RadialGradient && _targetGradient is RadialGradient) {
+            gradient = (_startGradient as RadialGradient).lerpTo(_targetGradient as RadialGradient, _animationController.value);
+          } else if(_startGradient is LinearGradient && _targetGradient is LinearGradient) {
+            gradient = (_startGradient as LinearGradient).lerpTo(_targetGradient as LinearGradient, _animationController.value);
+          } else {
+            gradient = _targetGradient;
+          }
+        } else {
+          gradient = _targetGradient;
+        }
+      }
+      color = Color.lerp(_startColor, _targetColor, _animationController.value)!;
+    } else {
+      gradient = _targetGradient;
+      color = _targetColor;
+    }
+
+    return ColorAndGradient(color: color, gradient: gradient);
+  }
+
+  @override
+  void didUpdateWidget(covariant MetaballsRenderer oldWidget) {
+    if(oldWidget.color != widget.color || oldWidget.gradient != widget.gradient) {
+      final colorAndGradient = _getCurrentColorAndGradient();
+      _startColor = colorAndGradient.color;
+      _startGradient = colorAndGradient.gradient;
+      _targetColor = widget.color;
+      _targetGradient = widget.gradient;
+      _animationController.forward(from: 0);
+    }
+    if(oldWidget.size != widget.size) {
+      _setScaledSize();
+      _canvasElement.width = _scaledSize.width.floor();
+      _canvasElement.height = _scaledSize.height.floor();
+      _gl.viewport(0, 0, _scaledSize.width.floor(), _scaledSize.height.floor());
+    }
+    if(oldWidget.animationDuration != widget.animationDuration) {
+      _animationController.duration = widget.animationDuration;
+    }
+    _draw();
+    super.didUpdateWidget(oldWidget);
   }
 
   Shader _compileShader(shaderSource, shaderType) {
@@ -229,16 +286,18 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     _gl.uniform1f(_glowIntensityHandle, min(max(widget.glowIntensity, 0), 1));
     _gl.uniform1f(_timeHandle, widget.time);
 
-    if(widget.gradient == null) {
+    final colorAndGradient = _getCurrentColorAndGradient();
+
+    if(colorAndGradient.gradient == null) {
       _gl.uniform1i(_gradientTypeHandle, 3);
       _gl.uniform4fv(_colorsHandle, Float32List.fromList([
-        widget.color.red / 255,
-        widget.color.green / 255,
-        widget.color.blue / 255,
-        widget.color.alpha / 255
+        colorAndGradient.color.red / 255,
+        colorAndGradient.color.green / 255,
+        colorAndGradient.color.blue / 255,
+        colorAndGradient.color.alpha / 255
       ]));
     } else {
-      final gradient = widget.gradient!;
+      final gradient = colorAndGradient.gradient!;
 
       final colorData = Float32List(4 * 32);
       final stopsData = Float32List(32);
@@ -316,15 +375,6 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     }
 
     _gl.drawArrays(_gl.TRIANGLE_STRIP, 0, 4);
-  }
-
-  @override
-  void didUpdateWidget(covariant MetaballsRenderer oldWidget) {
-    _draw();
-    _setScaledSize();
-    _canvasElement.width = _scaledSize.width.floor();
-    _canvasElement.height = _scaledSize.height.floor();
-    super.didUpdateWidget(oldWidget);
   }
 
   @override

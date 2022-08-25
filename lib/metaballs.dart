@@ -187,6 +187,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
               _lastFrame = currentFrame;
 
               return MetaballsRenderer(
+                key: _key,
                 time: _controller.value,
                 gradient: widget.gradient,
                 color: widget.color,

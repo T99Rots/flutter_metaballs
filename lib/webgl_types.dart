@@ -100,6 +100,10 @@ class WebGL2RenderingContext {
     return context.getAttribLocation(program.program, name);
   }
 
+  void viewport(int x, int y, int width, int height) {
+    context.viewport(x, y, width, height);
+  }
+
   void uniform1f(UniformLocation? location, num x) {
     context.uniform1f(location?.uniformLocation, x);
   }
