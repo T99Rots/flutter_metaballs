@@ -1,4 +1,3 @@
-library metaballs;
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';

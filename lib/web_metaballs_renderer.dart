@@ -1,4 +1,3 @@
-library metaballs;
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 import 'dart:math';
@@ -12,13 +11,13 @@ import 'dart_ui_shim.dart' as ui;
 import 'package:flutter/widgets.dart' hide Element;
 import 'package:metaballs/metaballs.dart';
 
-int counter = 0;
+int _counter = 0;
 
-class ColorAndGradient {
+class _ColorAndGradient {
   final Color color;
   final Gradient? gradient;
 
-  ColorAndGradient({
+  _ColorAndGradient({
     this.gradient,
     required this.color,
   });
@@ -107,6 +106,9 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
       height: _scaledSize.height.toInt(),
     );
 
+    _canvasElement.style.width = '100%';
+    _canvasElement.style.height = '100%';
+
     _gl = WebGL2RenderingContext(
       context: _canvasElement.getContext('webgl2')
     );
@@ -114,10 +116,10 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     _setup();
     _draw();
 
-    _id = 'metaballs/instance:$counter';
+    _id = 'metaballs/instance:$_counter';
     _canvasElement.id = _id;
     _canvasElement.style.pointerEvents = 'none';
-    counter++;
+    _counter++;
     _canvasElement.width = _scaledSize.width.floor();
     _canvasElement.height = _scaledSize.height.floor();
 
@@ -129,7 +131,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     super.initState();
   }
 
-  ColorAndGradient _getCurrentColorAndGradient() {
+  _ColorAndGradient _getCurrentColorAndGradient() {
     Gradient? gradient;
     Color color;
 
@@ -155,7 +157,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
       color = _targetColor;
     }
 
-    return ColorAndGradient(color: color, gradient: gradient);
+    return _ColorAndGradient(color: color, gradient: gradient);
   }
 
   @override

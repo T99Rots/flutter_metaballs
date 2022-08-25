@@ -21,7 +21,7 @@ and the Flutter guide for
 ## Installing:
 ```yaml
 dependencies:
-  metaballs: "^1.2.0"
+  metaballs: "^1.3.0"
 ```
 ```dart
 import 'package:metaballs/metaballs.dart';
@@ -63,3 +63,6 @@ Metaballs(
 | `double? glowRadius`          | `0.7`                         | 0 to 1          | A multiplier to indicate the radius of the glow                  |
 | `double? glowIntensity`       | `0.6`                         | 0 to 1          | The brightness of the glow around the ball                       |
 | `Widget? child`               |                               |                 | A widget to be placed on top of the Metaballs widget             |
+
+## Web support
+On web the gradients are currently manually implemented in webgl because `ShaderMask` is currently not supported on web. Because of that certain gradient features are currently not implemented like the `focal` and `focalRadius` options on the `RadialGradient` and the transform matrix on all gradients. Support for these options will probably be added in a later release but currently don't have high priority. If you depend on these features feel free to open a feature request or pull request on github.

@@ -25,3 +25,7 @@
 ## 1.2.0
 
 * Added support for a custom amount of metaballs
+
+## 1.3.0
+
+* Added partial support for web through webgl

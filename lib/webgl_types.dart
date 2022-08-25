@@ -168,4 +168,3 @@ class WebGL2RenderingContext {
     context.uniform4iv(location?.uniformLocation, list);
   }
 }
-
