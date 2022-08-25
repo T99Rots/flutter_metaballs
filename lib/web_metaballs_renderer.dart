@@ -4,24 +4,12 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:metaballs/metaballs_web_shader.frag.dart';
 import 'package:metaballs/metaballs_web_shader.vert.dart';
+import 'package:metaballs/types.dart';
 import 'package:metaballs/webgl_types.dart';
-
-import 'dart_ui_shim.dart' as ui;
-
+import 'package:metaballs/dart_ui_shim.dart' as ui;
 import 'package:flutter/widgets.dart' hide Element;
-import 'package:metaballs/metaballs.dart';
 
 int _counter = 0;
-
-class _ColorAndGradient {
-  final Color color;
-  final Gradient? gradient;
-
-  _ColorAndGradient({
-    this.gradient,
-    required this.color,
-  });
-}
 
 class MetaballsRenderer extends StatefulWidget {
   final double time;
@@ -131,7 +119,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     super.initState();
   }
 
-  _ColorAndGradient _getCurrentColorAndGradient() {
+  ColorAndGradient _getCurrentColorAndGradient() {
     Gradient? gradient;
     Color color;
 
@@ -157,7 +145,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
       color = _targetColor;
     }
 
-    return _ColorAndGradient(color: color, gradient: gradient);
+    return ColorAndGradient(color: color, gradient: gradient);
   }
 
   @override

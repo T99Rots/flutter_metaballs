@@ -1,3 +1,4 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 // Fake interface for the logic that this package needs from (web-only) dart:ui.

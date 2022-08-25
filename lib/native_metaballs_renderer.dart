@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/metaballs.dart';
 import 'package:metaballs/metaballs_shader_sprv.dart';
+import 'package:metaballs/types.dart';
 
 class MetaballsRenderer extends StatefulWidget {
   final double time;
@@ -43,6 +43,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
       // ignore: avoid_print
       print('shader error: $error');
     });
+    super.initState();
   }
 
   @override

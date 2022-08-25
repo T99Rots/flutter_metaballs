@@ -1,23 +1,10 @@
 library metaballs;
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'metaballs_shader_sprv.dart';
-import 'native_metaballs_renderer.dart' if (dart.library.html) 'web_metaballs_renderer.dart';
-
-class MetaBallComputedState {
-  final double x;
-  final double y;
-  final double r;
-
-  MetaBallComputedState({
-    required this.x,
-    required this.y,
-    required this.r,
-  });
-}
+import 'package:metaballs/native_metaballs_renderer.dart'
+  if (dart.library.html) 'package:metaballs/web_metaballs_renderer.dart';
+import 'package:metaballs/types.dart';
 
 class _MetaBall {
   late double _x;

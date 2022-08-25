@@ -24,12 +24,19 @@ class WebGL2RenderingContext {
   final dynamic context;
   WebGL2RenderingContext({this.context});
 
+  // ignore: non_constant_identifier_names
   int FRAGMENT_SHADER = 0x8B30;
+  // ignore: non_constant_identifier_names
   int VERTEX_SHADER = 0x8B31;
+  // ignore: non_constant_identifier_names
   int ARRAY_BUFFER = 0x8892;
+  // ignore: non_constant_identifier_names
   int STATIC_DRAW = 0x88E4;
+  // ignore: non_constant_identifier_names
   int COMPILE_STATUS = 0x8B81;
+  // ignore: non_constant_identifier_names
   int FLOAT = 0x1406;
+  // ignore: non_constant_identifier_names
   int TRIANGLE_STRIP = 0x0005;
 
   void attachShader(Program program, Shader shader) {
