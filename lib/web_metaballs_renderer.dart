@@ -369,6 +369,12 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return HtmlElementView(viewType: _id);
+    return Stack(
+      children: [
+        HtmlElementView(viewType: _id),
+        // fix for gestures not being passed to widgets up the widget tree
+        Container(color: const Color(0x00000000))
+      ],
+    );
   }
 }
