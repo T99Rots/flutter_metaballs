@@ -1,22 +1,10 @@
 library metaballs;
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'metaballs_shader_sprv.dart';
-
-class _MetaBallComputedState {
-  final double x;
-  final double y;
-  final double r;
-
-  _MetaBallComputedState({
-    required this.x,
-    required this.y,
-    required this.r,
-  });
-}
+import 'package:metaballs/native_metaballs_renderer.dart'
+  if (dart.library.html) 'package:metaballs/web_metaballs_renderer.dart';
+import 'package:metaballs/types.dart';
 
 class _MetaBall {
   late double _x;
@@ -38,7 +26,7 @@ class _MetaBall {
     _r = random.nextDouble();
   }
 
-  _MetaBallComputedState update({
+  MetaBallComputedState update({
     required double minRadius,
     required double maxRadius,
     required Size canvasSize,
@@ -88,7 +76,7 @@ class _MetaBall {
     final d = r * 2;
     final x = ((canvasSize.width - d) * _x) + r;
     final y = ((canvasSize.height - d) * _y) + r;
-    return _MetaBallComputedState(x: x, y: y, r: r);
+    return MetaBallComputedState(x: x, y: y, r: r);
   }
 }
 
@@ -135,7 +123,7 @@ class Metaballs extends StatefulWidget {
 class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
-  late Future<FragmentProgram> _fragmentProgramFuture;
+  final UniqueKey _key = UniqueKey();
 
   double _lastFrame = 0;
 
@@ -144,11 +132,6 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
     _controller = AnimationController.unbounded(
       duration: const Duration(days: 365), vsync: this
     )..animateTo(const Duration(days: 365).inSeconds.toDouble());
-
-    _fragmentProgramFuture = metaballsShaderFragmentProgram().catchError((error) {
-      // ignore: avoid_print
-      print('shader error: $error');
-    });
 
     _metaBalls = List.generate(widget.metaballs, (_) => _MetaBall());
     super.initState();
@@ -177,78 +160,52 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final futureBuilder = FutureBuilder<FragmentProgram>(
-      future: _fragmentProgramFuture,
-      builder: (context, snapshot) {
-        if(snapshot.hasData) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final size = Size(constraints.maxWidth, constraints.maxHeight);
+    final layoutBuilder = LayoutBuilder(
+      builder: (context, constraints) {
+        final size = Size(constraints.maxWidth, constraints.maxHeight);
+        final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
-              return SizedBox.expand(
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    final currentFrame = _controller.value;
-                    final frameTime = min(currentFrame - _lastFrame, 0.25);
-                    _lastFrame = currentFrame;
+        return SizedBox.expand(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              final currentFrame = _controller.value;
+              final frameTime = min(currentFrame - _lastFrame, 0.25);
+              _lastFrame = currentFrame;
 
-                    final List<double> doubles = List.filled(4 + (128 * 3), 0.0);
-
-                    doubles[0] = _controller.value;
-                    doubles[1] = min(max(1-widget.glowRadius, 0), 1);
-                    doubles[2] = min(max(widget.glowIntensity, 0), 1);
-                    doubles[3] = _metaBalls.length.toDouble();
-
-                    for(int i = 0; i < _metaBalls.length; i++) {
-                      final computed = _metaBalls[i].update(
-                        canvasSize: size,
-                        frameTime: frameTime,
-                        maxRadius: widget.maxBallRadius,
-                        minRadius: widget.minBallRadius,
-                        speedMultiplier: widget.speedMultiplier,
-                        bounceStiffness: widget.bounceStiffness
-                      );
-                      final int offset = (i*3)+4;
-                      doubles[offset] = computed.x;
-                      doubles[offset + 1] = computed.y;
-                      doubles[offset + 2] = computed.r;
-                    }
-
-                    return ShaderMask(
-                      blendMode: BlendMode.dstATop,
-                      shaderCallback: (bounds) {
-                        return snapshot.data!.shader(
-                          floatUniforms: Float32List.fromList(doubles),
-                        );
-                      },
-                      child: AnimatedContainer(
-                        duration: widget.animationDuration,
-                        decoration: BoxDecoration(
-                          gradient: widget.gradient,
-                          color: widget.color
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              return MetaballsRenderer(
+                key: _key,
+                time: _controller.value,
+                gradient: widget.gradient,
+                color: widget.color,
+                animationDuration: widget.animationDuration,
+                glowIntensity: widget.glowIntensity,
+                glowRadius: widget.glowRadius,
+                size: size,
+                pixelRatio: pixelRatio,
+                metaballs: _metaBalls.map((metaball) => metaball.update(
+                  canvasSize: size,
+                  frameTime: frameTime,
+                  maxRadius: widget.maxBallRadius,
+                  minRadius: widget.minBallRadius,
+                  speedMultiplier: widget.speedMultiplier,
+                  bounceStiffness: widget.bounceStiffness
+                )).toList(),
               );
-            }
-          );
-        } else {
-          return Container();
-        }
+            },
+          ),
+        );
       }
     );
     if(widget.child != null) {
       return Stack(
         children: [
-          futureBuilder,
+          layoutBuilder,
           widget.child!,
         ],
       );
     } else {
-      return futureBuilder;
+      return layoutBuilder;
     }
   }
 }
