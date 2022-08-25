@@ -14,6 +14,7 @@ class MetaballsRenderer extends StatefulWidget {
   final List<MetaBallComputedState> metaballs;
   final double glowRadius;
   final double glowIntensity;
+  final double pixelRatio;
   final Duration animationDuration;
   final Size size;
 
@@ -23,6 +24,7 @@ class MetaballsRenderer extends StatefulWidget {
     required this.time,
     required this.color,
     required this.metaballs,
+    required this.pixelRatio,
     required this.glowRadius,
     required this.glowIntensity,
     required this.animationDuration,

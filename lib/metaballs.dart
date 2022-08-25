@@ -136,6 +136,7 @@ class Metaballs extends StatefulWidget {
 class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
+  final UniqueKey _key = UniqueKey();
 
   double _lastFrame = 0;
 
@@ -175,6 +176,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
     final layoutBuilder = LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
+        final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
         return SizedBox.expand(
           child: AnimatedBuilder(
@@ -192,6 +194,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                 glowIntensity: widget.glowIntensity,
                 glowRadius: widget.glowRadius,
                 size: size,
+                pixelRatio: pixelRatio,
                 metaballs: _metaBalls.map((metaball) => metaball.update(
                   canvasSize: size,
                   frameTime: frameTime,

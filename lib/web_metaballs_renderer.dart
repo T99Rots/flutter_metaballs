@@ -1,16 +1,28 @@
 library metaballs;
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:metaballs/web_metaballs_api.dart';
+import 'package:metaballs/metaballs_web_shader.frag.dart';
+import 'package:metaballs/metaballs_web_shader.vert.dart';
+import 'package:metaballs/webgl_types.dart';
 
 import 'dart_ui_shim.dart' as ui;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide Element;
 import 'package:metaballs/metaballs.dart';
 
 int counter = 0;
-bool scriptInjected = false;
+
+class BiasScaleResult {
+  final double bias;
+  final double scale;
+
+  BiasScaleResult({
+    required this.bias,
+    required this.scale,
+  });
+}
 
 class MetaballsRenderer extends StatefulWidget {
   final double time;
@@ -21,6 +33,7 @@ class MetaballsRenderer extends StatefulWidget {
   final double glowIntensity;
   final Duration animationDuration;
   final Size size;
+  final double pixelRatio;
 
   const MetaballsRenderer({
     Key? key,
@@ -28,6 +41,7 @@ class MetaballsRenderer extends StatefulWidget {
     required this.time,
     required this.color,
     required this.metaballs,
+    required this.pixelRatio,
     required this.glowRadius,
     required this.glowIntensity,
     required this.animationDuration,
@@ -38,28 +52,69 @@ class MetaballsRenderer extends StatefulWidget {
   State<MetaballsRenderer> createState() => _MetaballsRendererState();
 }
 
-class _MetaballsRendererState extends State<MetaballsRenderer> {
+class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProviderStateMixin {
   late CanvasElement _canvasElement;
   late String _id;
-  late FLutterMetaballsWebRenderer _renderer;
+  late WebGL2RenderingContext _gl;
   
+  // basic coloring requirements
+  late UniformLocation _gradientTypeHandle;
+  late UniformLocation _colorsHandle;
+  late UniformLocation _stopsHandle;
+  late UniformLocation _gradientStopsHandle;
+  late UniformLocation _tileModeHandle;
+  
+  // required for linear gradient
+  late UniformLocation _gradientStartHandle;
+  late UniformLocation _gradientEndHandle;
+  
+  // required for radial gradient
+  late UniformLocation _radiusHandle;
+  
+  // required for sweeping gradient
+  late UniformLocation _biasHandle;
+  late UniformLocation _scaleHandle;
+  
+  // metaball values 
+  late UniformLocation _metaballsHandle;
+  late UniformLocation _metaballCountHandle;
+  late UniformLocation _minimumGlowSumHandle;
+  late UniformLocation _glowIntensityHandle;
+  late UniformLocation _timeHandle;
+  late Size _scaledSize;
+
+  late Color targetColor;
+  late Gradient? targetGradient;
+  late Color startColor;
+  late Gradient? startGradient;
+
+  void _setScaledSize () {
+    _scaledSize = widget.size * widget.pixelRatio;
+  }
+
   @override
   void initState() {
-    if(!scriptInjected) {
-      scriptInjected = true;
-      document.body!.append(ScriptElement()
-        ..src = 'assets/packages/metaballs/assets/metaballs_renderer.js'
-        ..type = 'application/javascript'
-        ..defer = true
-      );
-    }
+    targetColor = widget.color;
+    targetGradient = widget.gradient;
 
-    _canvasElement = CanvasElement();
+    _setScaledSize();
+
+    _canvasElement = CanvasElement(
+      width: _scaledSize.width.toInt(),
+      height: _scaledSize.height.toInt(),
+    );
+    
+    _gl = WebGL2RenderingContext(
+      context: _canvasElement.getContext('webgl2')
+    );
+
+    _setup();
+    _draw();
+
     _id = 'metaballs/instance:$counter';
     counter++;
-    _renderer = FLutterMetaballsWebRenderer(_canvasElement);
-    _canvasElement.width = widget.size.width.floor();
-    _canvasElement.height = widget.size.height.floor();
+    _canvasElement.width = _scaledSize.width.floor();
+    _canvasElement.height = _scaledSize.height.floor();
 
     ui.platformViewRegistry.registerViewFactory(
       _id,
@@ -69,55 +124,146 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
     super.initState();
   }
 
-  void _draw() {
-    final List<Vec3> metaballs = [];
+  Shader _compileShader(shaderSource, shaderType) {
+    final shader = _gl.createShader(shaderType);
+    _gl.shaderSource(shader, shaderSource);
+    _gl.compileShader(shader);
 
-    for(final metaball in widget.metaballs) {
-      metaballs.add(Vec3(
-        metaball.x,
-        metaball.y,
-        metaball.r,
-      ));
+    if(!(_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)?? false)) {
+      throw Exception("Shader compile failed with: ${_gl.getShaderInfoLog(shader) ?? 'Unknown error'}");
     }
 
-    late int gradientType;
+    return shader;
+  }
 
-    final List<Vec4> colors = [];
-    final List<double> stops = [];
-    int tileMode = 0;
-    Vec2 gradientStart = Vec2(0, 0);
-    Vec2 gradientEnd = Vec2(0, 0);
-    double radius = 0;
-    double bias = 0;
-    double scale = 0;
+  UniformLocation _getUniformLocation(Program program, String name) {
+    final location = _gl.getUniformLocation(program, name);
+    if(location == null) {
+      throw Exception('Can not find uniform $name.');
+    }
+    return location;
+  }
+
+  int _getAttribLocation(Program program, String name) {
+    final location = _gl.getAttribLocation(program, name);
+    if(location == -1) {
+      throw Exception('Can not find attribute $name.');
+    }
+    return location;
+  }
+
+  void _setup() {
+    final vertexShader = _compileShader(vertexShaderSource, _gl.VERTEX_SHADER);
+    final fragmentShader = _compileShader(fragmentShaderSource, _gl.FRAGMENT_SHADER);
+
+    final program = _gl.createProgram();
+
+    _gl.attachShader(program, vertexShader);
+    _gl.attachShader(program, fragmentShader);
+    _gl.linkProgram(program);
+    _gl.useProgram(program);
+
+    final vertexData = Float32List.fromList([
+      -1.0, 1.0, // top left
+      -1.0, -1.0, // bottom left
+      1.0, 1.0, // top right
+      1.0, -1.0, // bottom right
+    ]);
+
+    final vertexDataBuffer = _gl.createBuffer();
+    _gl.bindBuffer(_gl.ARRAY_BUFFER, vertexDataBuffer);
+    _gl.bufferData(_gl.ARRAY_BUFFER, vertexData, _gl.STATIC_DRAW);
+
+    final position = _getAttribLocation(program, 'position');
+    _gl.enableVertexAttribArray(position);
+    _gl.vertexAttribPointer(
+      position,
+      2, // position is a vec2
+      _gl.FLOAT, // each component is a float
+      false, // don't normalize values
+      2 * 4, // two 4 byte float components per vertex
+      0 // offset into each span of vertex data
+    );
+
+    // // basic coloring requirements
+    _gradientTypeHandle = _getUniformLocation(program, 'gradientType');
+    _colorsHandle = _getUniformLocation(program, 'colors');
+    _stopsHandle = _getUniformLocation(program, 'stops');
+    _gradientStopsHandle = _getUniformLocation(program, 'gradientStops');
+    _tileModeHandle = _getUniformLocation(program, 'tileMode');
+    
+    // required for linear gradient
+    _gradientStartHandle = _getUniformLocation(program, 'gradientStart');
+    _gradientEndHandle = _getUniformLocation(program, 'gradientEnd');
+    
+    // required for radial gradient
+    _radiusHandle = _getUniformLocation(program, 'radius');
+    
+    // required for sweeping gradient
+    _biasHandle = _getUniformLocation(program, 'bias');
+    _scaleHandle = _getUniformLocation(program, 'scale');
+    
+    // metaball values 
+    _metaballsHandle = _getUniformLocation(program, 'metaballs');
+    _metaballCountHandle = _getUniformLocation(program, 'metaballCount');
+    _minimumGlowSumHandle = _getUniformLocation(program, 'minimumGlowSum');
+    _glowIntensityHandle = _getUniformLocation(program, 'glowIntensity');
+    _timeHandle = _getUniformLocation(program, 'time');
+  }
+
+  void _draw() {
+    final metaballData = Float32List(3*128);
+    final int metaballCount = widget.metaballs.length;
+
+    for(int i = 0; i < metaballCount; i++) {
+      final int offset = i*3;
+      final metaball = widget.metaballs[i];
+      metaballData[offset] = metaball.x * widget.pixelRatio;
+      metaballData[offset + 1] = metaball.y * widget.pixelRatio;
+      metaballData[offset + 2] = metaball.r * widget.pixelRatio;
+    }
+
+    _gl.uniform3fv(_metaballsHandle, metaballData);
+    _gl.uniform1i(_metaballCountHandle, metaballCount);
+    _gl.uniform1f(_minimumGlowSumHandle, min(max(1-widget.glowRadius, 0), 1));
+    _gl.uniform1f(_glowIntensityHandle, min(max(widget.glowIntensity, 0), 1));
+    _gl.uniform1f(_timeHandle, widget.time);
 
     if(widget.gradient == null) {
-      gradientType = 3;
-      colors.add(Vec4(
+      _gl.uniform1i(_gradientTypeHandle, 3);
+      _gl.uniform4fv(_colorsHandle, Float32List.fromList([
         widget.color.red / 255,
         widget.color.green / 255,
         widget.color.blue / 255,
         widget.color.alpha / 255
-      ));
+      ]));
     } else {
       final gradient = widget.gradient!;
 
-      final hasStops = gradient.stops == null;
+      final colorData = Float32List(4 * 32);
+      final stopsData = Float32List(32);
+      final stopCount = gradient.colors.length;
+      final hasStops = gradient.stops != null;
 
-      for(int i = 0; i < gradient.colors.length; i++) {
+      for(int i = 0; i < stopCount; i++) {
         final color = gradient.colors[i];
-        colors.add(Vec4(
-          color.red / 255,
-          color.green / 255,
-          color.blue / 255,
-          color.alpha / 255
-        ));
+        final offset = i * 4;
+        colorData[offset] = color.red / 255;
+        colorData[offset + 1] = color.green / 255;
+        colorData[offset + 2] = color.blue / 255;
+        colorData[offset + 3] = color.alpha / 255;
+
         if(hasStops) {
-          stops.add(gradient.stops![i]);
+          stopsData[i] = gradient.stops![i];
         } else {
-          stops.add(min(i / (gradient.stops!.length - 1), 1));
+          stopsData[i] = min(i / (stopCount - 1), 1);
         }
       }
+
+      _gl.uniform4fv(_colorsHandle, colorData);
+      _gl.uniform1fv(_stopsHandle, stopsData);
+
+      _gl.uniform1i(_gradientStopsHandle, stopCount);
 
       int mapTileMode(TileMode tileMode) {
         switch(tileMode) {
@@ -132,57 +278,52 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
         }
       }
 
-      final shortestSide = min(widget.size.width, widget.size.height);
+      final shortestSide = min(_scaledSize.width, _scaledSize.height);
 
-      Vec2 convertAlignment (AlignmentGeometry alignment) {
+      Offset convertAlignment (AlignmentGeometry alignment) {
         final resolved = alignment.resolve(TextDirection.ltr);
-        return Vec2(
-          (widget.size.width * ((resolved.x * 0.5) + 0.5)),
-          (widget.size.height * ((-resolved.y * 0.5) + 0.5))
+        return Offset(
+          (_scaledSize.width * ((resolved.x * 0.5) + 0.5)),
+          (_scaledSize.height * ((-resolved.y * 0.5) + 0.5)),
         );
       }
 
       if(gradient is LinearGradient) {
-        tileMode = mapTileMode(gradient.tileMode);
-        gradientType = 0;
-        gradientStart = convertAlignment(gradient.begin);
-        gradientEnd = convertAlignment(gradient.end);
+        _gl.uniform1i(_tileModeHandle, mapTileMode(gradient.tileMode));
+        _gl.uniform1i(_gradientTypeHandle, 0);
+        final begin = convertAlignment(gradient.begin);
+        final end = convertAlignment(gradient.end);
+        _gl.uniform2f(_gradientStartHandle, begin.dx, begin.dy);
+        _gl.uniform2f(_gradientEndHandle, end.dx, end.dy);
       } else if(gradient is RadialGradient) {
-        tileMode = mapTileMode(gradient.tileMode);
-        gradientStart = convertAlignment(gradient.center);
-        radius = shortestSide * gradient.radius;
-        gradientType = 1;
+        _gl.uniform1i(_tileModeHandle, mapTileMode(gradient.tileMode));
+        _gl.uniform1i(_gradientTypeHandle, 1);
+        final center = convertAlignment(gradient.center);
+        _gl.uniform2f(_gradientStartHandle, center.dx, center.dy);
+        _gl.uniform1f(_radiusHandle, shortestSide * gradient.radius);
       } else if(gradient is SweepGradient) {
-        tileMode = mapTileMode(gradient.tileMode);
-        gradientStart = convertAlignment(gradient.center);
-        bias = -(gradient.startAngle / 360);
-        scale = 1 / ((gradient.endAngle / 360) + bias);
-        gradientType = 2;
+        _gl.uniform1i(_tileModeHandle, mapTileMode(gradient.tileMode));
+        _gl.uniform1i(_gradientTypeHandle, 2);
+        final center = convertAlignment(gradient.center);
+        _gl.uniform2f(_gradientStartHandle, center.dx, center.dy);
+        final bias = -(gradient.startAngle / 360);
+        final scale = 1 / ((gradient.endAngle / 360) + bias);
+        _gl.uniform1f(_biasHandle, bias);
+        _gl.uniform1f(_scaleHandle, scale);
+      } else {
+        throw Exception('unsupported implementation of gradient');
       }
     }
 
-    _renderer.draw(
-      metaballs,
-      min(max(1-widget.glowRadius, 0), 1),
-      min(max(widget.glowIntensity, 0), 1),
-      widget.time,
-      gradientType,
-      colors,
-      stops,
-      tileMode,
-      gradientStart,
-      gradientEnd,
-      radius,
-      bias,
-      scale
-    );
+    _gl.drawArrays(_gl.TRIANGLE_STRIP, 0, 4);
   }
 
   @override
   void didUpdateWidget(covariant MetaballsRenderer oldWidget) {
     _draw();
-    _canvasElement.width = widget.size.width.floor();
-    _canvasElement.height = widget.size.height.floor();
+    _setScaledSize();
+    _canvasElement.width = _scaledSize.width.floor();
+    _canvasElement.height = _scaledSize.height.floor();
     super.didUpdateWidget(oldWidget);
   }
 
