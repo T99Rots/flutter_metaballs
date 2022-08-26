@@ -6,6 +6,90 @@ import 'package:metaballs/native_metaballs_renderer.dart'
   if (dart.library.html) 'package:metaballs/web_metaballs_renderer.dart';
 import 'package:metaballs/types.dart';
 
+abstract class MetaballsEffect {
+  MetaballsEffect();
+
+  /// An effect that increases the size of the metaballs in an outgoing ripple when touching the screen
+  factory MetaballsEffect.ripple({
+    double speed = 1,
+    double width = 1,
+    double growthFactor = 1,
+    Duration fade = const Duration(seconds: 2)
+  }) => MetaballsTabRippleEffect(
+    fade: fade,
+    growthFactor: growthFactor,
+    speed: speed,
+    width: width
+  );
+
+  /// An effect that increases the size of the metaballs around the mouse cursor
+  factory MetaballsEffect.grow({
+    double radius = 0.5,
+    double growthFactor = 0.5,
+    double smoothing = 0.2,
+  }) => MetaballsMouseGrowEffect(
+    radius: radius,
+    growthFactor: growthFactor,
+    smoothing: smoothing,
+  );
+}
+
+/// An effect that increases the size of the metaballs around the mouse cursor
+class MetaballsMouseGrowEffect extends MetaballsEffect {
+  /// The radius around the mouse in which the metaballs get scaled
+  final double radius;
+
+  /// The multiplier of the growing effect of the metaballs
+  final double growthFactor;
+
+  /// The amount the movement gets smoothed
+  final double smoothing;
+
+  MetaballsMouseGrowEffect({
+    this.radius = 0.5,
+    this.growthFactor = 0.5,
+    this.smoothing = 0.2,
+  }):
+    assert(smoothing >= 0 && smoothing <= 1),
+    assert(radius > 0),
+    assert(growthFactor > 0);
+}
+
+/// An effect that increases the size of the metaballs in an outgoing ripple when touching the screen
+class MetaballsTabRippleEffect extends MetaballsEffect {
+  /// The multiplier of the speed of the ripple effect
+  final double speed;
+
+  /// The multiplier of the ripple width
+  final double width;
+
+  /// The multiplier of the growing effect of the metaballs
+  final double growthFactor;
+
+  /// The time before the ripple is completely faded away
+  final Duration fade;
+
+  MetaballsTabRippleEffect({
+    this.speed = 1,
+    this.width = 1,
+    this.growthFactor = 1,
+    this.fade = const Duration(seconds: 2)
+  }):
+    assert(speed > 0),
+    assert(width > 0),
+    assert(growthFactor > 0);
+}
+
+class _Ripple {
+  final Offset origin;
+  final double creationTime;
+
+  _Ripple({
+    required this.creationTime,
+    required this.origin,
+  });
+}
+
 class _MetaBall {
   late double _x;
   late double _y;
@@ -14,6 +98,7 @@ class _MetaBall {
   late double _r;
   late double _vxm;
   late double _vym;
+  double _rm = 1;
 
   _MetaBall() {
     final random = Random();
@@ -31,8 +116,13 @@ class _MetaBall {
     required double maxRadius,
     required Size canvasSize,
     required double frameTime,
+    required double time,
     required double speedMultiplier,
     required double bounceStiffness,
+    required Offset mousePosition,
+    required List<_Ripple> ripples,
+    required bool hovering,
+    MetaballsEffect? effect,
   }) {
     assert(maxRadius >= minRadius);
     
@@ -72,10 +162,41 @@ class _MetaBall {
 
     // transform the local state relative to canvas
     final scale = sqrt(canvasSize.width * canvasSize.height) / 1000;
-    final r = (((maxRadius - minRadius) * _r) + minRadius) * scale;
+    double r = (((maxRadius - minRadius) * _r) + minRadius) * scale;
     final d = r * 2;
     final x = ((canvasSize.width - d) * _x) + r;
     final y = ((canvasSize.height - d) * _y) + r;
+
+    if(effect is MetaballsMouseGrowEffect) {
+      double target = 1;
+      if(hovering) {
+        final dx = mousePosition.dx - x;
+        final dy = mousePosition.dy - y;
+        target = max(
+          0,
+          effect.growthFactor - (
+            (
+              sqrt(dx * dx + dy * dy) / (canvasSize.shortestSide * effect.radius)
+            ) * effect.growthFactor
+          )
+        ) + 1;
+      }
+      _rm+=(target - _rm)*frameTime * (1 / effect.smoothing);
+      r*=_rm;
+    } else if(effect is MetaballsTabRippleEffect) {
+      // double t = 1;
+      for(final ripple in ripples) {
+        final dx = ripple.origin.dx - x;
+        final dy = ripple.origin.dy - y;
+        final distance = min(1, 1 - (sqrt(dx * dx + dy * dy) / canvasSize.shortestSide));
+        final timeElapsed = time - ripple.creationTime;
+        final timeMultiplier = 1 - (timeElapsed / effect.fade.inSeconds);
+        final m2 = max(0, distance * (1 - timeMultiplier));
+        r*= 1 + (effect.growthFactor * distance);
+        // t = max(t, )
+      }
+    }
+
     return MetaBallComputedState(x: x, y: y, r: r);
   }
 }
@@ -115,6 +236,9 @@ class Metaballs extends StatefulWidget {
   /// The amount of metaballs
   final int metaballs;
 
+  /// The animated effects applied to the metaballs 
+  final MetaballsEffect? effect;
+
   const Metaballs({
     Key? key,
     this.color = const Color(0xff4285F4),
@@ -127,7 +251,8 @@ class Metaballs extends StatefulWidget {
     this.glowIntensity = 0.6,
     this.bounceStiffness = 3,
     this.metaballs = 40,
-    this.child
+    this.child,
+    this.effect,
   }) : 
     assert(speedMultiplier >= 0),
     assert(bounceStiffness > 0),
@@ -145,9 +270,12 @@ class Metaballs extends StatefulWidget {
 class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
+  Offset _mousePosition = Offset(0, 0);
+  final List<_Ripple> _ripples = [];
   final UniqueKey _key = UniqueKey();
-
+  
   double _lastFrame = 0;
+  bool _hovering = false;
 
   @override
   void initState() {
@@ -182,52 +310,113 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final layoutBuilder = LayoutBuilder(
+    Widget resultWidget = LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
         final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
         return SizedBox.expand(
           child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              final currentFrame = _controller.value;
-              final frameTime = min(currentFrame - _lastFrame, 0.25);
-              _lastFrame = currentFrame;
-
-              return MetaballsRenderer(
-                key: _key,
-                time: currentFrame,
-                gradient: widget.gradient,
-                color: widget.color,
-                animationDuration: widget.animationDuration,
-                glowIntensity: widget.glowIntensity,
-                glowRadius: widget.glowRadius,
-                size: size,
-                pixelRatio: pixelRatio,
-                metaballs: _metaBalls.map((metaball) => metaball.update(
-                  canvasSize: size,
-                  frameTime: frameTime,
-                  maxRadius: widget.maxBallRadius,
-                  minRadius: widget.minBallRadius,
-                  speedMultiplier: widget.speedMultiplier,
-                  bounceStiffness: widget.bounceStiffness
-                )).toList(),
-              );
-            },
-          ),
+              animation: _controller,
+              builder: (context, child) {
+                final time = _controller.value;
+                final frameTime = min(time - _lastFrame, 0.25);
+                _lastFrame = time;
+                
+                final effect = widget.effect;
+                // if(effect is MetaballsMouseGrowEffect) {
+                //   if(effect.smoothing == 0) {
+                //     _mousePosition = _targetMousePosition;
+                //   } else {
+                //     _mousePosition = Offset(
+                //       _mousePosition.dx + (_targetMousePosition.dx - _mousePosition.dx)*frameTime * (1 / effect.smoothing),
+                //       _mousePosition.dy + (_targetMousePosition.dy - _mousePosition.dy)*frameTime * (1 / effect.smoothing),
+                //     );
+                //   }
+                // } else
+                if (effect is MetaballsTabRippleEffect) {
+                  _ripples.removeWhere((ripple) => (time - ripple.creationTime) > effect.fade.inSeconds);
+                }
+          
+                return Stack(
+                  children: [
+                    MetaballsRenderer(
+                      key: _key,
+                      time: time,
+                      gradient: widget.gradient,
+                      color: widget.color,
+                      animationDuration: widget.animationDuration,
+                      glowIntensity: widget.glowIntensity,
+                      glowRadius: widget.glowRadius,
+                      size: size,
+                      pixelRatio: pixelRatio,
+                      metaballs: _metaBalls.map((metaball) => metaball.update(
+                        canvasSize: size,
+                        frameTime: frameTime,
+                        maxRadius: widget.maxBallRadius,
+                        minRadius: widget.minBallRadius,
+                        speedMultiplier: widget.speedMultiplier,
+                        bounceStiffness: widget.bounceStiffness,
+                        mousePosition: _mousePosition,
+                        effect: widget.effect,
+                        ripples: _ripples,
+                        hovering: _hovering,
+                        time: time
+                      )).toList(),
+                    ),
+                    // Positioned(
+                    //   top: _mousePosition.dy,
+                    //   left: _mousePosition.dx,
+                    //   child: Container(
+                    //     color: Color(0xff00ffff),
+                    //     width: 10,
+                    //     height: 10,
+                    //   )
+                    // )
+                  ],
+                );
+              },
+            ),
         );
       }
     );
+
     if(widget.child != null) {
-      return Stack(
+      resultWidget = Stack(
         children: [
-          layoutBuilder,
-          widget.child!,
+          resultWidget,
+          widget.child!
         ],
       );
-    } else {
-      return layoutBuilder;
     }
+
+    if(widget.effect is MetaballsMouseGrowEffect) {
+      resultWidget = MouseRegion(
+        onHover: (event) {
+          _mousePosition = event.localPosition;
+        },
+        onEnter: (event) {
+          _hovering = true;
+        },
+        onExit: (event) {
+          _hovering = false;
+        },
+        child: resultWidget
+      );
+    }
+
+    if(widget.effect is MetaballsTabRippleEffect) {
+      resultWidget = Listener(
+        onPointerDown: (event) {
+          _ripples.add(_Ripple(
+            creationTime: _controller.value,
+            origin: event.localPosition
+          ));
+        },
+        child: resultWidget
+      );
+    }
+
+    return resultWidget;
   }
 }
