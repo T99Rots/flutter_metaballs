@@ -73,7 +73,7 @@ class MetaballsTabRippleEffect extends MetaballsEffect {
     this.speed = 1,
     this.width = 1,
     this.growthFactor = 1,
-    this.fade = const Duration(seconds: 2)
+    this.fade = const Duration(milliseconds: 2000)
   }):
     assert(speed > 0),
     assert(width > 0),
@@ -184,15 +184,30 @@ class _MetaBall {
       _rm+=(target - _rm)*frameTime * (1 / effect.smoothing);
       r*=_rm;
     } else if(effect is MetaballsTabRippleEffect) {
-      // double t = 1;
+      double smooth (double t) => (sin((pi/2)*((t*2)-1))/2)+0.5;
       for(final ripple in ripples) {
+        final timeElapsed = time - ripple.creationTime;
+        final timeMultiplier = 1 - smooth(timeElapsed / (effect.fade.inMilliseconds / 1000));
+
         final dx = ripple.origin.dx - x;
         final dy = ripple.origin.dy - y;
-        final distance = min(1, 1 - (sqrt(dx * dx + dy * dy) / canvasSize.shortestSide));
-        final timeElapsed = time - ripple.creationTime;
-        final timeMultiplier = 1 - (timeElapsed / effect.fade.inSeconds);
-        final m2 = max(0, distance * (1 - timeMultiplier));
-        r*= 1 + (effect.growthFactor * distance);
+        final dist = sqrt(dx * dx + dy * dy);
+        final scaledDist = dist / canvasSize.shortestSide;
+        final distInverted = max(0, 1 - scaledDist);
+        final scaledWidth = effect.width * 5;
+        final distScaled2 = (distInverted * scaledWidth) - scaledWidth;
+        final distAndTime = distScaled2 + (timeElapsed * effect.speed * 5);
+        double target;
+        if(distAndTime > 1) {
+          target = max(0, 1 - (distAndTime - 1));
+        } else {
+          target = max(0, distAndTime);
+        }
+        final smoothTarget = smooth(target);
+        
+        // final distance = min(1, 1 - scaledDist);
+        // final m2 = max(0, distance * (1 - timeMultiplier));
+        r*= 1 + (smoothTarget * effect.growthFactor) * timeMultiplier;
         // t = max(t, )
       }
     }
@@ -335,7 +350,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                 //   }
                 // } else
                 if (effect is MetaballsTabRippleEffect) {
-                  _ripples.removeWhere((ripple) => (time - ripple.creationTime) > effect.fade.inSeconds);
+                  _ripples.removeWhere((ripple) => (time - ripple.creationTime) > (effect.fade.inMilliseconds / 1000));
                 }
           
                 return Stack(

@@ -74,12 +74,18 @@ class _HomePageState extends State<HomePage> {
             )
           ),
           child: Metaballs(
-            effect: MetaballsEffect.ripple(),
+            effect: MetaballsEffect.ripple(
+              // fade: Duration(milliseconds: 1200),
+              width: 0.5,
+              // speed: ,
+              growthFactor: 0.5
+            ),
             glowRadius: 1,
             glowIntensity: 0.6,
-            maxBallRadius: 20,
-            minBallRadius: 10,
-            metaballs: 128,
+            maxBallRadius: 40,
+            minBallRadius: 17,
+            metaballs: 60,
+            animationDuration: Duration(milliseconds: 1200),
             color: Colors.grey,
             gradient: LinearGradient(
               colors: colorStops[index],
