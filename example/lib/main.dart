@@ -90,17 +90,16 @@ class _HomePageState extends State<HomePage> {
             )
           ),
           child: Metaballs(
-            effect: MetaballsFollowMouseEffect(
-              speedupGrow: true,
-              smoothing: 0.5
+            effect: MetaballsEffect.follow(
+              growthFactor: 1,
+              radius: 0.5,
+              smoothing: 1
             ),
-            // effect: effects[effectIndex],
             glowRadius: 1,
             glowIntensity: 0.6,
             maxBallRadius: 40,
             minBallRadius: 17,
             metaballs: 60,
-            animationDuration: Duration(milliseconds: 1200),
             color: Colors.grey,
             gradient: LinearGradient(
               colors: colorStops[colorIndex],

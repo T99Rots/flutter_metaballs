@@ -26,7 +26,7 @@ abstract class MetaballsEffect {
   factory MetaballsEffect.grow({
     double radius = 0.5,
     double growthFactor = 0.5,
-    double smoothing = 0.2,
+    double smoothing = 1,
   }) => MetaballsMouseGrowEffect(
     radius: radius,
     growthFactor: growthFactor,
@@ -42,12 +42,12 @@ abstract class MetaballsEffect {
 
   /// Effect with which a single metaball will follow the cursor around the screen
   factory MetaballsEffect.follow({
-    smoothing = 1,
-    speedupGrow = false,
-    radius
+    double smoothing = 1,
+    double growthFactor = 1,
+    double? radius
   }) => MetaballsFollowMouseEffect(
     smoothing: smoothing,
-    speedupGrow: speedupGrow,
+    growthFactor: growthFactor,
     radius: radius
   );
 }
@@ -57,24 +57,25 @@ class MetaballsFollowMouseEffect extends MetaballsEffect {
   /// A smoothing that is applied to the movement of the following metaball
   final double smoothing;
 
-  /// When true increases the size of the metaball when the mouse moves faster
-  final bool speedupGrow;
-
   /// The size of the following metaball where 0 is the minBallRadius and 1 is the maxBallRadius
   final double? radius;
 
+  /// The multiplier of the growing effect of the following metaball when speed
+  final double growthFactor;
+
   MetaballsFollowMouseEffect({
     this.smoothing = 1,
-    this.speedupGrow = false,
-    this.radius
+    this.radius,
+    this.growthFactor = 1
   }):
     assert(smoothing >= 0),
+    assert(growthFactor >= 0),
     assert(radius == null || radius >= 0);
 }
 
 /// An effect that speeds up the movement of the metaballs when the mouse moves relative to how fast the mouse moves
 class MetaballsSpeedupEffect extends MetaballsEffect {
-  /// An multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves
+  /// A multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves
   final double speedup;
 
   MetaballsSpeedupEffect({
@@ -96,7 +97,7 @@ class MetaballsMouseGrowEffect extends MetaballsEffect {
   MetaballsMouseGrowEffect({
     this.radius = 0.5,
     this.growthFactor = 0.5,
-    this.smoothing = 0.2,
+    this.smoothing = 1,
   }):
     assert(smoothing >= 0 && smoothing <= 1),
     assert(radius > 0),
@@ -176,7 +177,7 @@ class _MetaBall {
     assert(maxRadius >= minRadius);
 
     if(effect is MetaballsSpeedupEffect) {
-      speedMultiplier*=1+(mouseDelta.distance / 30);
+      speedMultiplier*=1+((mouseDelta.distance / 30) * effect.speedup);
     }
 
     // update the meta ball position
@@ -235,7 +236,7 @@ class _MetaBall {
           )
         ) + 1;
       }
-      _rm+=(target - _rm)*frameTime * (1 / effect.smoothing);
+      _rm+=(target - _rm)*frameTime * (1 / (effect.smoothing / 5));
       r*=_rm;
     } else if(effect is MetaballsTabRippleEffect) {
       double smooth (double t) => (sin((pi/2)*((t*2)-1))/2)+0.5;
@@ -245,20 +246,11 @@ class _MetaBall {
 
         final dx = ripple.origin.dx - x;
         final dy = ripple.origin.dy - y;
-        final dist = sqrt(dx * dx + dy * dy);
-        final scaledDist = dist / canvasSize.shortestSide;
-        final distInverted = max(0, 1 - scaledDist);
+        final distInverted = max(0, 1 - (sqrt(dx * dx + dy * dy) / canvasSize.shortestSide));
         final scaledWidth = (1 / effect.width) * 5;
-        final distScaled2 = (distInverted * scaledWidth) - scaledWidth;
-        final distAndTime = distScaled2 + (timeElapsed * effect.speed * 5);
-        double target;
-        if(distAndTime > 1) {
-          target = max(0, 1 - (distAndTime - 1));
-        } else {
-          target = max(0, distAndTime);
-        }
-        final smoothTarget = smooth(target);        
-        r*= 1 + (smoothTarget * effect.growthFactor) * timeMultiplier;
+        final distAndTime = ((distInverted - 1) * scaledWidth) + (timeElapsed * effect.speed * 5);
+        final target = smooth(max(0, distAndTime > 1? 2 - distAndTime: distAndTime));
+        r*= 1 + (target * effect.growthFactor) * timeMultiplier;
       }
     }
 
@@ -422,8 +414,8 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                   _followPosition = _mousePosition;
                 } else {
                   _followPosition = Offset(
-                    _followPosition.dx + (_mousePosition.dx - _followPosition.dx)*frameTime * (5 / effect.smoothing),
-                    _followPosition.dy + (_mousePosition.dy - _followPosition.dy)*frameTime * (5 / effect.smoothing),
+                    _followPosition.dx + (_mousePosition.dx - _followPosition.dx)*frameTime * (7.5 / effect.smoothing),
+                    _followPosition.dy + (_mousePosition.dy - _followPosition.dy)*frameTime * (7.5 / effect.smoothing),
                   );
                 }
 
@@ -435,11 +427,11 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                   ) + widget.minBallRadius
                 ) * scale;
 
-                if(effect.speedupGrow) {
+                if(effect.growthFactor > 0) {
                   final dx = _followPosition.dx - oldPosition.dx ;
                   final dy = _followPosition.dy - oldPosition.dy ;
                   final moved = sqrt(dx * dx + dy * dy);
-                  final target = r * (1+(moved / 30));
+                  final target = r * (1+((moved / 50) * effect.growthFactor));
                   _followRadius+=(target - _followRadius) * frameTime * (5 + (effect.smoothing * 20));
                 } else {
                   _followRadius = r;
