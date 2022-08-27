@@ -10,7 +10,7 @@ layout(location = 1) uniform float minimumGlowSum;
 layout(location = 2) uniform float glowIntensity;
 layout(location = 3) uniform float metaballs;
 
-// Why are these defined seperatly? Because when using a vec3[128] the shader when loading in throws
+// Why are these defined seperatly? Because when using a vec3[129] the shader when loading in throws
 // "Not a supported op". The only place i've seen arrays being using in the flutter engine is in
 // https://github.com/flutter/engine/blob/main/lib/ui/fixtures/shaders/general_shaders/uniform_arrays.frag
 // but here opengl #version 100 core is used which is not supported by the shader package compiler
@@ -143,6 +143,7 @@ layout(location = 128) uniform vec3 metaball125;
 layout(location = 129) uniform vec3 metaball126;
 layout(location = 130) uniform vec3 metaball127;
 layout(location = 131) uniform vec3 metaball128;
+layout(location = 132) uniform vec3 metaball129;
 
 float addSum(vec3 metaball, vec2 coords) {
   float dx = metaball.x - coords.x;
@@ -420,6 +421,8 @@ float getSum(vec2 coords) {
   sum += addSum(metaball127, coords);
   if(metaballs < 128.0) return sum;
   sum += addSum(metaball128, coords);
+  if(metaballs < 129.0) return sum;
+  sum += addSum(metaball129, coords);
   return sum;
 }
 

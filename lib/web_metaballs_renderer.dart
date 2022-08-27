@@ -278,7 +278,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
   }
 
   void _draw() {
-    final metaballData = Float32List(3*128);
+    final metaballData = Float32List(3*129);
     final int metaballCount = widget.metaballs.length;
 
     for(int i = 0; i < metaballCount; i++) {

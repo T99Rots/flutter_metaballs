@@ -20,6 +20,16 @@ List<List<Color>> colorStops = [
   ]
 ];
 
+List<MetaballsEffect?> effects = [
+  MetaballsEffect.grow(),
+  MetaballsEffect.ripple(
+    width: 1.5,
+    speed: 2,
+    growthFactor: 0.125
+  ),
+  null
+];
+
 void main() {
   // enable dithering to smooth out the gradients and metaballs
   Paint.enableDithering = true;
@@ -49,7 +59,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int index = 0;
+  int colorIndex = 0;
+  int effectIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +68,14 @@ class _HomePageState extends State<HomePage> {
 
     return Material(
       child: GestureDetector(
+        onLongPress: () {
+          setState(() {
+            effectIndex=(effectIndex+1)%effects.length;
+          });
+        },
         onTap: () {
           setState(() {
-            index=(index+1)%colorStops.length;
+            colorIndex=(colorIndex+1)%colorStops.length;
           });
         },
         child: Container(
@@ -74,12 +90,11 @@ class _HomePageState extends State<HomePage> {
             )
           ),
           child: Metaballs(
-            effect: MetaballsEffect.ripple(
-              // fade: Duration(milliseconds: 1200),
-              width: 0.5,
-              // speed: ,
-              growthFactor: 0.5
+            effect: MetaballsFollowMouseEffect(
+              speedupGrow: true,
+              smoothing: 0.5
             ),
+            // effect: effects[effectIndex],
             glowRadius: 1,
             glowIntensity: 0.6,
             maxBallRadius: 40,
@@ -88,7 +103,7 @@ class _HomePageState extends State<HomePage> {
             animationDuration: Duration(milliseconds: 1200),
             color: Colors.grey,
             gradient: LinearGradient(
-              colors: colorStops[index],
+              colors: colorStops[colorIndex],
               begin: Alignment.bottomRight,
               end: Alignment.topLeft
             ),
