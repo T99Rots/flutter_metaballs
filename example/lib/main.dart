@@ -22,11 +22,9 @@ List<List<Color>> colorStops = [
 
 List<MetaballsEffect?> effects = [
   MetaballsEffect.grow(),
-  MetaballsEffect.ripple(
-    width: 1.5,
-    speed: 2,
-    growthFactor: 0.125
-  ),
+  MetaballsEffect.ripple(),
+  MetaballsEffect.follow(),
+  MetaballsEffect.speedup(),
   null
 ];
 
@@ -90,11 +88,8 @@ class _HomePageState extends State<HomePage> {
             )
           ),
           child: Metaballs(
-            effect: MetaballsEffect.follow(
-              growthFactor: 1,
-              radius: 0.5,
-              smoothing: 1
-            ),
+            effect: MetaballsEffect.grow(),
+            // effect: effects[effectIndex],
             glowRadius: 1,
             glowIntensity: 0.6,
             maxBallRadius: 40,

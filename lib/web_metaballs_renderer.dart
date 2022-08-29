@@ -278,14 +278,14 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
   }
 
   void _draw() {
-    final metaballData = Float32List(3*129);
+    final metaballData = Float32List(3*138);
     final int metaballCount = widget.metaballs.length;
 
     for(int i = 0; i < metaballCount; i++) {
       final int offset = i*3;
       final metaball = widget.metaballs[i];
       metaballData[offset] = metaball.x * widget.pixelRatio;
-      metaballData[offset + 1] = metaball.y * widget.pixelRatio;
+      metaballData[offset + 1] = (widget.size.height - metaball.y) * widget.pixelRatio;
       metaballData[offset + 2] = metaball.r * widget.pixelRatio;
     }
 

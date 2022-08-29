@@ -1,6 +1,7 @@
 library metaballs;
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/native_metaballs_renderer.dart'
   if (dart.library.html) 'package:metaballs/web_metaballs_renderer.dart';
@@ -139,6 +140,35 @@ class _Ripple {
   });
 }
 
+class _Pointer {
+  final double created;
+  Offset position;
+  Offset delta;
+  double timeDeleted = -1;
+  PointerDeviceKind kind;
+
+  _Pointer({
+    required this.created,
+    required this.delta,
+    required this.position,
+    required this.kind,
+  });
+}
+
+class _FollowEntry {
+  Offset position;
+  double radius;
+  double random;
+  _Pointer pointer;
+
+  _FollowEntry({
+    required this.position,
+    required this.radius,
+    required this.random,
+    required this.pointer,
+  });
+}
+
 class _MetaBall {
   late double _x;
   late double _y;
@@ -168,17 +198,11 @@ class _MetaBall {
     required double time,
     required double speedMultiplier,
     required double bounceStiffness,
-    required Offset mousePosition,
-    required Offset mouseDelta,
     required List<_Ripple> ripples,
-    required bool hovering,
+    required List<_Pointer> pointers,
     MetaballsEffect? effect,
   }) {
     assert(maxRadius >= minRadius);
-
-    if(effect is MetaballsSpeedupEffect) {
-      speedMultiplier*=1+((mouseDelta.distance / 30) * effect.speedup);
-    }
 
     // update the meta ball position
     final speed = frameTime*speedMultiplier*sqrt(canvasSize.aspectRatio);
@@ -224,17 +248,11 @@ class _MetaBall {
     // apply effect transformations
     if(effect is MetaballsMouseGrowEffect) {
       double target = 1;
-      if(hovering) {
-        final dx = mousePosition.dx - x;
-        final dy = mousePosition.dy - y;
-        target = max(
-          0,
-          effect.growthFactor - (
-            (
-              sqrt(dx * dx + dy * dy) / (canvasSize.shortestSide * effect.radius)
-            ) * effect.growthFactor
-          )
-        ) + 1;
+      for(final pointer in pointers) {
+        final dx = pointer.position.dx - x;
+        final dy = pointer.position.dy - y;
+        final newTarget = 1 + effect.growthFactor - ((sqrt(dx * dx + dy * dy) / (canvasSize.shortestSide * effect.radius)) * effect.growthFactor);
+        if(newTarget > target) target = newTarget;
       }
       _rm+=(target - _rm)*frameTime * (1 / (effect.smoothing / 5));
       r*=_rm;
@@ -328,20 +346,15 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   late List<_MetaBall> _metaBalls;
   late AnimationController _controller;
   final List<_Ripple> _ripples = [];
+  final Map<int, _Pointer> _pointers = {};
+  final List<_FollowEntry> _pointerFollowerMap = [];
   final GlobalKey _key = GlobalKey();
+  final Random _random = Random();
 
-  Offset _mousePosition = const Offset(0, 0);
-  Offset _followPosition = const Offset(0, 0);
-  Offset _mouseDelta = const Offset(0, 0);
-  double _followRadius = 0;
-  double _followRadiusMultiplier = 0;
   double _lastFrame = 0;
-  bool _hovering = false;
 
   @override
   void initState() {
-    _followRadiusMultiplier = Random().nextDouble();
-
     _controller = AnimationController.unbounded(
       duration: const Duration(days: 365), vsync: this
     )..animateTo(const Duration(days: 365).inSeconds.toDouble());
@@ -385,11 +398,17 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
               final time = _controller.value;
               final frameTime = min(time - _lastFrame, 0.25);
               _lastFrame = time;
+              double speedMultiplier = widget.speedMultiplier;
               
               final effect = widget.effect;
 
               if (effect is MetaballsTabRippleEffect) {
                 _ripples.removeWhere((ripple) => (time - ripple.creationTime) > (effect.fade.inMilliseconds / 1000));
+              } else if (effect is MetaballsSpeedupEffect) {
+                final averageDelta = _pointers.values.fold<double>(0, (total, accumulator) => accumulator.delta.distance + total);
+                double multiplier = 1+((averageDelta / size.shortestSide) * effect.speedup * 50) / _pointers.length;
+                if(multiplier.isNaN) multiplier = 1;
+                speedMultiplier*=multiplier;
               }
         
               final computedMetaballs = _metaBalls.map((metaball) => metaball.update(
@@ -397,56 +416,77 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
                 frameTime: frameTime,
                 maxRadius: widget.maxBallRadius,
                 minRadius: widget.minBallRadius,
-                speedMultiplier: widget.speedMultiplier,
+                speedMultiplier: speedMultiplier,
                 bounceStiffness: widget.bounceStiffness,
-                mousePosition: _mousePosition,
-                mouseDelta: _mouseDelta,
                 effect: widget.effect,
                 ripples: _ripples,
-                hovering: _hovering,
-                time: time
+                pointers: _pointers.values.toList(),
+                time: time,
               )).toList();
 
               if(effect is MetaballsFollowMouseEffect) {
-                final oldPosition = _followPosition;
+                int i = 0;
+                for(final follower in _pointerFollowerMap.toList()) {
+                  if(i++ == 9) break;
+                  final pointer = follower.pointer;
 
-                if(effect.smoothing == 0) {
-                  _followPosition = _mousePosition;
-                } else {
-                  _followPosition = Offset(
-                    _followPosition.dx + (_mousePosition.dx - _followPosition.dx)*frameTime * (7.5 / effect.smoothing),
-                    _followPosition.dy + (_mousePosition.dy - _followPosition.dy)*frameTime * (7.5 / effect.smoothing),
+                  final oldPosition = follower.position;
+
+                  if(effect.smoothing == 0) {
+                    follower.position = pointer.position;
+                  } else {
+                    follower.position = Offset(
+                      follower.position.dx + (pointer.position.dx - follower.position.dx)*frameTime * (7.5 / effect.smoothing),
+                      follower.position.dy + (pointer.position.dy - follower.position.dy)*frameTime * (7.5 / effect.smoothing),
+                    );
+                  }
+
+                  final scale = sqrt(size.width * size.height) / 1000;
+
+                  double r = (
+                    (
+                      (widget.maxBallRadius - widget.minBallRadius) * (effect.radius ?? follower.random)
+                    ) + widget.minBallRadius
+                  ) * scale;
+
+                  if(pointer.timeDeleted > 0) {
+                    final timeSinceDelete = time - pointer.timeDeleted;
+                    if(timeSinceDelete > 0.15) {
+                      _pointerFollowerMap.remove(follower);
+                      continue;
+                    } else {
+                      r *= 1 - (timeSinceDelete / 0.15);
+                    }
+                  } else {
+                    final timeSinceCreated = time - pointer.created;
+                    if(timeSinceCreated < 0.15) {
+                      r *= timeSinceCreated / 0.15;
+                    }
+                  }
+
+                  if(effect.growthFactor > 0) {
+                    final dx = follower.position.dx - oldPosition.dx ;
+                    final dy = follower.position.dy - oldPosition.dy ;
+                    final moved = sqrt(dx * dx + dy * dy);
+                    final target = r * (1+((moved / 50) * effect.growthFactor));
+                    follower.radius+=(target - follower.radius) * frameTime * (5 + (effect.smoothing * 20));
+                  } else {
+                    follower.radius = r;
+                  }
+
+                  computedMetaballs.add(
+                    MetaBallComputedState(
+                      x: follower.position.dx,
+                      y: follower.position.dy,
+                      r: follower.radius
+                    )
                   );
                 }
-
-                final scale = sqrt(size.width * size.height) / 1000;
-
-                double r = (
-                  (
-                    (widget.maxBallRadius - widget.minBallRadius) * (effect.radius ?? _followRadiusMultiplier)
-                  ) + widget.minBallRadius
-                ) * scale;
-
-                if(effect.growthFactor > 0) {
-                  final dx = _followPosition.dx - oldPosition.dx ;
-                  final dy = _followPosition.dy - oldPosition.dy ;
-                  final moved = sqrt(dx * dx + dy * dy);
-                  final target = r * (1+((moved / 50) * effect.growthFactor));
-                  _followRadius+=(target - _followRadius) * frameTime * (5 + (effect.smoothing * 20));
-                } else {
-                  _followRadius = r;
-                }
-
-                computedMetaballs.add(
-                  MetaBallComputedState(
-                    x: _followPosition.dx,
-                    y: _followPosition.dy,
-                    r: _followRadius
-                  )
-                );
               }
 
-              _mouseDelta = const Offset(0,0);
+              for(final pointer in _pointers.values) {
+                pointer.delta = const Offset(0, 0);
+              }
 
               return MetaballsRenderer(
                 key: _key,
@@ -475,40 +515,112 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
       );
     }
 
-    if(
-      widget.effect is MetaballsMouseGrowEffect
-      || widget.effect is MetaballsSpeedupEffect
-      || widget.effect is MetaballsFollowMouseEffect
-    ) {
-      resultWidget = MouseRegion(
-        onHover: (event) {
-          _mousePosition = event.localPosition;
-          _mouseDelta = event.delta;
+    if(widget.effect != null) {
+      resultWidget = _CombinedListener(
+        onPress: (event) {
+          if(widget.effect is MetaballsTabRippleEffect) {
+            _ripples.add(_Ripple(
+              creationTime: _controller.value,
+              origin: event.localPosition
+            ));
+          }          
         },
-        onEnter: (event) {
-          _hovering = true;
+        onMove: (PointerEvent event) {
+          if(event.delta.distance > 0 && _pointers.containsKey(event.pointer)) {
+            _pointers[event.pointer]!
+              ..delta = event.delta
+              ..position = event.position;
+          }
         },
-        onExit: (event) {
-          _hovering = false;
+        onAdd: (PointerEvent event) {
+          if(!_pointers.containsKey(event.pointer)) {
+            final pointer = _pointers[event.pointer] = _Pointer(
+              created: _controller.value,
+              delta: event.delta,
+              position: event.localPosition,
+              kind: event.kind
+            );
+            if(widget.effect is MetaballsFollowMouseEffect) {
+              _pointerFollowerMap.add(_FollowEntry(
+                position: pointer.position,
+                radius: 0,
+                random: _random.nextDouble(),
+                pointer: pointer
+              ));
+            }
+          }
         },
-        child: resultWidget
-      );
-    }
-
-    if(
-      widget.effect is MetaballsTabRippleEffect
-    ) {
-      resultWidget = Listener(
-        onPointerDown: (event) {
-          _ripples.add(_Ripple(
-            creationTime: _controller.value,
-            origin: event.localPosition
-          ));
+        onRemove: (event) {
+          _pointers.remove(event.pointer)?.timeDeleted = _controller.value;
         },
         child: resultWidget
       );
     }
 
     return resultWidget;
+  }
+}
+
+class _CombinedListener extends StatefulWidget {
+  final void Function(PointerEvent event)? onMove;
+  final void Function(PointerEvent event)? onAdd;
+  final void Function(PointerEvent event)? onRemove;
+  final void Function(PointerEvent event)? onPress;
+  final Widget? child;
+
+  const _CombinedListener({
+    Key? key,
+    this.onMove,
+    this.onAdd,
+    this.onRemove,
+    this.onPress,
+    this.child,
+  }) : super(key: key);
+
+  @override
+  State<_CombinedListener> createState() => _CombinedListenerState();
+}
+
+class _CombinedListenerState extends State<_CombinedListener> {
+  PointerEvent? _mouseEvent;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onExit: (event) {
+        if(_mouseEvent != null) {
+          widget.onRemove?.call(event);
+          _mouseEvent = null;
+        }
+      },
+      child: Listener(
+        onPointerDown: (event) {
+          if(event.kind == PointerDeviceKind.touch) {
+            widget.onAdd?.call(event);
+          }
+          widget.onPress?.call(event);
+        },
+        onPointerMove: (event) {
+          if(_mouseEvent != null && event.kind == PointerDeviceKind.mouse) {
+            widget.onMove?.call(event.copyWith(pointer: _mouseEvent!.pointer));
+          } else {
+            widget.onMove?.call(event);
+          }
+        },
+        onPointerCancel: widget.onRemove,
+        onPointerUp: widget.onRemove,
+        onPointerHover: (event) {
+          if(event.kind == PointerDeviceKind.mouse) {
+            if(_mouseEvent == null) {
+              widget.onAdd?.call(event);
+            } else {
+              widget.onMove?.call(event);
+            }
+            _mouseEvent = event;
+          }
+        },
+        child: widget.child,
+      ),
+    );
   }
 }

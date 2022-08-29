@@ -78,7 +78,7 @@ Metaballs(
 ## Effects
 <br>
 
-### `MetaballsEffect.follow`
+### `MetaballsEffect.follow()`
 In this effect there is 1 extra metaball which will follow your mouse cursor around
 | Property               | Default value | Accepted values | Description                                                                                |
 |------------------------|---------------|-----------------|--------------------------------------------------------------------------------------------|
@@ -89,7 +89,7 @@ In this effect there is 1 extra metaball which will follow your mouse cursor aro
 <br>
 <br>
 
-### `MetaballsEffect.speedup`
+### `MetaballsEffect.speedup()` (Doesn't work well with touch devices yet)
 In this effect all metaballs will speedup relative to how fast you move your mouse 
 | Property          | Default value | Accepted values | Description                                                                                                                  |
 |-------------------|---------------|-----------------|------------------------------------------------------------------------------------------------------------------------------|
@@ -98,7 +98,7 @@ In this effect all metaballs will speedup relative to how fast you move your mou
 <br>
 <br>
 
-### `MetaballsEffect.grow`
+### `MetaballsEffect.grow()` (Doesn't work with touch devices yet)
 In this effect all metaballs within a given radius increase their radius based on how close they are to the mouse cursor
 | Property               | Default value | Accepted values | Description                                                   |
 |------------------------|---------------|-----------------|---------------------------------------------------------------|
@@ -109,7 +109,7 @@ In this effect all metaballs within a given radius increase their radius based o
 <br>
 <br>
 
-### `MetaballsEffect.ripple`
+### `MetaballsEffect.ripple()` (Recommended for touch devices)
 In this effect all metaballs will increase and then decrease their radius in an outgoing ripple from a tab / mouse click
 | Property               | Default value                  | Accepted values | Description                                           |
 |------------------------|--------------------------------|-----------------|-------------------------------------------------------|

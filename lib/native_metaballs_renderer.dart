@@ -70,7 +70,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
       future: _fragmentProgramFuture,
       builder: (context, snapshot) {
         if(snapshot.hasData) {
-          final List<double> doubles = List.filled(4 + (129 * 3), 0.0);
+          final List<double> doubles = List.filled(4 + (138 * 3), 0.0);
 
           doubles[0] = widget.time;
           doubles[1] = min(max(1-widget.glowRadius, 0), 1);
