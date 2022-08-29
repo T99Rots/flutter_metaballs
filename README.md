@@ -79,7 +79,7 @@ Metaballs(
 <br>
 
 ### `MetaballsEffect.follow()`
-In this effect there is 1 extra metaball which will follow your mouse cursor around
+This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
 | Property               | Default value | Accepted values | Description                                                                                |
 |------------------------|---------------|-----------------|--------------------------------------------------------------------------------------------|
 | `double? smoothing`    | `1`           | 0 or more       | A smoothing that is applied to the movement of the following metaball                      |
@@ -89,8 +89,8 @@ In this effect there is 1 extra metaball which will follow your mouse cursor aro
 <br>
 <br>
 
-### `MetaballsEffect.speedup()` (Doesn't work well with touch devices yet)
-In this effect all metaballs will speedup relative to how fast you move your mouse 
+### `MetaballsEffect.speedup()`
+This effect makes all metaballs speedup relative to how fast you move your mouse or swipe on your touchscreen
 | Property          | Default value | Accepted values | Description                                                                                                                  |
 |-------------------|---------------|-----------------|------------------------------------------------------------------------------------------------------------------------------|
 | `double? speedup` | `1`           | Above 0         | A multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves |
@@ -98,8 +98,8 @@ In this effect all metaballs will speedup relative to how fast you move your mou
 <br>
 <br>
 
-### `MetaballsEffect.grow()` (Doesn't work with touch devices yet)
-In this effect all metaballs within a given radius increase their radius based on how close they are to the mouse cursor
+### `MetaballsEffect.grow()`
+This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
 | Property               | Default value | Accepted values | Description                                                   |
 |------------------------|---------------|-----------------|---------------------------------------------------------------|
 | `double? radius`       | `0.5`         | Above 0         | The radius around the mouse in which the metaballs get scaled |
@@ -109,8 +109,8 @@ In this effect all metaballs within a given radius increase their radius based o
 <br>
 <br>
 
-### `MetaballsEffect.ripple()` (Recommended for touch devices)
-In this effect all metaballs will increase and then decrease their radius in an outgoing ripple from a tab / mouse click
+### `MetaballsEffect.ripple()`
+This effect makes all metaballs increase and then decrease their radius in an outgoing ripple from a tab / mouse click
 | Property               | Default value                  | Accepted values | Description                                           |
 |------------------------|--------------------------------|-----------------|-------------------------------------------------------|
 | `double? speed`        | `1`                            | Above 0         | The multiplier of the speed of the ripple effect      |

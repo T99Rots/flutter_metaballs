@@ -10,7 +10,7 @@ import 'package:metaballs/types.dart';
 abstract class MetaballsEffect {
   MetaballsEffect();
 
-  /// An effect that increases the size of the metaballs in an outgoing ripple when touching the screen
+  /// This effect makes all metaballs increase and then decrease their radius in an outgoing ripple from a tab / mouse click
   factory MetaballsEffect.ripple({
     double speed = 1,
     double width = 1,
@@ -23,7 +23,7 @@ abstract class MetaballsEffect {
     width: width
   );
 
-  /// An effect that increases the size of the metaballs around the mouse cursor
+  /// This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
   factory MetaballsEffect.grow({
     double radius = 0.5,
     double growthFactor = 0.5,
@@ -34,14 +34,14 @@ abstract class MetaballsEffect {
     smoothing: smoothing,
   );
 
-  /// An effect that speeds up the movement of the metaballs when the mouse moves relative to how fast the mouse moves
+  /// This effect makes all metaballs speedup relative to how fast you move your mouse or swipe on your touchscreen
   factory MetaballsEffect.speedup({
     double speedup = 1
   }) => MetaballsSpeedupEffect(
     speedup: speedup
   );
 
-  /// Effect with which a single metaball will follow the cursor around the screen
+  /// This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
   factory MetaballsEffect.follow({
     double smoothing = 1,
     double growthFactor = 1,
@@ -53,7 +53,7 @@ abstract class MetaballsEffect {
   );
 }
 
-/// Effect with which a single metaball will follow the cursor around the screen
+/// This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
 class MetaballsFollowMouseEffect extends MetaballsEffect {
   /// A smoothing that is applied to the movement of the following metaball
   final double smoothing;
@@ -72,9 +72,19 @@ class MetaballsFollowMouseEffect extends MetaballsEffect {
     assert(smoothing >= 0),
     assert(growthFactor >= 0),
     assert(radius == null || radius >= 0);
+
+  @override
+  bool operator ==(Object other) => 
+    other is MetaballsFollowMouseEffect
+    && other.smoothing == smoothing
+    && other.radius == radius
+    && other.growthFactor == growthFactor;
+    
+  @override
+  int get hashCode => hashValues(smoothing, radius, growthFactor);
 }
 
-/// An effect that speeds up the movement of the metaballs when the mouse moves relative to how fast the mouse moves
+/// This effect makes all metaballs speedup relative to how fast you move your mouse or swipe on your touchscreen
 class MetaballsSpeedupEffect extends MetaballsEffect {
   /// A multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves
   final double speedup;
@@ -82,9 +92,17 @@ class MetaballsSpeedupEffect extends MetaballsEffect {
   MetaballsSpeedupEffect({
     this.speedup = 1
   }): assert(speedup > 0);
+
+  @override
+  bool operator ==(Object other) => 
+    other is MetaballsSpeedupEffect
+    && other.speedup == speedup;
+    
+  @override
+  int get hashCode => speedup.hashCode;
 }
 
-/// An effect that increases the size of the metaballs around the mouse cursor
+/// This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
 class MetaballsMouseGrowEffect extends MetaballsEffect {
   /// The radius around the mouse in which the metaballs get scaled
   final double radius;
@@ -103,9 +121,19 @@ class MetaballsMouseGrowEffect extends MetaballsEffect {
     assert(smoothing >= 0 && smoothing <= 1),
     assert(radius > 0),
     assert(growthFactor > 0);
+
+  @override
+  bool operator ==(Object other) => 
+    other is MetaballsMouseGrowEffect
+    && other.growthFactor == growthFactor
+    && other.radius == radius
+    && other.smoothing == smoothing;
+    
+  @override
+  int get hashCode => hashValues(growthFactor, radius, smoothing);
 }
 
-/// An effect that increases the size of the metaballs in an outgoing ripple when touching the screen
+/// This effect makes all metaballs increase and then decrease their radius in an outgoing ripple from a tab / mouse click
 class MetaballsTabRippleEffect extends MetaballsEffect {
   /// The multiplier of the speed of the ripple effect
   final double speed;
@@ -128,6 +156,17 @@ class MetaballsTabRippleEffect extends MetaballsEffect {
     assert(speed > 0),
     assert(width > 0),
     assert(growthFactor > 0);
+
+  @override
+  bool operator ==(Object other) => 
+    other is MetaballsTabRippleEffect
+    && other.speed == speed
+    && other.width == width
+    && other.growthFactor == growthFactor
+    && other.fade == fade;
+    
+  @override
+  int get hashCode => hashValues(speed, width, growthFactor, fade);
 }
 
 class _Ripple {
