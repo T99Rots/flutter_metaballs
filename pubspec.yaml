@@ -1,6 +1,6 @@
 name: metaballs
 description: A metaballs implementation for flutter using webgl on the web and the shader package on other devices
-version: 1.4.0
+version: 1.4.2
 homepage: https://github.com/T99Rots/flutter_metaballs
 
 environment:

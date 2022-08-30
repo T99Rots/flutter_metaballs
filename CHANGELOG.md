@@ -38,3 +38,9 @@
 
 ## 1.4.0
 * Implemented animated effects for the metaballs based on mouse or touch input
+
+## 1.4.1
+* Attempt at fixing broken tables in readme on pub.dev
+
+## 1.4.2
+* Yet another attempt at fixing broken tables in readme on pub.dev
