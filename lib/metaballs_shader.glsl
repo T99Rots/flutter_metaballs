@@ -10,7 +10,7 @@ layout(location = 1) uniform float minimumGlowSum;
 layout(location = 2) uniform float glowIntensity;
 layout(location = 3) uniform float metaballs;
 
-// Why are these defined seperatly? Because when using a vec3[128] the shader when loading in throws
+// Why are these defined seperatly? Because when using a vec3[138] the shader when loading in throws
 // "Not a supported op". The only place i've seen arrays being using in the flutter engine is in
 // https://github.com/flutter/engine/blob/main/lib/ui/fixtures/shaders/general_shaders/uniform_arrays.frag
 // but here opengl #version 100 core is used which is not supported by the shader package compiler
@@ -143,6 +143,16 @@ layout(location = 128) uniform vec3 metaball125;
 layout(location = 129) uniform vec3 metaball126;
 layout(location = 130) uniform vec3 metaball127;
 layout(location = 131) uniform vec3 metaball128;
+layout(location = 132) uniform vec3 metaball129;
+layout(location = 133) uniform vec3 metaball130;
+layout(location = 134) uniform vec3 metaball131;
+layout(location = 135) uniform vec3 metaball132;
+layout(location = 136) uniform vec3 metaball133;
+layout(location = 137) uniform vec3 metaball134;
+layout(location = 138) uniform vec3 metaball135;
+layout(location = 139) uniform vec3 metaball136;
+layout(location = 140) uniform vec3 metaball137;
+layout(location = 141) uniform vec3 metaball138;
 
 float addSum(vec3 metaball, vec2 coords) {
   float dx = metaball.x - coords.x;
@@ -420,6 +430,26 @@ float getSum(vec2 coords) {
   sum += addSum(metaball127, coords);
   if(metaballs < 128.0) return sum;
   sum += addSum(metaball128, coords);
+  if(metaballs < 129.0) return sum;
+  sum += addSum(metaball129, coords);
+  if(metaballs < 130.0) return sum;
+  sum += addSum(metaball130, coords);
+  if(metaballs < 131.0) return sum;
+  sum += addSum(metaball131, coords);
+  if(metaballs < 132.0) return sum;
+  sum += addSum(metaball132, coords);
+  if(metaballs < 133.0) return sum;
+  sum += addSum(metaball133, coords);
+  if(metaballs < 134.0) return sum;
+  sum += addSum(metaball134, coords);
+  if(metaballs < 135.0) return sum;
+  sum += addSum(metaball135, coords);
+  if(metaballs < 136.0) return sum;
+  sum += addSum(metaball136, coords);
+  if(metaballs < 137.0) return sum;
+  sum += addSum(metaball137, coords);
+  if(metaballs < 138.0) return sum;
+  sum += addSum(metaball138, coords);
   return sum;
 }
 

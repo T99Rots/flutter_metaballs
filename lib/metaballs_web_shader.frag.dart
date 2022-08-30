@@ -19,7 +19,7 @@ uniform float bias;
 uniform float scale;
 
 // metaball values 
-uniform vec3 metaballs[128];
+uniform vec3 metaballs[138];
 uniform int metaballCount;
 uniform float minimumGlowSum;
 uniform float glowIntensity;
@@ -106,7 +106,7 @@ void main(){
 
   float sum = 0.0;
 
-  for (int i = 0; i < 128; i++) {
+  for (int i = 0; i < 138; i++) {
     if(i < metaballCount) {
       vec3 metaball = metaballs[i];
       float dx = metaball.x - coords.x;
