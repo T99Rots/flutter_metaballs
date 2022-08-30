@@ -35,3 +35,6 @@
 * Fixed gestures not being passed to widgets up the widget tree on web
 * Added more dart docs
 * Added live example to readme
+
+## 1.4.0
+* Implemented animated effects for the metaballs based on mouse or touch input
