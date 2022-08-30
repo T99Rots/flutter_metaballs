@@ -18,6 +18,11 @@ and the Flutter guide for
   <img src="https://raw.githubusercontent.com/T99Rots/readme_data/main/flutter/metaballs/metaballs.webp" width="360px">
 </p>
 
+## About
+This library makes it easy to add well performing, highly configurable metaballs to your flutter project. The metaballs automatically scale to any screen size so you don't have to manually adjust the parameters for different devices. The metaballs have been implemented in shaders for the best performance across all devices. All available effects have been optimized for both mouse and touch input and should not interfere with any gesture detectors
+
+<br>
+
 ## Installing:
 ```yaml
 dependencies:
@@ -34,8 +39,8 @@ Metaballs(
   color: const Color.fromARGB(255, 66, 133, 244),
   effect: MetaballsEffect.follow(
     growthFactor: 1,
+    smoothing: 1,
     radius: 0.5,
-    smoothing: 1
   ),
   gradient: LinearGradient(
     colors: [
@@ -61,7 +66,7 @@ Metaballs(
 | Property                      | Default value                 | Accepted values | Description                                                      |
 |-------------------------------|-------------------------------|-----------------|------------------------------------------------------------------|
 | `Color? color`                | `Color(0xff4285F4)`           |                 | The color of the metaballs                                       |
-| `MetaballsEffect? effect`     |                               |                 | The animated effects applied to the metaballs                    |
+| `MetaballsEffect? effect`     |                               |                 | The animated effect applied to the metaballs                     |
 | `Gradient? gradient`          |                               |                 | A gradient for coloring the metaballs, overwrites color          |
 | `int? metaballs`              | `40`                          | 1 to 128        | The amount of metaballs                                          |
 | `Duration? animationDuration` | `Duration(milliseconds: 200)` |                 | The duration of the color changing animation                     |
@@ -82,8 +87,8 @@ Metaballs(
 This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
 | Property               | Default value | Accepted values | Description                                                                                |
 |------------------------|---------------|-----------------|--------------------------------------------------------------------------------------------|
-| `double? smoothing`    | `1`           | 0 or more       | A smoothing that is applied to the movement of the following metaball                      |
-| `double? growthFactor` | `1`           | 0 or more       | The multiplier of the growing effect of the following metaball when speed                  |
+| `double? smoothing`    | `1`           | 0 or more       | The amount the metaballs movement gets smoothed                                            |
+| `double? growthFactor` | `1`           | 0 or more       | The amount the metaballs grow relative to their movement speed                             |
 | `double? radius`       |               | 0 or more       | The size of the following metaball where 0 is the minBallRadius and 1 is the maxBallRadius |
 
 <br>
@@ -91,32 +96,32 @@ This effect adds a metaball for every cursor / touch and then follows that curso
 
 ### `MetaballsEffect.speedup()`
 This effect makes all metaballs speedup relative to how fast you move your mouse or swipe on your touchscreen
-| Property          | Default value | Accepted values | Description                                                                                                                  |
-|-------------------|---------------|-----------------|------------------------------------------------------------------------------------------------------------------------------|
-| `double? speedup` | `1`           | Above 0         | A multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves |
+| Property          | Default value | Accepted values | Description                                                           |
+|-------------------|---------------|-----------------|-----------------------------------------------------------------------|
+| `double? speedup` | `1`           | Above 0         | The amount the metaballs speed up relative to the mouse / swipe speed |
 
 <br>
 <br>
 
 ### `MetaballsEffect.grow()`
 This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
-| Property               | Default value | Accepted values | Description                                                   |
-|------------------------|---------------|-----------------|---------------------------------------------------------------|
-| `double? radius`       | `0.5`         | Above 0         | The radius around the mouse in which the metaballs get scaled |
-| `double? growthFactor` | `0.5`         | Above 0         | The multiplier of the growing effect of the metaballs         |
-| `double? smoothing`    | `1`           | 0 or more       | The amount the movement gets smoothed                         |
+| Property               | Default value | Accepted values | Description                                                              |
+|------------------------|---------------|-----------------|--------------------------------------------------------------------------|
+| `double? radius`       | `0.5`         | Above 0         | The radius around the mouse / touch in which the metaballs get scaled up |
+| `double? growthFactor` | `0.5`         | Above 0         | The amount by which the metaballs increase in size                       |
+| `double? smoothing`    | `1`           | 0 or more       | The amount the movement gets smoothed                                    |
 
 <br>
 <br>
 
 ### `MetaballsEffect.ripple()`
 This effect makes all metaballs increase and then decrease their radius in an outgoing ripple from a tab / mouse click
-| Property               | Default value                  | Accepted values | Description                                           |
-|------------------------|--------------------------------|-----------------|-------------------------------------------------------|
-| `double? speed`        | `1`                            | Above 0         | The multiplier of the speed of the ripple effect      |
-| `double? width`        | `1`                            | Above 0         | The multiplier of the ripple width                    |
-| `double? growthFactor` | `1`                            | Above 0         | The multiplier of the growing effect of the metaballs |
-| `Duration? fade`       | `Duration(milliseconds: 1200)` |                 | The time before the ripple is completely faded away   |
+| Property               | Default value                  | Accepted values | Description                                         |
+|------------------------|--------------------------------|-----------------|-----------------------------------------------------|
+| `double? speed`        | `1`                            | Above 0         | The speed of the ripple effect                      |
+| `double? width`        | `1`                            | Above 0         | The the ripple width                                |
+| `double? growthFactor` | `1`                            | Above 0         | The amount by which the metaballs grow              |
+| `Duration? fade`       | `Duration(milliseconds: 1200)` |                 | The time before the ripple is completely faded away |
 
 <br>
 <br>

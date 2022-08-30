@@ -55,13 +55,13 @@ abstract class MetaballsEffect {
 
 /// This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
 class MetaballsFollowMouseEffect extends MetaballsEffect {
-  /// A smoothing that is applied to the movement of the following metaball
+  /// The amount the metaballs movement gets smoothed
   final double smoothing;
 
-  /// The size of the following metaball where 0 is the minBallRadius and 1 is the maxBallRadius
+  /// The size of the following metaballs where 0 is the minBallRadius and 1 is the maxBallRadius
   final double? radius;
 
-  /// The multiplier of the growing effect of the following metaball when speed
+  /// The amount the metaballs grow relative to their movement speed
   final double growthFactor;
 
   MetaballsFollowMouseEffect({
@@ -86,7 +86,7 @@ class MetaballsFollowMouseEffect extends MetaballsEffect {
 
 /// This effect makes all metaballs speedup relative to how fast you move your mouse or swipe on your touchscreen
 class MetaballsSpeedupEffect extends MetaballsEffect {
-  /// A multiplier applied to the speedup effect, increasing it will increase the speed of the metaballs more when the mouse moves
+  /// The amount the metaballs speed up relative to the mouse / swipe speed
   final double speedup;
 
   MetaballsSpeedupEffect({
@@ -104,10 +104,10 @@ class MetaballsSpeedupEffect extends MetaballsEffect {
 
 /// This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
 class MetaballsMouseGrowEffect extends MetaballsEffect {
-  /// The radius around the mouse in which the metaballs get scaled
+  /// The radius around the mouse / touch in which the metaballs get scaled up
   final double radius;
 
-  /// The multiplier of the growing effect of the metaballs
+  /// The amount by which the metaballs increase in size
   final double growthFactor;
 
   /// The amount the movement gets smoothed
@@ -135,13 +135,13 @@ class MetaballsMouseGrowEffect extends MetaballsEffect {
 
 /// This effect makes all metaballs increase and then decrease their radius in an outgoing ripple from a tab / mouse click
 class MetaballsTabRippleEffect extends MetaballsEffect {
-  /// The multiplier of the speed of the ripple effect
+  /// The speed of the ripple effect
   final double speed;
 
-  /// The multiplier of the ripple width
+  /// The the ripple width
   final double width;
 
-  /// The multiplier of the growing effect of the metaballs
+  /// The amount by which the metaballs grow
   final double growthFactor;
 
   /// The time before the ripple is completely faded away
@@ -350,7 +350,7 @@ class Metaballs extends StatefulWidget {
   /// The amount of metaballs
   final int metaballs;
 
-  /// The animated effects applied to the metaballs 
+  /// The animated effect applied to the metaballs 
   final MetaballsEffect? effect;
 
   const Metaballs({
