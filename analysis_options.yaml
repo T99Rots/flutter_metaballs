@@ -1,4 +1,19 @@
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+
+analyzer:
+  strong-mode:
+    implicit-dynamic: false
+  errors:
+    missing_required_param: warning
+
+linter:
+  rules:
+    always_declare_return_types: true
+    always_specify_types: true
+    flutter_style_todos: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true

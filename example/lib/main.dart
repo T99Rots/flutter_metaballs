@@ -20,7 +20,7 @@ List<ColorsEffectPair> colorsAndEffects = [
       const Color.fromARGB(255, 255, 153, 0),
     ],
     effect: MetaballsEffect.follow(),
-    name: 'FOLLOW'
+    name: 'FOLLOW',
   ),
   ColorsEffectPair(
     colors: [
@@ -28,7 +28,7 @@ List<ColorsEffectPair> colorsAndEffects = [
       const Color.fromARGB(255, 255, 251, 0),
     ],
     effect: MetaballsEffect.grow(),
-    name: 'GROW'
+    name: 'GROW',
   ),
   ColorsEffectPair(
     colors: [
@@ -36,7 +36,7 @@ List<ColorsEffectPair> colorsAndEffects = [
       const Color.fromARGB(255, 120, 255, 255),
     ],
     effect: MetaballsEffect.speedup(),
-    name: 'SPEEDUP'
+    name: 'SPEEDUP',
   ),
   ColorsEffectPair(
     colors: [
@@ -44,7 +44,7 @@ List<ColorsEffectPair> colorsAndEffects = [
       const Color.fromARGB(255, 237, 120, 255),
     ],
     effect: MetaballsEffect.ripple(),
-    name: 'RIPPLE'
+    name: 'RIPPLE',
   ),
   ColorsEffectPair(
     colors: [
@@ -52,7 +52,7 @@ List<ColorsEffectPair> colorsAndEffects = [
       const Color.fromARGB(255, 255, 234, 214),
     ],
     effect: null,
-    name: 'NONE'
+    name: 'NONE',
   ),
 ];
 
@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
       child: GestureDetector(
         onDoubleTap: () {
           setState(() {
-            colorEffectIndex=(colorEffectIndex+1)%colorsAndEffects.length;
+            colorEffectIndex = (colorEffectIndex + 1) % colorsAndEffects.length;
           });
         },
         child: Container(
@@ -106,21 +106,24 @@ class _HomePageState extends State<HomePage> {
               colors: [
                 Color.fromARGB(255, 13, 35, 61),
                 Colors.black,
-              ]
-            )
+              ],
+            ),
           ),
           child: Metaballs(
-            effect: colorsAndEffects[colorEffectIndex].effect,
-            glowRadius: 1,
-            glowIntensity: 0.6,
-            maxBallRadius: 50,
-            minBallRadius: 20,
-            metaballs: 40,
-            color: Colors.grey,
-            gradient: LinearGradient(
-              colors: colorsAndEffects[colorEffectIndex].colors,
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft
+            config: MetaballsConfig(
+              effects: colorsAndEffects[colorEffectIndex].effect == null
+                  ? null
+                  : [colorsAndEffects[colorEffectIndex].effect!],
+              glowRadius: 1,
+              glowIntensity: 0.6,
+              radius: const Range(min: 20, max: 50),
+              metaballs: 40,
+              color: Colors.grey,
+              gradient: LinearGradient(
+                colors: colorsAndEffects[colorEffectIndex].colors,
+                begin: Alignment.bottomRight,
+                end: Alignment.topLeft,
+              ),
             ),
             child: Center(
               child: Column(
@@ -130,27 +133,17 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     'METABALLS',
                     style: TextStyle(
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.6),
-                          blurRadius: 80
-                        )
-                      ],
+                      shadows: [Shadow(color: Colors.black.withOpacity(0.6), blurRadius: 80)],
                       fontSize: 50 * width / 400,
-                      fontWeight: FontWeight.w900
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                   Text(
                     'DOUBLE TAP TO CHANGE EFFECT AND COLOR\nCURRENT EFFECT: ${colorsAndEffects[colorEffectIndex].name}',
                     style: TextStyle(
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.6),
-                          blurRadius: 80
-                        )
-                      ],
+                      shadows: [Shadow(color: Colors.black.withOpacity(0.6), blurRadius: 80)],
                       fontSize: 16 * width / 400,
-                      fontWeight: FontWeight.w900
+                      fontWeight: FontWeight.w900,
                     ),
                     textAlign: TextAlign.center,
                   ),
