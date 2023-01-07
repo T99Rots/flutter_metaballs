@@ -44,7 +44,9 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
   }
 
   Future<FragmentShader> _getShader() async {
-    final FragmentProgram fragmentProgram = await FragmentProgram.fromAsset('shaders/flutter/metaballs.frag');
+    final FragmentProgram fragmentProgram = await FragmentProgram.fromAsset(
+      'packages/metaballs/shaders/flutter/metaballs.frag',
+    );
     return fragmentProgram.fragmentShader();
   }
 

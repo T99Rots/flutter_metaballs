@@ -1,21 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 class CombinedListener extends StatefulWidget {
-  final void Function(PointerEvent event)? onMove;
-  final void Function(PointerEvent event)? onAdd;
-  final void Function(PointerEvent event)? onRemove;
-  final void Function(PointerEvent event)? onPress;
-  final Widget? child;
-
   const CombinedListener({
     Key? key,
-    this.onMove,
-    this.onAdd,
-    this.onRemove,
-    this.onPress,
     this.child,
+    required this.onPointerAdded,
+    required this.onTap,
   }) : super(key: key);
+
+  final Widget? child;
+
+  final void Function(Pointer pointer) onPointerAdded;
+  final void Function(TapEvent tabEvent) onTap;
 
   @override
   State<CombinedListener> createState() => CombinedListenerState();
@@ -27,34 +26,34 @@ class CombinedListenerState extends State<CombinedListener> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onExit: (event) {
+      onExit: (PointerExitEvent event) {
         if (_mouseEvent != null) {
-          widget.onRemove?.call(event);
+          onRemove.call(event);
           _mouseEvent = null;
         }
       },
       child: Listener(
-        onPointerDown: (event) {
+        onPointerDown: (PointerDownEvent event) {
           if (event.kind == PointerDeviceKind.touch) {
-            widget.onAdd?.call(event);
+            onAdd.call(event);
           }
-          widget.onPress?.call(event);
+          onPress.call(event);
         },
-        onPointerMove: (event) {
+        onPointerMove: (PointerMoveEvent event) {
           if (_mouseEvent != null && event.kind == PointerDeviceKind.mouse) {
-            widget.onMove?.call(event.copyWith(pointer: _mouseEvent!.pointer));
+            onMove.call(event.copyWith(pointer: _mouseEvent!.pointer));
           } else {
-            widget.onMove?.call(event);
+            onMove.call(event);
           }
         },
-        onPointerCancel: widget.onRemove,
-        onPointerUp: widget.onRemove,
-        onPointerHover: (event) {
+        onPointerCancel: onRemove,
+        onPointerUp: onRemove,
+        onPointerHover: (PointerHoverEvent event) {
           if (event.kind == PointerDeviceKind.mouse) {
             if (_mouseEvent == null) {
-              widget.onAdd?.call(event);
+              onAdd.call(event);
             } else {
-              widget.onMove?.call(event);
+              onMove.call(event);
             }
             _mouseEvent = event;
           }
@@ -63,4 +62,97 @@ class CombinedListenerState extends State<CombinedListener> {
       ),
     );
   }
+
+  void onMove(PointerEvent event) {}
+  void onAdd(PointerEvent event) {}
+  void onRemove(PointerEvent event) {}
+  void onPress(PointerEvent event) {}
+}
+
+class Pointer extends Stream<PointerUpdateEvent> {
+  Pointer({
+    required this.id,
+    required this.kind,
+    required Offset position,
+    required Animation<double> animation,
+  })  : _animation = animation,
+        _createdTime = animation.value,
+        _lastEvent = PointerUpdateEvent(
+          position: position,
+          delta: const Offset(0, 0),
+          time: animation.value,
+        ) {
+    _controller.add(_lastEvent);
+  }
+
+  final int id;
+  final PointerDeviceKind kind;
+
+  final StreamController<PointerUpdateEvent> _controller = StreamController<PointerUpdateEvent>();
+  final Animation<double> _animation;
+  final double _createdTime;
+
+  double? _removedTime;
+  PointerUpdateEvent _lastEvent;
+
+  double get createdTime => _createdTime;
+  double? get removedTime => _removedTime;
+
+  Offset get position => _lastEvent.position;
+  Offset get delta => _lastEvent.delta;
+
+  bool get removed => _removedTime != null;
+
+  @override
+  StreamSubscription<PointerUpdateEvent> listen(
+    void Function(PointerUpdateEvent event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    return _controller.stream.listen(
+      onData,
+      onDone: onDone,
+      onError: onError,
+      cancelOnError: cancelOnError,
+    );
+  }
+
+  void addEvent({
+    required Offset position,
+    required Offset delta,
+  }) {
+    _controller.add(_lastEvent = PointerUpdateEvent(
+      position: position,
+      delta: delta,
+      time: _animation.value,
+    ));
+  }
+
+  void remove() {
+    _controller.close();
+    _removedTime = _animation.value;
+  }
+}
+
+class TapEvent {
+  TapEvent({
+    required this.position,
+    required this.time,
+  });
+
+  final Offset position;
+  final double time;
+}
+
+class PointerUpdateEvent {
+  PointerUpdateEvent({
+    required this.position,
+    required this.delta,
+    required this.time,
+  });
+
+  final Offset position;
+  final Offset delta;
+  final double time;
 }

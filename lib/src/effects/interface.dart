@@ -1,8 +1,11 @@
 import 'package:metaballs/src/models/_models.dart';
+import 'package:metaballs/src/widgets/_widgets.dart';
 
 import '_effects.dart';
 
 abstract class MetaballsEffect {
+  const MetaballsEffect();
+
   /// Effect which adds a metaball for every cursor / touch and then follows that cursor / touch around.
   factory MetaballsEffect.follow({
     double smoothing = 1,
@@ -52,6 +55,19 @@ abstract class MetaballsEffect {
       width: width,
     );
   }
+
+  MetaballsEffectState<MetaballsEffect> createState();
+}
+
+abstract class MetaballsEffectState<T extends MetaballsEffect> {
+  late T _effect;
+
+  void updateEffect(T newEffect) {
+    _effect = newEffect;
+  }
+
+  T get effect => _effect;
+
   MetaballShaderData transformShaderData(
     MetaballFrameData frameData,
     MetaballState state,
@@ -67,6 +83,12 @@ abstract class MetaballsEffect {
   ) {
     return state;
   }
-}
 
-abstract class EffectState {}
+  void onPointerAdded(Pointer pointer) {}
+
+  void onTap(TapEvent tap) {}
+
+  void onEffectUpdated(T oldEffect) {}
+
+  void initState() {}
+}

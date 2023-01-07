@@ -54,9 +54,11 @@ class Metaball {
 
     final double aspectRatio = frameData.canvasSize.aspectRatio;
 
+    final double interpolatedSpeed = frameData.config.speed.interpolate(speed);
+
     // Calculate the movementMultiplier.
     // frameData.speedMultiplier should already have frame time included.
-    final double movementMultiplier = frameData.speedMultiplier * _defaultMultiplier * speed;
+    final double movementMultiplier = frameData.speedMultiplier * _defaultMultiplier * interpolatedSpeed;
 
     // Compute new the new position.
     x += (xVelocity / aspectRatio) * movementMultiplier;
@@ -64,16 +66,16 @@ class Metaball {
 
     // Flip the direction if the direction of the metaball is out of bounds and
     // the direction is going towards a out of bounds direction.
-    Point<double> targetVelocity = polarToCartesian(direction, speed);
+    Point<double> targetVelocity = polarToCartesian(direction, interpolatedSpeed);
 
     if ((x < 0 && targetVelocity.x < 0) || (x > 1 && targetVelocity.x > 0)) {
-      direction = reflectRadian(direction, Axis.horizontal);
-      targetVelocity = polarToCartesian(direction, speed);
+      direction = reflectRadian(direction, Axis.vertical);
+      targetVelocity = polarToCartesian(direction, interpolatedSpeed);
     }
 
     if ((y < 0 && targetVelocity.y < 0) || (y > 1 && targetVelocity.y > 0)) {
-      direction = reflectRadian(direction, Axis.vertical);
-      targetVelocity = polarToCartesian(direction, speed);
+      direction = reflectRadian(direction, Axis.horizontal);
+      targetVelocity = polarToCartesian(direction, interpolatedSpeed);
     }
 
     // Update the velocity based on target velocity.
@@ -99,12 +101,8 @@ class Metaball {
     );
 
     // Apply the effects if there are any.
-    final List<MetaballsEffect>? effects = frameData.config.effects;
-
-    if (effects != null) {
-      for (final MetaballsEffect effect in effects) {
-        newState = effect.transformState(frameData, newState, state);
-      }
+    for (final MetaballsEffectState<MetaballsEffect> effect in frameData.effects) {
+      newState = effect.transformState(frameData, newState, state);
     }
 
     state = newState;

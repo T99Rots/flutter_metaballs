@@ -119,6 +119,7 @@ class _HomePageState extends State<HomePage> {
               radius: const Range(min: 20, max: 50),
               metaballs: 40,
               color: Colors.grey,
+              bounceIntensity: 10,
               gradient: LinearGradient(
                 colors: colorsAndEffects[colorEffectIndex].colors,
                 begin: Alignment.bottomRight,

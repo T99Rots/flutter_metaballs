@@ -7,7 +7,7 @@ class MetaballsConfig {
   MetaballsConfig({
     this.animationDuration = const Duration(milliseconds: 200),
     this.radius = const Range(min: 15, max: 40),
-    this.speed = const Range.fromValue(1),
+    this.speed = const Range(max: 1, min: 0.33),
     this.color = const Color(0xff4285F4),
     this.effects,
     this.glowRadius = 0.7,

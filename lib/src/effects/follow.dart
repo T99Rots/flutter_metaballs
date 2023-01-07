@@ -5,7 +5,7 @@ import 'package:metaballs/src/models/metaballs_shader_data.dart';
 import '_effects.dart';
 
 /// This effect adds a metaball for every cursor / touch and then follows that cursor / touch around
-class MetaballsFollowMouseEffect implements MetaballsEffect {
+class MetaballsFollowMouseEffect extends MetaballsEffect {
   MetaballsFollowMouseEffect({
     this.smoothing = 1,
     this.radius,
@@ -34,15 +34,25 @@ class MetaballsFollowMouseEffect implements MetaballsEffect {
   int get hashCode => Object.hash(smoothing, radius, growthFactor);
 
   @override
+  MetaballsEffectState<MetaballsFollowMouseEffect> createState() => MetaballsFollowMouseEffectState();
+}
+
+class MetaballsFollowMouseEffectState extends MetaballsEffectState<MetaballsFollowMouseEffect> {
+  @override
   MetaballShaderData transformShaderData(
-      MetaballFrameData frameData, MetaballState state, MetaballShaderData shaderData) {
-    // TODO: implement transformShaderData
-    throw UnimplementedError();
+    MetaballFrameData frameData,
+    MetaballState state,
+    MetaballShaderData shaderData,
+  ) {
+    return shaderData;
   }
 
   @override
-  MetaballState transformState(MetaballFrameData frameData, MetaballState state, MetaballState oldState) {
-    // TODO: implement transformState
-    throw UnimplementedError();
+  MetaballState transformState(
+    MetaballFrameData frameData,
+    MetaballState state,
+    MetaballState oldState,
+  ) {
+    return state;
   }
 }

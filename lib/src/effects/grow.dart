@@ -1,11 +1,7 @@
-import 'package:metaballs/src/models/metaball_state.dart';
-import 'package:metaballs/src/models/metaballs_frame_data.dart';
-import 'package:metaballs/src/models/metaballs_shader_data.dart';
-
 import '_effects.dart';
 
 /// This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
-class MetaballsMouseGrowEffect implements MetaballsEffect {
+class MetaballsMouseGrowEffect extends MetaballsEffect {
   MetaballsMouseGrowEffect({
     this.radius = 0.5,
     this.growthFactor = 0.5,
@@ -34,15 +30,9 @@ class MetaballsMouseGrowEffect implements MetaballsEffect {
   int get hashCode => Object.hash(growthFactor, radius, smoothing);
 
   @override
-  MetaballShaderData transformShaderData(
-      MetaballFrameData frameData, MetaballState state, MetaballShaderData shaderData) {
-    // TODO: implement transformShaderData
-    throw UnimplementedError();
-  }
-
-  @override
-  MetaballState transformState(MetaballFrameData frameData, MetaballState state, MetaballState oldState) {
-    // TODO: implement transformState
-    throw UnimplementedError();
+  MetaballsMouseGrowEffectState createState() {
+    return MetaballsMouseGrowEffectState();
   }
 }
+
+class MetaballsMouseGrowEffectState extends MetaballsEffectState<MetaballsMouseGrowEffect> {}

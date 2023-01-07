@@ -1,7 +1,7 @@
 import 'dart:math';
 
 Point<double> polarToCartesian(double theta, double r) {
-  double x = r * cos(theta);
-  double y = r * sin(theta);
-  return Point(x, y);
+  final double x = r * cos(theta);
+  final double y = r * sin(theta);
+  return Point<double>(x, y);
 }
