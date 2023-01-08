@@ -1,12 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
 
-void main() async {
-  // Get a reference to the shaders directory
-  final Directory shadersDir = Directory('shaders/webgl');
-
+void generateShadersClassFromDir(Directory shadersDir) async {
   // Get a list of all file system entities (files and directories) in the shaders directory
   final List<FileSystemEntity> fileSystemEntities = shadersDir.listSync();
 
@@ -23,7 +22,7 @@ void main() async {
   }
 
   // Create a list to store the shader code strings
-  final List<String> shaderCodeList = [];
+  final List<String> shaderCodeList = <String>[];
 
   // Read the contents of each file and create a string containing a Dart constant declaration for the code
   for (final File file in files) {
@@ -40,8 +39,25 @@ void main() async {
   ));
 
   // Wrap the list of shader code strings in a Dart class definition
-  final wrappedCode = 'class WebShaders {\n  const WebShaders._();\n\n${shaderCodeList.join('\n\n')}\n}';
+  final String wrappedCode = 'class WebShaders {\n  const WebShaders._();\n\n${shaderCodeList.join('\n\n')}\n}';
 
   // Write the code to the web_shaders.dart file
   await destinationFile.writeAsString(wrappedCode);
+}
+
+void main(List<String> arguments) async {
+  final bool watch = arguments.contains('--watch');
+
+  // Get a reference to the shaders directory
+  final Directory shadersDir = Directory('shaders/webgl');
+
+  if (watch) {
+    print('Watch mode. Waiting for changes.');
+    shadersDir.watch().listen((_) {
+      print('changes, regenerating shaders files.');
+      generateShadersClassFromDir(shadersDir);
+    });
+  }
+
+  generateShadersClassFromDir(shadersDir);
 }
