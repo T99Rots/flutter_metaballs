@@ -233,7 +233,7 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     _gl.linkProgram(program);
     _gl.useProgram(program);
 
-    final Float32List vertexData = Float32List.fromList([
+    final Float32List vertexData = Float32List.fromList(<double>[
       -1.0, 1.0, // top left
       -1.0, -1.0, // bottom left
       1.0, 1.0, // top right

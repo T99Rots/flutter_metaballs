@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A Drawer section with title and divider.
 class DrawerSection extends StatelessWidget {
   const DrawerSection({
     super.key,

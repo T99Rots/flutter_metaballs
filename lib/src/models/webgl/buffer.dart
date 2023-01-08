@@ -1,4 +1,5 @@
 class Buffer {
-  final dynamic buffer;
   Buffer({this.buffer});
+
+  final dynamic buffer;
 }

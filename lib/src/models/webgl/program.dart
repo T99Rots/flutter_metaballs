@@ -1,4 +1,5 @@
 class Program {
-  final dynamic program;
   Program({this.program});
+
+  final dynamic program;
 }

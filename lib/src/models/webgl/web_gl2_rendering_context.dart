@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import '_webgl.dart';
 
 class WebGL2RenderingContext {
-  final dynamic context;
   WebGL2RenderingContext({this.context});
+
+  final dynamic context;
 
   // ignore: non_constant_identifier_names
   int FRAGMENT_SHADER = 0x8B30;

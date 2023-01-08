@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_prism/flutter_prism.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// A widget which renders code with syntax highlighting and selecting.
 class CodeRender extends StatefulWidget {
   const CodeRender({
     super.key,
@@ -57,6 +58,7 @@ class _CodeRenderState extends State<CodeRender> {
         color: const Color(0xffabb2bf),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
             List<String>.generate(

@@ -1,8 +1,8 @@
 import 'package:example/widgets/_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:metaballs/metaballs.dart';
 
+/// Dialog allowing you to export the current settings as dart code.
 class ExportDialog extends StatefulWidget {
   const ExportDialog({
     super.key,
@@ -33,8 +33,8 @@ class _ExportDialogState extends State<ExportDialog> {
                 style: TextStyle(fontSize: 24),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: 400,
+              Padding(
+                padding: const EdgeInsets.only(right: 10.0),
                 child: CodeRender(
                   code: widget.code,
                 ),
@@ -49,7 +49,7 @@ class _ExportDialogState extends State<ExportDialog> {
                       duration: const Duration(milliseconds: 200),
                       crossFadeState: copied ? CrossFadeState.showFirst : CrossFadeState.showSecond,
                       firstChild: Row(
-                        children: const [
+                        children: const <Widget>[
                           Text('Copied'),
                           SizedBox(width: 5),
                           Icon(
@@ -59,7 +59,7 @@ class _ExportDialogState extends State<ExportDialog> {
                         ],
                       ),
                       secondChild: Row(
-                        children: const [
+                        children: const <Widget>[
                           Text('Copy'),
                           SizedBox(width: 5),
                           Icon(
@@ -91,26 +91,4 @@ class _ExportDialogState extends State<ExportDialog> {
     Clipboard.setData(ClipboardData(text: widget.code));
     setState(() {});
   }
-
-  Widget get test => Metaballs(
-        config: MetaballsConfig(
-          gradient: const LinearGradient(
-            colors: <Color>[
-              Color(0xff000000),
-              Color(0xffffffff),
-            ],
-            begin: Alignment.bottomRight,
-            end: Alignment.topLeft,
-          ),
-          bounceIntensity: 1,
-          metaballs: 40,
-          glowIntensity: 1,
-          glowRadius: 1,
-          radius: const Range(min: 25, max: 40),
-          speed: const Range(min: 0.33, max: 1),
-          effects: <MetaballsEffect>[
-            MetaballsEffect.follow(),
-          ],
-        ),
-      );
 }

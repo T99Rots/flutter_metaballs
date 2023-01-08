@@ -1,4 +1,5 @@
 class UniformLocation {
-  final dynamic uniformLocation;
   UniformLocation({this.uniformLocation});
+
+  final dynamic uniformLocation;
 }

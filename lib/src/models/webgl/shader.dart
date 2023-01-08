@@ -1,4 +1,5 @@
 class Shader {
-  final dynamic shader;
   Shader({this.shader});
+
+  final dynamic shader;
 }

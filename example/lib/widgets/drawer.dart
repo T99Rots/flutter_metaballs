@@ -3,6 +3,7 @@ import 'package:example/widgets/_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:metaballs/metaballs.dart';
 
+/// The drawer for the app with all configuration options.
 class ExampleDrawer extends StatelessWidget {
   const ExampleDrawer({
     super.key,
@@ -113,6 +114,7 @@ class ExampleDrawer extends StatelessWidget {
               onPresetChange(value, false);
             }
           },
+          initialSelection: selectedPreset,
           dropdownMenuEntries: presets
               .map(
                 (ColorPreset preset) => DropdownMenuEntry<ColorPreset>(
@@ -126,7 +128,10 @@ class ExampleDrawer extends StatelessWidget {
                       width: 28,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [preset.startColor, preset.endColor],
+                          colors: <Color>[
+                            preset.startColor,
+                            preset.endColor,
+                          ],
                           begin: Alignment.bottomRight,
                           end: Alignment.topLeft,
                         ),
@@ -140,7 +145,7 @@ class ExampleDrawer extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Row(
-          children: [
+          children: <Widget>[
             ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll<Color>(
@@ -203,15 +208,16 @@ class ExampleDrawer extends StatelessWidget {
       title: 'Effects',
       children: <Widget>[
         DropdownMenu<EffectPreset>(
-            label: const Text('Select effect'),
-            dropdownMenuEntries: effectPresets
-                .map(
-                  (EffectPreset preset) => DropdownMenuEntry<EffectPreset>(
-                    value: preset,
-                    label: preset.name,
-                  ),
-                )
-                .toList()),
+          label: const Text('Select effect'),
+          dropdownMenuEntries: effectPresets
+              .map(
+                (EffectPreset preset) => DropdownMenuEntry<EffectPreset>(
+                  value: preset,
+                  label: preset.name,
+                ),
+              )
+              .toList(),
+        ),
       ],
     );
   }
@@ -219,7 +225,7 @@ class ExampleDrawer extends StatelessWidget {
   DrawerSection _buildGeneralSection() {
     return DrawerSection(
       title: 'General',
-      children: [
+      children: <Widget>[
         SliderHeader(
           label: 'Metaball count',
           value: metaballs.toString(),

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+/// A Widget allowing you to select a alignment for a gradient with build in preview.
 class DirectionSelectorAndPreview extends StatelessWidget {
   const DirectionSelectorAndPreview({
     super.key,
@@ -45,10 +46,10 @@ class DirectionSelectorAndPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: <Widget>[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                        children: <Widget>[
                           _DirectionButton(
                             alignment: Alignment.topLeft,
                             currentAlignment: alignment,
@@ -68,7 +69,7 @@ class DirectionSelectorAndPreview extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                        children: <Widget>[
                           _DirectionButton(
                             alignment: Alignment.centerLeft,
                             currentAlignment: alignment,
@@ -83,7 +84,7 @@ class DirectionSelectorAndPreview extends StatelessWidget {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
+                        children: <Widget>[
                           _DirectionButton(
                             alignment: Alignment.bottomLeft,
                             currentAlignment: alignment,

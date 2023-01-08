@@ -23,56 +23,107 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        SizedBox(
-          width: 320,
-          child: ExampleDrawer(
-            onPresetChange: onPresetChange,
-            gradient: gradient,
-            alignment: alignment,
-            onAlignmentChange: onAlignmentChange,
-            speed: speed,
-            onSpeedChange: onSpeedChange,
-            size: size,
-            onSizeChange: onSizeChange,
-            metaballs: metaballs,
-            onMetaballsChange: onMetaballsChange,
-            presets: allPresets,
-            selectedPreset: selectedPreset,
-            bounceIntensity: bounceIntensity,
-            glowIntensity: glowIntensity,
-            glowRadius: glowRadius,
-            onBounceIntensityChange: onBounceIntensityChange,
-            onGlowIntensityChange: onGlowIntensityChange,
-            onGlowRadiusChange: onGlowRadiusChange,
-          ),
-        ),
-        Expanded(
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.bottomCenter,
-                radius: 1.5,
-                colors: <Color>[
-                  Color.fromARGB(255, 13, 35, 61),
-                  Colors.black,
-                ],
-              ),
+    final bool small = MediaQuery.of(context).size.width < 800;
+
+    return Scaffold(
+      drawer: !small
+          ? null
+          : Drawer(
+              child: _buildDrawerBody(),
             ),
-            child: Metaballs(
-              config: MetaballsConfig(
-                glowRadius: glowRadius,
-                glowIntensity: glowIntensity,
-                radius: size,
-                metaballs: metaballs,
-                bounceIntensity: bounceIntensity,
-                gradient: gradient,
+      body: Row(
+        children: <Widget>[
+          if (!small)
+            SizedBox(
+              width: 320,
+              child: _buildDrawerBody(),
+            ),
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.bottomCenter,
+                  radius: 1.5,
+                  colors: <Color>[
+                    Color.fromARGB(255, 13, 35, 61),
+                    Colors.black,
+                  ],
+                ),
+              ),
+              child: Metaballs(
+                config: MetaballsConfig(
+                  glowRadius: glowRadius,
+                  glowIntensity: glowIntensity,
+                  radius: size,
+                  metaballs: metaballs,
+                  bounceIntensity: bounceIntensity,
+                  gradient: gradient,
+                ),
+                child: !small ? null : _buildMenuButton(),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Align _buildMenuButton() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Builder(builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: OutlinedButton(
+            style: const ButtonStyle(
+              textStyle: MaterialStatePropertyAll<TextStyle>(
+                TextStyle(
+                  shadows: <Shadow>[
+                    Shadow(blurRadius: 10),
+                  ],
+                ),
+              ),
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const <Widget>[
+                Icon(
+                  Icons.settings_rounded,
+                  size: 16,
+                ),
+                SizedBox(width: 10.0),
+                Text('Configure Metaballs'),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  ExampleDrawer _buildDrawerBody() {
+    return ExampleDrawer(
+      onPresetChange: onPresetChange,
+      gradient: gradient,
+      alignment: alignment,
+      onAlignmentChange: onAlignmentChange,
+      speed: speed,
+      onSpeedChange: onSpeedChange,
+      size: size,
+      onSizeChange: onSizeChange,
+      metaballs: metaballs,
+      onMetaballsChange: onMetaballsChange,
+      presets: allPresets,
+      selectedPreset: selectedPreset,
+      bounceIntensity: bounceIntensity,
+      glowIntensity: glowIntensity,
+      glowRadius: glowRadius,
+      onBounceIntensityChange: onBounceIntensityChange,
+      onGlowIntensityChange: onGlowIntensityChange,
+      onGlowRadiusChange: onGlowRadiusChange,
     );
   }
 

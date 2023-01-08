@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
+/// A Color picker dialog.
 class ColorPickerDialog extends StatefulWidget {
   const ColorPickerDialog({
     super.key,
@@ -18,7 +19,13 @@ class ColorPickerDialog extends StatefulWidget {
 }
 
 class _ColorPickerDialogState extends State<ColorPickerDialog> {
-  late Color currentColor = widget.initialColor;
+  late Color initialColor;
+
+  @override
+  void initState() {
+    initialColor = widget.initialColor;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +50,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                   portraitOnly: true,
                   pickerAreaBorderRadius: BorderRadius.circular(5),
                   onColorChanged: (Color value) {
-                    currentColor = value;
+                    widget.onChange(value);
                   },
                   pickerColor: widget.initialColor,
                 ),
@@ -54,6 +61,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                 children: <Widget>[
                   TextButton(
                     onPressed: () {
+                      widget.onChange(initialColor);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Cancel'),
@@ -62,7 +70,6 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      widget.onChange(currentColor);
                     },
                     child: const Text('Save'),
                   ),
