@@ -18,4 +18,10 @@ class Range {
   double interpolate(double t) {
     return min + (max - min) * t;
   }
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return 'Range(min: $min, max: $max)';
+  }
 }

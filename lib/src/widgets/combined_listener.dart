@@ -9,18 +9,21 @@ class CombinedListener extends StatefulWidget {
     this.child,
     required this.onPointerAdded,
     required this.onTap,
+    required this.animation,
   }) : super(key: key);
 
   final Widget? child;
 
   final void Function(Pointer pointer) onPointerAdded;
   final void Function(TapEvent tabEvent) onTap;
+  final Animation<double> animation;
 
   @override
   State<CombinedListener> createState() => CombinedListenerState();
 }
 
 class CombinedListenerState extends State<CombinedListener> {
+  final Map<int, Pointer> _pointers = <int, Pointer>{};
   PointerEvent? _mouseEvent;
 
   @override
@@ -63,10 +66,38 @@ class CombinedListenerState extends State<CombinedListener> {
     );
   }
 
-  void onMove(PointerEvent event) {}
-  void onAdd(PointerEvent event) {}
-  void onRemove(PointerEvent event) {}
-  void onPress(PointerEvent event) {}
+  void onMove(PointerEvent event) {
+    if (event.delta.distance > 0 && _pointers.containsKey(event.pointer)) {
+      _pointers[event.pointer]!.addEvent(
+        position: event.position,
+        delta: event.delta,
+      );
+    }
+  }
+
+  void onAdd(PointerEvent event) {
+    if (!_pointers.containsKey(event.pointer)) {
+      final Pointer pointer = _pointers[event.pointer] = Pointer(
+        animation: widget.animation,
+        position: event.localPosition,
+        kind: event.kind,
+        id: event.pointer,
+      );
+
+      widget.onPointerAdded(pointer);
+    }
+  }
+
+  void onRemove(PointerEvent event) {
+    _pointers.remove(event.pointer)?.remove();
+  }
+
+  void onPress(PointerEvent event) {
+    widget.onTap(TapEvent(
+      position: event.localPosition,
+      time: widget.animation.value,
+    ));
+  }
 }
 
 class Pointer extends Stream<PointerUpdateEvent> {

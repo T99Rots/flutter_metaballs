@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/_effects.dart';
 import 'package:metaballs/src/models/_models.dart';
+import 'package:metaballs/src/widgets/_widgets.dart';
 
 /// All data required to render a metaball for a single frame.
 class MetaballFrameData {
@@ -11,6 +12,7 @@ class MetaballFrameData {
     required this.config,
     required this.speedMultiplier,
     required this.effects,
+    required this.pointers,
   });
 
   /// The size of the canvas used to render the metaballs.
@@ -31,4 +33,6 @@ class MetaballFrameData {
 
   /// The effect states.
   final List<MetaballsEffectState<MetaballsEffect>> effects;
+
+  final List<Pointer> pointers;
 }

@@ -66,8 +66,8 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
           for (int i = 0; i < widget.metaballsData.length; i++) {
             final int offset = (i * 3) + 4;
             final MetaballShaderData metaball = widget.metaballsData[i];
-            shader.setFloat(offset, metaball.x);
-            shader.setFloat(offset + 1, metaball.y);
+            shader.setFloat(offset, metaball.position.dx);
+            shader.setFloat(offset + 1, metaball.position.dy);
             shader.setFloat(offset + 2, metaball.radius);
           }
 

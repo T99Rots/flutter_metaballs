@@ -25,45 +25,61 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final bool small = MediaQuery.of(context).size.width < 800;
 
-    return Scaffold(
-      drawer: !small
-          ? null
-          : Drawer(
-              child: _buildDrawerBody(),
-            ),
-      body: Row(
-        children: <Widget>[
-          if (!small)
-            SizedBox(
-              width: 320,
-              child: _buildDrawerBody(),
-            ),
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.bottomCenter,
-                  radius: 1.5,
-                  colors: <Color>[
-                    Color.fromARGB(255, 13, 35, 61),
-                    Colors.black,
-                  ],
+    final ThemeData theme = Theme.of(context);
+
+    final ColorScheme colorScheme = computeColorScheme(theme.colorScheme);
+
+    return Theme(
+      data: theme.copyWith(
+        colorScheme: colorScheme,
+        textSelectionTheme: theme.textSelectionTheme.copyWith(
+          selectionColor: colorScheme.primary.withOpacity(0.25),
+        ),
+      ),
+      child: Scaffold(
+        drawer: !small
+            ? null
+            : Drawer(
+                child: _buildDrawerBody(),
+              ),
+        body: Row(
+          children: <Widget>[
+            if (!small)
+              SizedBox(
+                width: 320,
+                child: _buildDrawerBody(),
+              ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.bottomCenter,
+                    radius: 1.5,
+                    colors: <Color>[
+                      Color.fromARGB(255, 13, 35, 61),
+                      Colors.black,
+                    ],
+                  ),
+                ),
+                child: Metaballs(
+                  config: MetaballsConfig(
+                    glowRadius: glowRadius,
+                    glowIntensity: glowIntensity,
+                    radius: size,
+                    metaballs: metaballs,
+                    bounceIntensity: bounceIntensity,
+                    gradient: gradient,
+                    speed: speed,
+                    effects: [
+                      MetaballsEffect.grow(),
+                    ],
+                  ),
+                  child: !small ? null : _buildMenuButton(),
                 ),
               ),
-              child: Metaballs(
-                config: MetaballsConfig(
-                  glowRadius: glowRadius,
-                  glowIntensity: glowIntensity,
-                  radius: size,
-                  metaballs: metaballs,
-                  bounceIntensity: bounceIntensity,
-                  gradient: gradient,
-                ),
-                child: !small ? null : _buildMenuButton(),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -139,11 +155,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<ColorPreset> get allPresets {
-    final List<ColorPreset> returnValue = colorPresets;
-    if (customPreset != null) {
-      returnValue.add(customPreset!);
-    }
-    return returnValue;
+    return <ColorPreset>[
+      ...colorPresets,
+      if (customPreset != null) customPreset!,
+    ];
+  }
+
+  /// Creates a [ColorScheme] based on the current selected preset to make the ui
+  /// match the metaballs colors.
+  ColorScheme computeColorScheme(ColorScheme base) {
+    final HSVColor startColor = HSVColor.fromColor(selectedPreset.startColor);
+    final HSVColor endColor = HSVColor.fromColor(selectedPreset.endColor);
+
+    final Color primary = HSVColor.fromColor(
+      Color.lerp(
+        selectedPreset.startColor,
+        selectedPreset.endColor,
+        0.5 - ((startColor.saturation - endColor.saturation) / 2),
+      )!,
+    ).withValue(1.0).toColor();
+
+    final Color onPrimary = primary.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+
+    return base.copyWith(
+      primary: primary,
+      onPrimary: onPrimary,
+    );
   }
 
   void onPresetChange(ColorPreset preset, bool custom) {

@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:example/utils/_utils.dart';
 import 'package:example/widgets/_widget.dart';
 import 'package:flutter/material.dart';
@@ -107,41 +108,45 @@ class ExampleDrawer extends StatelessWidget {
     return DrawerSection(
       title: 'Colors & Gradient',
       children: <Widget>[
-        DropdownMenu<ColorPreset>(
-          label: const Text('Select Color preset'),
-          onSelected: (ColorPreset? value) {
+        BetterDropdown<ColorPreset>(
+          onChange: (ColorPreset? value) {
             if (value != null) {
               onPresetChange(value, false);
             }
           },
-          initialSelection: selectedPreset,
-          dropdownMenuEntries: presets
+          items: presets
               .map(
-                (ColorPreset preset) => DropdownMenuEntry<ColorPreset>(
-                  label: preset.name,
+                (ColorPreset preset) => DropdownMenuItem<ColorPreset>(
                   value: preset,
-                  leadingIcon: Material(
-                    borderRadius: BorderRadius.circular(5),
-                    elevation: 3,
-                    child: Container(
-                      height: 28,
-                      width: 28,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: <Color>[
-                            preset.startColor,
-                            preset.endColor,
-                          ],
-                          begin: Alignment.bottomRight,
-                          end: Alignment.topLeft,
-                        ),
+                  child: Row(
+                    children: [
+                      Material(
                         borderRadius: BorderRadius.circular(5),
+                        elevation: 3,
+                        child: Container(
+                          height: 28,
+                          width: 28,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: <Color>[
+                                preset.startColor,
+                                preset.endColor,
+                              ],
+                              begin: Alignment.bottomRight,
+                              end: Alignment.topLeft,
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      Text(preset.name),
+                    ],
                   ),
                 ),
               )
               .toList(),
+          value: selectedPreset,
         ),
         const SizedBox(height: 20),
         Row(
@@ -222,92 +227,95 @@ class ExampleDrawer extends StatelessWidget {
     );
   }
 
-  DrawerSection _buildGeneralSection() {
-    return DrawerSection(
-      title: 'General',
-      children: <Widget>[
-        SliderHeader(
-          label: 'Metaball count',
-          value: metaballs.toString(),
-        ),
-        Slider(
-          value: metaballs.toDouble(),
-          min: 1,
-          max: 128,
-          onChanged: (double value) {
-            onMetaballsChange(value.toInt());
-          },
-        ),
-        SliderHeader(
-          label: 'Speed',
-          value: '${speed.min} - ${speed.max}',
-        ),
-        RangeSlider(
-          values: RangeValues(
-            speed.min,
-            speed.max,
+  Widget _buildGeneralSection() {
+    return SliderTheme(
+      data: const SliderThemeData(),
+      child: DrawerSection(
+        title: 'General',
+        children: <Widget>[
+          SliderWrapper(
+            label: 'Metaball count',
+            value: metaballs.toString(),
           ),
-          min: 0,
-          max: 1,
-          onChanged: (RangeValues value) {
-            onSpeedChange(Range(
-              min: value.start.roundToPrecision(2),
-              max: value.end.roundToPrecision(2),
-            ));
-          },
-        ),
-        SliderHeader(
-          label: 'Radius',
-          value: '${size.min} - ${size.max}',
-        ),
-        RangeSlider(
-          values: RangeValues(size.min, size.max),
-          min: 0,
-          max: 100,
-          onChanged: (RangeValues value) {
-            onSizeChange(Range(
-              min: value.start.roundToPrecision(1),
-              max: value.end.roundToPrecision(1),
-            ));
-          },
-        ),
-        SliderHeader(
-          label: 'Bounce Intensity',
-          value: bounceIntensity.toString(),
-        ),
-        Slider(
-          value: bounceIntensity,
-          min: 1,
-          max: 100,
-          onChanged: (double value) {
-            onBounceIntensityChange(value.roundToPrecision(1));
-          },
-        ),
-        SliderHeader(
-          label: 'Glow Intensity',
-          value: glowIntensity.toString(),
-        ),
-        Slider(
-          value: glowIntensity,
-          min: 0,
-          max: 1,
-          onChanged: (double value) {
-            onGlowIntensityChange(value.roundToPrecision(2));
-          },
-        ),
-        SliderHeader(
-          label: 'Glow Radius',
-          value: glowRadius.toString(),
-        ),
-        Slider(
-          value: glowRadius,
-          min: 0,
-          max: 1,
-          onChanged: (double value) {
-            onGlowRadiusChange(value.roundToPrecision(2));
-          },
-        ),
-      ],
+          Slider(
+            value: metaballs.toDouble(),
+            min: 1,
+            max: 128,
+            onChanged: (double value) {
+              onMetaballsChange(value.toInt());
+            },
+          ),
+          SliderWrapper(
+            label: 'Speed',
+            value: '${speed.min} - ${speed.max}',
+          ),
+          RangeSlider(
+            values: RangeValues(
+              speed.min,
+              speed.max,
+            ),
+            min: 0,
+            max: 3,
+            onChanged: (RangeValues value) {
+              onSpeedChange(Range(
+                min: value.start.roundToPrecision(2),
+                max: value.end.roundToPrecision(2),
+              ));
+            },
+          ),
+          SliderWrapper(
+            label: 'Radius',
+            value: '${size.min} - ${size.max}',
+          ),
+          RangeSlider(
+            values: RangeValues(size.min, size.max),
+            min: 0,
+            max: 100,
+            onChanged: (RangeValues value) {
+              onSizeChange(Range(
+                min: value.start.roundToPrecision(1),
+                max: value.end.roundToPrecision(1),
+              ));
+            },
+          ),
+          SliderWrapper(
+            label: 'Bounce Intensity',
+            value: bounceIntensity.toString(),
+          ),
+          Slider(
+            value: bounceIntensity,
+            min: 1,
+            max: 100,
+            onChanged: (double value) {
+              onBounceIntensityChange(value.roundToPrecision(1));
+            },
+          ),
+          SliderWrapper(
+            label: 'Glow Intensity',
+            value: glowIntensity.toString(),
+          ),
+          Slider(
+            value: glowIntensity,
+            min: 0,
+            max: 1,
+            onChanged: (double value) {
+              onGlowIntensityChange(value.roundToPrecision(2));
+            },
+          ),
+          SliderWrapper(
+            label: 'Glow Radius',
+            value: glowRadius.toString(),
+          ),
+          Slider(
+            value: glowRadius,
+            min: 0,
+            max: 1,
+            onChanged: (double value) {
+              onGlowRadiusChange(value.roundToPrecision(2));
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -367,15 +375,17 @@ class ExampleDrawer extends StatelessWidget {
   }
 }
 
-class SliderHeader extends StatelessWidget {
-  const SliderHeader({
+class SliderWrapper extends StatelessWidget {
+  const SliderWrapper({
     super.key,
     required this.label,
     required this.value,
+    // required this.slider,
   });
 
   final String label;
   final String value;
+  // final Widget slider;
 
   @override
   Widget build(BuildContext context) {
@@ -384,6 +394,67 @@ class SliderHeader extends StatelessWidget {
       children: <Widget>[
         Text(label),
         Text(value),
+      ],
+    );
+  }
+}
+
+class BetterDropdown<T> extends StatefulWidget {
+  const BetterDropdown({
+    super.key,
+    required this.items,
+    required this.value,
+    required this.onChange,
+  });
+
+  final List<DropdownMenuItem<T>> items;
+  final T value;
+  final Function(T? value) onChange;
+
+  @override
+  State<BetterDropdown<T>> createState() => _BetterDropdownState<T>();
+}
+
+class _BetterDropdownState<T> extends State<BetterDropdown<T>> {
+  bool isOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: InputDecorator(
+            isFocused: isOpen,
+            decoration: const InputDecoration(label: Text('Select Color Preset'), border: OutlineInputBorder()),
+          ),
+        ),
+        DropdownButtonHideUnderline(
+          child: DropdownButton2<T>(
+            dropdownDecoration: BoxDecoration(
+              color: const Color(0xff424242),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            focusColor: Colors.transparent,
+            barrierColor: Colors.transparent,
+            itemSplashColor: Colors.transparent,
+            buttonSplashColor: Colors.transparent,
+            buttonOverlayColor: const MaterialStatePropertyAll<Color>(Colors.transparent),
+            buttonHighlightColor: Colors.transparent,
+            itemHighlightColor: Colors.transparent,
+            onChanged: widget.onChange,
+            value: widget.value,
+            items: widget.items,
+            onMenuStateChange: (bool isOpen) {
+              this.isOpen = isOpen;
+              setState(() {});
+            },
+            iconEnabledColor: isOpen ? Theme.of(context).colorScheme.primary : null,
+            icon: const Padding(
+              padding: EdgeInsets.only(right: 15),
+              child: Icon(Icons.arrow_drop_down),
+            ),
+          ),
+        ),
       ],
     );
   }

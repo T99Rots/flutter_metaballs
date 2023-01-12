@@ -116,10 +116,19 @@ class Metaball {
     final double computedRadius = frameData.config.radius.interpolate(radius) * scale;
     final double diameter = computedRadius * 2;
 
-    return MetaballShaderData(
+    MetaballShaderData shaderData = MetaballShaderData(
       radius: computedRadius,
-      x: ((width - diameter) * state.position.x) + computedRadius,
-      y: ((height - diameter) * state.position.y) + computedRadius,
+      position: Offset(
+        ((width - diameter) * state.position.x) + computedRadius,
+        ((height - diameter) * state.position.y) + computedRadius,
+      ),
     );
+
+    // Apply the effects if there are any.
+    for (final MetaballsEffectState<MetaballsEffect> effect in frameData.effects) {
+      shaderData = effect.transformShaderData(frameData, state, shaderData);
+    }
+
+    return shaderData;
   }
 }

@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/_effects.dart';
 import 'package:metaballs/src/models/_models.dart';
+import 'package:metaballs/src/utils/_utils.dart';
 import 'package:metaballs/src/widgets/_widgets.dart';
 
 /// A metaballs implementation for flutter.
@@ -30,6 +31,7 @@ class Metaballs extends StatefulWidget {
 class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
   final List<MetaballsEffectState<MetaballsEffect>> _effectStates = <MetaballsEffectState<MetaballsEffect>>[];
   final GlobalKey _key = GlobalKey();
+  final List<Pointer> pointers = <Pointer>[];
   late List<Metaball> _metaballs;
   late AnimationController _controller;
 
@@ -46,6 +48,20 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
       widget.config.metaballs,
       (_) => Metaball.withRandomValues(),
     );
+
+    if (widget.config.effects != null) {
+      _effectStates.addAll(
+        widget.config.effects!.map(
+          (MetaballsEffect effect) {
+            final MetaballsEffectState<MetaballsEffect> state = effect.createState();
+            state.updateEffect(effect);
+            return state;
+          },
+        ),
+      );
+    }
+
+    print(_effectStates);
     super.initState();
   }
 
@@ -67,7 +83,41 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
         }
       }
     }
+    if (widget.config.effects != null) {
+      for (final MetaballsEffect effect in widget.config.effects!) {
+        _getOrCreateEffectState(effect, effect.createState);
+      }
+      _effectStates.removeWhere(
+        <E extends MetaballsEffect>(
+          MetaballsEffectState<E> state,
+        ) {
+          return !widget.config.effects!.any(
+            (MetaballsEffect effect) => effect is E,
+          );
+        },
+      );
+    } else {
+      _effectStates.clear();
+    }
     super.didUpdateWidget(oldWidget);
+  }
+
+  /// Check if a effect state exists, if not create new instance. Also check if
+  /// Effect has changed, if so update effect on state.
+  void _getOrCreateEffectState<T extends MetaballsEffectState<E>, E extends MetaballsEffect>(
+    E effect,
+    T Function() createState,
+  ) {
+    T? state = _effectStates.firstWhereType<T>();
+
+    if (state == null) {
+      state = createState();
+      _effectStates.add(state);
+    }
+
+    if (state.effect != effect) {
+      state.updateEffect(effect);
+    }
   }
 
   @override
@@ -91,6 +141,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
               time: time,
               config: widget.config,
               effects: _effectStates,
+              pointers: pointers,
             );
 
             for (final Metaball metaball in _metaballs) {
@@ -122,13 +173,33 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
       );
     }
 
-    if (widget.config.effects != null && widget.config.effects!.isNotEmpty) {
-      resultWidget = CombinedListener(
-        onPointerAdded: (Pointer pointer) {},
-        onTap: (TapEvent tabEvent) {},
-        child: resultWidget,
-      );
-    }
+    // if (widget.config.effects != null && widget.config.effects!.isNotEmpty) {
+    resultWidget = CombinedListener(
+      animation: _controller,
+      onPointerAdded: (Pointer pointer) {
+        print('added');
+        for (final MetaballsEffectState<dynamic> effect in _effectStates) {
+          effect.onPointerAdded(pointer);
+        }
+
+        pointers.add(pointer);
+
+        pointer.listen(
+          (_) {},
+          onDone: () {
+            pointers.remove(pointer);
+          },
+        );
+      },
+      onTap: (TapEvent tabEvent) {
+        print('tap');
+        for (final MetaballsEffectState<dynamic> effect in _effectStates) {
+          effect.onTap(tabEvent);
+        }
+      },
+      child: resultWidget,
+    );
+    // }
 
     return resultWidget;
   }

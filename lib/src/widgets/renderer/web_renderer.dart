@@ -288,8 +288,8 @@ class _MetaballsRendererState extends State<MetaballsRenderer> with TickerProvid
     for (int i = 0; i < metaballCount; i++) {
       final int offset = i * 3;
       final MetaballShaderData metaball = widget.metaballsData[i];
-      metaballData[offset] = metaball.x * widget.pixelRatio;
-      metaballData[offset + 1] = (widget.size.height - metaball.y) * widget.pixelRatio;
+      metaballData[offset] = metaball.position.dx * widget.pixelRatio;
+      metaballData[offset + 1] = (widget.size.height - metaball.position.dy) * widget.pixelRatio;
       metaballData[offset + 2] = metaball.radius * widget.pixelRatio;
     }
 
