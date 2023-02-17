@@ -70,7 +70,7 @@ abstract class MetaballsEffectState<T extends MetaballsEffect> {
 
   MetaballShaderData transformShaderData(
     MetaballFrameData frameData,
-    MetaballState state,
+    Metaball metaball,
     MetaballShaderData shaderData,
   ) {
     return shaderData;
@@ -78,8 +78,8 @@ abstract class MetaballsEffectState<T extends MetaballsEffect> {
 
   MetaballState transformState(
     MetaballFrameData frameData,
+    Metaball metaball,
     MetaballState state,
-    MetaballState oldState,
   ) {
     return state;
   }

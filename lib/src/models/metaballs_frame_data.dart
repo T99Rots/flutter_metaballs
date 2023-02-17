@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/_effects.dart';
 import 'package:metaballs/src/models/_models.dart';
-import 'package:metaballs/src/widgets/_widgets.dart';
 
 /// All data required to render a metaball for a single frame.
 class MetaballFrameData {
@@ -12,11 +11,17 @@ class MetaballFrameData {
     required this.config,
     required this.speedMultiplier,
     required this.effects,
-    required this.pointers,
+    required this.scale,
   });
 
   /// The size of the canvas used to render the metaballs.
   final Size canvasSize;
+
+  /// The scale by which all sizes are multiplied.
+  ///
+  /// Dynamically generated based on screen size to maintain the same density
+  /// of metaballs across different screens and aspect ratios.
+  final double scale;
 
   /// The time in ms since the last frame.
   final double frameTime;
@@ -33,6 +38,4 @@ class MetaballFrameData {
 
   /// The effect states.
   final List<MetaballsEffectState<MetaballsEffect>> effects;
-
-  final List<Pointer> pointers;
 }

@@ -1,8 +1,7 @@
 import 'dart:math';
 
-import 'package:metaballs/src/models/metaball_state.dart';
-import 'package:metaballs/src/models/metaballs_frame_data.dart';
-import 'package:metaballs/src/models/metaballs_shader_data.dart';
+import 'package:flutter/widgets.dart';
+import 'package:metaballs/src/models/_models.dart';
 import 'package:metaballs/src/widgets/combined_listener.dart';
 
 import '_effects.dart';
@@ -10,7 +9,7 @@ import '_effects.dart';
 /// This effect increases the radius of all metaballs based on how close they are to the mouse cursor or a touch
 class MetaballsMouseGrowEffect extends MetaballsEffect {
   MetaballsMouseGrowEffect({
-    this.radius = 0.5,
+    this.radius = 40,
     this.growthFactor = 0.5,
     this.smoothing = 1,
   })  : assert(smoothing >= 0 && smoothing <= 1),
@@ -43,27 +42,40 @@ class MetaballsMouseGrowEffect extends MetaballsEffect {
 }
 
 class MetaballsMouseGrowEffectState extends MetaballsEffectState<MetaballsMouseGrowEffect> {
+  final List<Pointer> _pointers = [];
+
   @override
   MetaballShaderData transformShaderData(
     MetaballFrameData frameData,
-    MetaballState state,
+    Metaball metaball,
     MetaballShaderData shaderData,
   ) {
-    double combinedDistance = 0;
+    double target = 1;
+    for (final Pointer pointer in _pointers) {
+      const double radius = 500.0;
+      const double growthFactor = 1.5;
+      final double distance = (pointer.position - shaderData.position).distance;
+      final double distancePercentOfRadius = distance / (radius * frameData.scale);
+      final double limitedInverseDistance = max(1 - distancePercentOfRadius, 0);
+      final double ageScale = Curves.easeOut.transform(
+        min(
+          (frameData.time - pointer.createdTime) / 0.33,
+          1,
+        ),
+      );
+      final double computedScale = 1 + (growthFactor * limitedInverseDistance * ageScale);
 
-    for (final Pointer pointer in frameData.pointers) {
-      combinedDistance += (pointer.position - shaderData.position).distance;
+      if (computedScale > target) target = computedScale;
     }
 
-    print(combinedDistance);
-
     return shaderData.copyWith(
-      radius: max(
-              1,
-              1 +
-                  effect.growthFactor -
-                  ((combinedDistance / (frameData.canvasSize.shortestSide * effect.radius)) * effect.growthFactor)) *
-          shaderData.radius,
+      radius: target * shaderData.radius,
     );
+  }
+
+  @override
+  void onPointerAdded(Pointer pointer) {
+    _pointers.add(pointer);
+    // pointer.l
   }
 }

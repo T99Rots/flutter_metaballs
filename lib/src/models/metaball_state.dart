@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'package:flutter/widgets.dart';
 
 /// The internal state of the metaball.
 class MetaballState {
@@ -9,10 +9,10 @@ class MetaballState {
   });
 
   /// The position of the metaball.
-  final Point<double> position;
+  final Offset position;
 
   /// The movement velocity of the metaball.
-  final Point<double> velocity;
+  final Offset velocity;
 
   /// The direction the metaball is moving in.
   final double direction;

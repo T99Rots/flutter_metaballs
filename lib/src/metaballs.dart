@@ -136,6 +136,7 @@ class _MetaBallsState extends State<Metaballs> with TickerProviderStateMixin {
 
             final MetaballFrameData frameData = MetaballFrameData(
               canvasSize: size,
+              scale: sqrt(size.width * size.height) / 1000,
               frameTime: frameTime,
               speedMultiplier: frameTime,
               time: time,

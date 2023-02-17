@@ -24,7 +24,7 @@ class Metaball {
     return Metaball(
       initialState: MetaballState(
         direction: direction,
-        position: Point<double>(
+        position: Offset(
           random.nextDouble(),
           random.nextDouble(),
         ),
@@ -46,10 +46,10 @@ class Metaball {
 
   void computeNewState(MetaballFrameData frameData) {
     // Extract the state values so we can modify them.
-    double x = state.position.x;
-    double y = state.position.y;
-    double xVelocity = state.velocity.x;
-    double yVelocity = state.velocity.y;
+    double x = state.position.dx;
+    double y = state.position.dy;
+    double xVelocity = state.velocity.dx;
+    double yVelocity = state.velocity.dy;
     double direction = state.direction;
 
     final double aspectRatio = frameData.canvasSize.aspectRatio;
@@ -66,14 +66,14 @@ class Metaball {
 
     // Flip the direction if the direction of the metaball is out of bounds and
     // the direction is going towards a out of bounds direction.
-    Point<double> targetVelocity = polarToCartesian(direction, interpolatedSpeed);
+    Offset targetVelocity = polarToCartesian(direction, interpolatedSpeed);
 
-    if ((x < 0 && targetVelocity.x < 0) || (x > 1 && targetVelocity.x > 0)) {
+    if ((x < 0 && targetVelocity.dx < 0) || (x > 1 && targetVelocity.dx > 0)) {
       direction = reflectRadian(direction, Axis.vertical);
       targetVelocity = polarToCartesian(direction, interpolatedSpeed);
     }
 
-    if ((y < 0 && targetVelocity.y < 0) || (y > 1 && targetVelocity.y > 0)) {
+    if ((y < 0 && targetVelocity.dy < 0) || (y > 1 && targetVelocity.dy > 0)) {
       direction = reflectRadian(direction, Axis.horizontal);
       targetVelocity = polarToCartesian(direction, interpolatedSpeed);
     }
@@ -81,52 +81,46 @@ class Metaball {
     // Update the velocity based on target velocity.
     xVelocity = transformValueOverTime(
       xVelocity,
-      targetVelocity.x,
+      targetVelocity.dx,
       movementMultiplier,
       frameData.config.bounceIntensity,
     );
 
     yVelocity = transformValueOverTime(
       yVelocity,
-      targetVelocity.y,
+      targetVelocity.dy,
       movementMultiplier,
       frameData.config.bounceIntensity,
     );
 
     // Create new state.
-    MetaballState newState = MetaballState(
+    state = MetaballState(
       direction: direction,
-      velocity: Point<double>(xVelocity, yVelocity),
-      position: Point<double>(x, y),
+      velocity: Offset(xVelocity, yVelocity),
+      position: Offset(x, y),
     );
 
     // Apply the effects if there are any.
     for (final MetaballsEffectState<MetaballsEffect> effect in frameData.effects) {
-      newState = effect.transformState(frameData, newState, state);
+      state = effect.transformState(frameData, this, state);
     }
-
-    state = newState;
   }
 
   MetaballShaderData computeShaderData(MetaballFrameData frameData) {
-    final double width = frameData.canvasSize.width;
-    final double height = frameData.canvasSize.height;
-    final double scale = sqrt(width * height) / 1000;
-
-    final double computedRadius = frameData.config.radius.interpolate(radius) * scale;
+    final double computedRadius = frameData.config.radius.interpolate(radius) * frameData.scale;
     final double diameter = computedRadius * 2;
 
     MetaballShaderData shaderData = MetaballShaderData(
       radius: computedRadius,
       position: Offset(
-        ((width - diameter) * state.position.x) + computedRadius,
-        ((height - diameter) * state.position.y) + computedRadius,
+        ((frameData.canvasSize.width - diameter) * state.position.dx) + computedRadius,
+        ((frameData.canvasSize.height - diameter) * state.position.dy) + computedRadius,
       ),
     );
 
     // Apply the effects if there are any.
     for (final MetaballsEffectState<MetaballsEffect> effect in frameData.effects) {
-      shaderData = effect.transformShaderData(frameData, state, shaderData);
+      shaderData = effect.transformShaderData(frameData, this, shaderData);
     }
 
     return shaderData;

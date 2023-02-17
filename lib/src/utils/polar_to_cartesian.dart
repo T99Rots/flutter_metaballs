@@ -1,7 +1,9 @@
 import 'dart:math';
 
-Point<double> polarToCartesian(double theta, double r) {
+import 'package:flutter/widgets.dart';
+
+Offset polarToCartesian(double theta, double r) {
   final double x = r * cos(theta);
   final double y = r * sin(theta);
-  return Point<double>(x, y);
+  return Offset(x, y);
 }

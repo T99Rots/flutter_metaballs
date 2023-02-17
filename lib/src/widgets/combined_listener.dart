@@ -69,7 +69,7 @@ class CombinedListenerState extends State<CombinedListener> {
   void onMove(PointerEvent event) {
     if (event.delta.distance > 0 && _pointers.containsKey(event.pointer)) {
       _pointers[event.pointer]!.addEvent(
-        position: event.position,
+        position: event.localPosition,
         delta: event.delta,
       );
     }
