@@ -1,28 +1,11 @@
 import 'dart:typed_data';
 
-class Program {
-  final dynamic program;
-  Program({this.program});
-}
-
-class Shader {
-  final dynamic shader;
-  Shader({this.shader});
-}
-
-class Buffer {
-  final dynamic buffer;
-  Buffer({this.buffer});
-}
-
-class UniformLocation {
-  final dynamic uniformLocation;
-  UniformLocation({this.uniformLocation});
-}
+import '_webgl.dart';
 
 class WebGL2RenderingContext {
-  final dynamic context;
   WebGL2RenderingContext({this.context});
+
+  final dynamic context;
 
   // ignore: non_constant_identifier_names
   int FRAGMENT_SHADER = 0x8B30;
@@ -42,27 +25,35 @@ class WebGL2RenderingContext {
   void attachShader(Program program, Shader shader) {
     context.attachShader(program.program, shader.shader);
   }
+
   void linkProgram(Program program) {
     context.linkProgram(program.program);
   }
+
   void useProgram(Program? program) {
     context.useProgram(program?.program);
   }
+
   void bindBuffer(int target, Buffer? buffer) {
     context.bindBuffer(target, buffer?.buffer);
   }
+
   void compileShader(Shader shader) {
     context.compileShader(shader.shader);
   }
+
   void enableVertexAttribArray(int index) {
     context.enableVertexAttribArray(index);
   }
+
   void vertexAttribPointer(int indx, int size, int type, bool normalized, int stride, int offset) {
     context.vertexAttribPointer(indx, size, type, normalized, stride, offset);
   }
+
   void shaderSource(Shader shader, String string) {
     context.shaderSource(shader.shader, string);
   }
+
   void drawArrays(int mode, int first, int count) {
     context.drawArrays(mode, first, count);
   }
@@ -72,21 +63,15 @@ class WebGL2RenderingContext {
   }
 
   Program createProgram() {
-    return Program(
-      program: context.createProgram()
-    );
+    return Program(program: context.createProgram());
   }
 
   Buffer createBuffer() {
-    return Buffer(
-      buffer: context.createBuffer()
-    );
+    return Buffer(buffer: context.createBuffer());
   }
 
   Shader createShader(int type) {
-    return Shader(
-      shader: context.createShader(type)
-    );
+    return Shader(shader: context.createShader(type));
   }
 
   bool? getShaderParameter(Shader shader, int pname) {
@@ -98,9 +83,7 @@ class WebGL2RenderingContext {
   }
 
   UniformLocation? getUniformLocation(Program program, String name) {
-    return UniformLocation(
-      uniformLocation: context.getUniformLocation(program.program, name)
-    );
+    return UniformLocation(uniformLocation: context.getUniformLocation(program.program, name));
   }
 
   int getAttribLocation(Program program, String name) {
@@ -140,7 +123,7 @@ class WebGL2RenderingContext {
   }
 
   void uniform2iv(UniformLocation? location, Int32List list) {
-    context.uniform2iv(location?.uniformLocation,  list);
+    context.uniform2iv(location?.uniformLocation, list);
   }
 
   void uniform3f(UniformLocation? location, num x, num y, num z) {

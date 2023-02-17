@@ -1,4 +1,7 @@
-const String fragmentShaderSource = """precision highp float;
+class WebShaders {
+  const WebShaders._();
+
+  static const String metaballsFrag = """precision highp float;
 
 // required for all gradients
 uniform int gradientType;
@@ -126,4 +129,15 @@ void main(){
   } else {
     gl_FragColor = vec4(0, 0, 0, 0);
   }
-}""";
+}
+""";
+
+  static const String metaballsVert = """attribute vec2 position;
+
+void main() {
+  // position specifies only x and y.
+  // We set z to be 0.0, and w to be 1.0
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+""";
+}
