@@ -1,9 +1,7 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/metaballs_shader_sprv.dart';
 import 'package:metaballs/types.dart';
 
 class MetaballsRenderer extends StatefulWidget {
@@ -53,57 +51,58 @@ class MetaballsRenderer extends StatefulWidget {
 }
 
 class _MetaballsRendererState extends State<MetaballsRenderer> {
-  late Future<FragmentProgram> _fragmentProgramFuture;
+  late Future<FragmentShader> _initFuture;
 
   @override
   void initState() {
-    _fragmentProgramFuture = metaballsShaderFragmentProgram().catchError((error) {
-      // ignore: avoid_print
-      print('shader error: $error');
-    });
+    _initFuture = _init();
     super.initState();
+  }
+
+  Future<FragmentShader> _init() async {
+    final program = await FragmentProgram.fromAsset(
+      'packages/metaballs/lib/metaballs_shader.frag',
+    );
+
+    return program.fragmentShader();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<FragmentProgram>(
-      future: _fragmentProgramFuture,
-      builder: (context, snapshot) {
-        if(snapshot.hasData) {
-          final List<double> doubles = List.filled(4 + (138 * 3), 0.0);
+    return FutureBuilder<FragmentShader>(
+        future: _initFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final FragmentShader shader = snapshot.data!;
 
-          doubles[0] = widget.time;
-          doubles[1] = min(max(1-widget.glowRadius, 0), 1);
-          doubles[2] = min(max(widget.glowIntensity, 0), 1);
-          doubles[3] = widget.metaballs.length.toDouble();
+            final List<double> doubles = List.filled(4 + (138 * 3), 0.0);
 
-          for(int i = 0; i < widget.metaballs.length; i++) {
-            final int offset = (i*3)+4;
-            final metaball = widget.metaballs[i];
-            doubles[offset] = metaball.x;
-            doubles[offset + 1] = metaball.y;
-            doubles[offset + 2] = metaball.r;
-          }
+            shader.setFloat(0, widget.time);
+            shader.setFloat(1, min(max(1 - widget.glowRadius, 0), 1));
+            shader.setFloat(2, min(max(widget.glowIntensity, 0), 1));
+            shader.setFloat(3, widget.metaballs.length.toDouble());
 
-          return ShaderMask(
-            blendMode: BlendMode.dstATop,
-            shaderCallback: (bounds) {
-              return snapshot.data!.shader(
-                floatUniforms: Float32List.fromList(doubles),
-              );
-            },
-            child: AnimatedContainer(
-              duration: widget.animationDuration,
-              decoration: BoxDecoration(
-                gradient: widget.gradient,
-                color: widget.color
+            for (int i = 0; i < widget.metaballs.length; i++) {
+              final int offset = (i * 3) + 4;
+              final metaball = widget.metaballs[i];
+              shader.setFloat(offset, metaball.x);
+              shader.setFloat(offset + 1, metaball.y);
+              shader.setFloat(offset + 2, metaball.r);
+            }
+
+            return ShaderMask(
+              blendMode: BlendMode.dstATop,
+              shaderCallback: (bounds) {
+                return shader;
+              },
+              child: AnimatedContainer(
+                duration: widget.animationDuration,
+                decoration: BoxDecoration(gradient: widget.gradient, color: widget.color),
               ),
-            ),
-          );
-        } else {
-          return Container();
-        }
-      }
-    );
+            );
+          } else {
+            return Container();
+          }
+        });
   }
 }
