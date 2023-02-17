@@ -44,3 +44,6 @@
 
 ## 1.4.2
 * Yet another attempt at fixing broken tables in readme on pub.dev
+
+## 1.5.0
+* Updated for compatibility with flutter 3.7.0+

@@ -75,8 +75,6 @@ class _MetaballsRendererState extends State<MetaballsRenderer> {
           if (snapshot.hasData) {
             final FragmentShader shader = snapshot.data!;
 
-            final List<double> doubles = List.filled(4 + (138 * 3), 0.0);
-
             shader.setFloat(0, widget.time);
             shader.setFloat(1, min(max(1 - widget.glowRadius, 0), 1));
             shader.setFloat(2, min(max(widget.glowIntensity, 0), 1));
