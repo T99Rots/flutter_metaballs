@@ -129,6 +129,19 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
       state.direction = -state.direction;
     }
   }
+
+  @override
+  void physicsConfigUpdated(BouncingPhysics oldConfig) {
+    if (oldConfig.maxForce != config.maxForce) {
+      visitMetaballs((Metaball metaball, MetaballBouncingPhysicsState? state) {
+        if (state == null) {
+          return;
+        }
+
+        state.force *= oldConfig.maxForce / config.maxForce;
+      });
+    }
+  }
 }
 
 class MetaballBouncingPhysicsState extends MetaballPhysicsState {

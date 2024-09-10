@@ -1,10 +1,23 @@
+import 'package:metaballs/src/controller/metaballs_scene.dart';
 import 'package:metaballs/src/interfaces/_interfaces.dart';
 
 import 'metaball_physics_state.dart';
 
+typedef MetaballsPhysicsSceneMetaballsVisitor<State extends MetaballPhysicsState> = void Function(
+  Metaball metaball,
+  State? state,
+);
+
 abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State extends MetaballPhysicsState> {
   final Map<Metaball, State> _stateCache = <Metaball, State>{};
+  MetaballsScene? _scene;
+  Config? _config;
 
+  /// Should create a physics state for a metaball.
+  ///
+  /// This gets called both if this physics scene first gets loaded and all
+  /// metaballs are added, and when metaballs get added during the lifecycle of
+  /// this scene.
   State? createState(MetaballPhysicsState? oldState) {
     return null;
   }
@@ -20,7 +33,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// If this metaball already existed in a previous [MetaballPhysicsScene],
   /// [oldState] will be the old [MetaballPhysicsState] assigned to this
   /// metaball.
-  void metaballAdded(Metaball metaball, MetaballPhysicsState? oldState) {
+  void adoptMetaball(Metaball metaball, MetaballPhysicsState? oldState) {
     final State? state = createState(oldState);
     if (state != null) {
       _stateCache[metaball] = state;
@@ -56,7 +69,47 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// Gets called whenever the physics config gets updated.
   ///
   /// May update the physics state of the current metaballs if required.
-  void physicsConfigUpdated() {}
+  void physicsConfigUpdated(Config oldConfig) {}
 
-  Config get config {}
+  void visitMetaballs(MetaballsPhysicsSceneMetaballsVisitor<State> visitor) {
+    scene.visitMetaballs((Metaball metaball) {
+      final State? state = getPhysicsState(metaball);
+      visitor(metaball, state);
+    });
+  }
+
+  /// The current physics config.
+  Config get config {
+    assert(
+      _config != null,
+      'Tried accessing MetaballsPhysicsConfig while the physics scene was not attached to a metaballs scene.',
+    );
+
+    return _config!;
+  }
+
+  /// The parent metaballs scene.
+  MetaballsScene get scene {
+    assert(
+      _scene != null,
+      'Tried accessing MetaballsScene while the physics scene was not attached to a metaballs scene.',
+    );
+
+    return _scene!;
+  }
+
+  void attach(MetaballsScene scene, Config config) {
+    _config = config;
+    _scene = scene;
+  }
+
+  void update(Config newConfig) {
+    if (_config == newConfig) {
+      return;
+    }
+
+    final Config oldConfig = config;
+    _config = newConfig;
+    physicsConfigUpdated(oldConfig);
+  }
 }

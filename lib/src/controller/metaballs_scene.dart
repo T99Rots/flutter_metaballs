@@ -4,8 +4,8 @@ import 'package:metaballs/src/interfaces/_interfaces.dart';
 
 typedef MetaballsVisitor = void Function(Metaball metaball);
 
-class MetaballsSceneImplementation with ChangeNotifier {
-  MetaballsSceneImplementation({
+class MetaballsScene with ChangeNotifier {
+  MetaballsScene({
     required TickerProvider vsync,
   }) {
     _ticker = vsync.createTicker(_tick);

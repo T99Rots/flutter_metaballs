@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/controller/_controller.dart';
-import 'package:metaballs/src/controller/metaballs_scene_implementation.dart';
+import 'package:metaballs/src/controller/metaballs_scene.dart';
 import 'package:metaballs/src/interfaces/_interfaces.dart';
 import 'package:metaballs/src/renderer/_renderer.dart';
 
@@ -29,7 +29,7 @@ class Metaballs extends StatefulWidget {
 }
 
 class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
-  final MetaballsSceneImplementation _scene = MetaballsSceneImplementation();
+  final MetaballsScene _scene = MetaballsScene();
   late MetaballsEffectController _controller;
   late MetaballsPhysics _physics;
 

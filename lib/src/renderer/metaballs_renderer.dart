@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:metaballs/src/controller/metaballs_scene_implementation.dart';
+import 'package:metaballs/src/controller/metaballs_scene.dart';
 import 'package:metaballs/src/interfaces/metaball.dart';
 import 'package:metaballs/src/pointer.dart';
 
@@ -14,7 +14,7 @@ class MetaballsRenderer extends RenderBox implements MouseTrackerAnnotation {
     required this.glowThreshold,
     required this.glowIntensity,
     required this.color,
-    required MetaballsSceneImplementation scene,
+    required MetaballsScene scene,
   })  : _scene = scene,
         assert(glowThreshold >= 0 && glowThreshold <= 1),
         assert(glowIntensity >= 0 && glowIntensity <= 1);
@@ -24,9 +24,9 @@ class MetaballsRenderer extends RenderBox implements MouseTrackerAnnotation {
   double glowThreshold;
   double glowIntensity;
 
-  MetaballsSceneImplementation _scene;
-  MetaballsSceneImplementation get scene => _scene;
-  set scene(MetaballsSceneImplementation newScene) {
+  MetaballsScene _scene;
+  MetaballsScene get scene => _scene;
+  set scene(MetaballsScene newScene) {
     if (newScene == _scene) {
       return;
     }
