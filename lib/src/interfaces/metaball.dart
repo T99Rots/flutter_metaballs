@@ -1,6 +1,11 @@
 import 'package:flutter/rendering.dart';
 
-abstract interface class Metaball {
-  Offset get position;
-  double get radius;
+class Metaball {
+  Metaball({
+    required this.position,
+    required this.radius,
+  });
+
+  Offset position;
+  double radius;
 }

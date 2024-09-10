@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           ),
           glowIntensity: 0.5,
           glowThreshold: 0.5,
-          metaBalls: [
+          metaballs: [
             MetaBall(
               position: Offset(40, 40),
               radius: 50,

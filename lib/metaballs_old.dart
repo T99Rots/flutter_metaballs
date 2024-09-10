@@ -356,7 +356,7 @@ class Metaballs extends StatefulWidget {
 }
 
 class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
-  late List<_MetaBall> _metaBalls;
+  late List<_MetaBall> _metaballs;
   late AnimationController _controller;
   final List<_Ripple> _ripples = [];
   final Map<int, _Pointer> _pointers = {};
@@ -371,7 +371,7 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
     _controller = AnimationController.unbounded(duration: const Duration(days: 365), vsync: this)
       ..animateTo(const Duration(days: 365).inSeconds.toDouble());
 
-    _metaBalls = List.generate(widget.metaballs, (_) => _MetaBall());
+    _metaballs = List.generate(widget.metaballs, (_) => _MetaBall());
     super.initState();
   }
 
@@ -383,13 +383,13 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
 
   @override
   void didUpdateWidget(covariant Metaballs oldWidget) {
-    if (_metaBalls.length != widget.metaballs) {
-      final difference = widget.metaballs - _metaBalls.length;
+    if (_metaballs.length != widget.metaballs) {
+      final difference = widget.metaballs - _metaballs.length;
       if (difference < 0) {
-        _metaBalls.removeRange(_metaBalls.length + difference, _metaBalls.length);
+        _metaballs.removeRange(_metaballs.length + difference, _metaballs.length);
       } else {
         for (int i = 0; i < difference; i++) {
-          _metaBalls.add(_MetaBall());
+          _metaballs.add(_MetaBall());
         }
       }
     }
@@ -423,7 +423,7 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
               speedMultiplier *= multiplier;
             }
 
-            final computedMetaballs = _metaBalls
+            final computedMetaballs = _metaballs
                 .map((metaball) => metaball.update(
                       canvasSize: size,
                       frameTime: frameTime,
