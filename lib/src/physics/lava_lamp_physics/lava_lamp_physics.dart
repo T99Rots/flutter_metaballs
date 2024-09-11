@@ -43,7 +43,11 @@ class LavaLampPhysicsScene extends MetaballsPhysicsScene<LavaLampPhysics, Metaba
   }
 
   @override
-  void tickMetaball(Duration elapsed, Metaball metaball, MetaballLavaLampPhysicsState state) {}
+  void tickMetaball(Duration frameTime, Metaball metaball, MetaballLavaLampPhysicsState? state) {
+    if (state == null) {
+      return;
+    }
+  }
 }
 
 class MetaballLavaLampPhysicsState extends MetaballPhysicsState {
