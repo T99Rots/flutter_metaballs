@@ -59,12 +59,13 @@ class _HomePageState extends State<HomePage> {
           ),
           glowIntensity: 0.5,
           glowThreshold: 0.5,
-          metaballs: [
-            MetaBall(
-              position: Offset(40, 40),
-              radius: 50,
-            ),
-          ],
+          effect: DefaultEffect(),
+          physics: BouncingPhysics(
+            maxForce: 1,
+            friction: 1,
+            massMultiplier: 1,
+            hasInitialSpeed: false,
+          ),
         ),
       ],
     );

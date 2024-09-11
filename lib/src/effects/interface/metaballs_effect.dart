@@ -2,6 +2,8 @@ import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/pointer.dart';
 
 abstract class MetaballsEffect {
+  const MetaballsEffect();
+
   MetaballsEffectState<MetaballsEffect> createState();
 }
 
