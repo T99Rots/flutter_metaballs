@@ -1,5 +1,6 @@
-import 'package:metaballs/src/controller/metaballs_scene.dart';
-import 'package:metaballs/src/interfaces/_interfaces.dart';
+import 'package:metaballs/src/metaballs_scene.dart';
+import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
 
 import 'metaball_physics_state.dart';
 
@@ -7,6 +8,8 @@ typedef MetaballsPhysicsSceneMetaballsVisitor<State extends MetaballPhysicsState
   Metaball metaball,
   State? state,
 );
+
+typedef MetaballsPhysicsSceneAny = MetaballsPhysicsScene<MetaballsPhysics, MetaballPhysicsState>;
 
 abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State extends MetaballPhysicsState> {
   final Map<Metaball, State> _stateCache = <Metaball, State>{};
@@ -64,13 +67,22 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   ///
   /// Gets called once a tick, usually would update the position and velocity of
   /// the passed metaball based on how much time has passed since the last tick.
-  void updateMetaball(Duration elapsed, Metaball metaball, State state) {}
+  void tickMetaball(Duration frameTime, Metaball metaball, State? state) {}
 
   /// Gets called whenever the physics config gets updated.
   ///
   /// May update the physics state of the current metaballs if required.
   void physicsConfigUpdated(Config oldConfig) {}
 
+  void dispose() {}
+
+  void tick(Duration frameTime) {
+    visitMetaballs((Metaball metaball, State? state) {
+      tickMetaball(frameTime, metaball, state);
+    });
+  }
+
+  /// Allows you to iterate over every metaball and its physics state.
   void visitMetaballs(MetaballsPhysicsSceneMetaballsVisitor<State> visitor) {
     scene.visitMetaballs((Metaball metaball) {
       final State? state = getPhysicsState(metaball);

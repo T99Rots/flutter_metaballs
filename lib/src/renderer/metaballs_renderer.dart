@@ -1,14 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:metaballs/src/controller/metaballs_scene.dart';
-import 'package:metaballs/src/interfaces/metaball.dart';
-import 'package:metaballs/src/pointer.dart';
+import 'package:metaballs/src/metaballs_scene.dart';
+import 'package:metaballs/src/models/visual_metaball.dart';
 
 import 'shader_program_provider.dart';
 
-class MetaballsRenderer extends RenderBox implements MouseTrackerAnnotation {
+class MetaballsRenderer extends RenderBox {
   MetaballsRenderer({
     required this.gradient,
     required this.glowThreshold,
@@ -40,7 +38,6 @@ class MetaballsRenderer extends RenderBox implements MouseTrackerAnnotation {
   }
 
   final Paint _paint = Paint();
-  final Map<int, Pointer> _pointers = <int, Pointer>{};
   FragmentShader? _shader;
 
   @override
@@ -117,51 +114,21 @@ class MetaballsRenderer extends RenderBox implements MouseTrackerAnnotation {
   }
 
   void _updateShader(FragmentShader shader) {
-    final List<Metaball> metaballs = _scene.metaballs;
+    final List<VisualMetaball> metaballs = _scene.metaballs;
     int index = 0;
 
     shader.setFloat(index++, glowThreshold);
     shader.setFloat(index++, glowIntensity);
     shader.setFloat(index++, metaballs.length.toDouble());
 
-    for (final Metaball metaball in metaballs) {
-      shader.setFloat(index++, metaball.position.dx);
-      shader.setFloat(index++, metaball.position.dy);
+    for (final VisualMetaball metaball in metaballs) {
+      shader.setFloat(index++, metaball.visualPosition.dx);
+      shader.setFloat(index++, metaball.visualPosition.dy);
 
       // Due to the algorithm used, the radius of the rendered metaball will be
       // double the radius it was given. We divide by 2 so we don't need to do
       // this on the GPU.
-      shader.setFloat(index++, metaball.radius / 2);
+      shader.setFloat(index++, metaball.visualRadius / 2);
     }
   }
-
-  @override
-  void handleEvent(PointerEvent event, covariant BoxHitTestEntry entry) {
-    _pointers[event.pointer]?.handleEvent(event);
-  }
-
-  @override
-  MouseCursor get cursor => MouseCursor.defer;
-
-  @override
-  PointerEnterEventListener? get onEnter => _handleOnEnter;
-  void _handleOnEnter(PointerEnterEvent event) {
-    final Pointer pointer = Pointer(
-      position: event.localPosition,
-      delta: event.localDelta,
-      kind: event.kind,
-      id: event.pointer,
-    );
-    _pointers[event.pointer] = pointer;
-    _scene.handlePointer(pointer);
-  }
-
-  @override
-  PointerExitEventListener? get onExit => _handleOnExit;
-  void _handleOnExit(PointerExitEvent event) {
-    _pointers.remove(event.pointer);
-  }
-
-  @override
-  bool get validForMouseTracker => true;
 }
