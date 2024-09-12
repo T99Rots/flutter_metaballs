@@ -54,7 +54,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   ///
   /// In case this physics scene does keep state for this [metaball], this
   /// method should return it.
-  State? metaballRemoved(Metaball metaball) {
+  State? dropMetaball(Metaball metaball) {
     return _stateCache.remove(metaball);
   }
 
@@ -73,8 +73,6 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   ///
   /// May update the physics state of the current metaballs if required.
   void physicsConfigUpdated(Config oldConfig) {}
-
-  void dispose() {}
 
   void tick(Duration frameTime) {
     visitMetaballs((Metaball metaball, State? state) {
@@ -113,6 +111,11 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   void attach(MetaballsScene scene, Config config) {
     _config = config;
     _scene = scene;
+  }
+
+  void detach() {
+    _config = null;
+    _scene = null;
   }
 
   void update(Config newConfig) {

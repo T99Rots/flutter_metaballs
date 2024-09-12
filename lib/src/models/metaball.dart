@@ -48,4 +48,9 @@ class Metaball implements VisualMetaball {
   ///
   /// This is the [radius] of the metaball with the [radiusOffset] applied.
   double get visualRadius => radius + radiusOffset;
+
+  @override
+  String toString() {
+    return 'Metaball(position: $position, radius: $radius, positionOffset: $positionOffset, radiusOffset: $radiusOffset)';
+  }
 }

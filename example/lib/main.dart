@@ -61,9 +61,9 @@ class _HomePageState extends State<HomePage> {
           glowThreshold: 0.5,
           effect: DefaultEffect(),
           physics: BouncingPhysics(
-            maxForce: 1,
-            friction: 1,
-            massMultiplier: 1,
+            maxForce: 10,
+            friction: 0.9,
+            metaballMass: 10,
             hasInitialSpeed: false,
           ),
         ),

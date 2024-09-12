@@ -77,8 +77,6 @@ class MetaballsRenderer extends RenderBox {
       return;
     }
 
-    final Rect rect = offset & size;
-
     // Ensure the layer is a ShaderMaskLayer.
     Layer? layer = this.layer;
     if (layer is! ShaderMaskLayer) {
@@ -88,7 +86,7 @@ class MetaballsRenderer extends RenderBox {
     _updateShader(shader);
     layer
       ..shader = _shader
-      ..maskRect = rect
+      ..maskRect = offset & size
       ..blendMode = BlendMode.dstATop;
 
     context.pushLayer(
@@ -117,18 +115,20 @@ class MetaballsRenderer extends RenderBox {
     final List<VisualMetaball> metaballs = _scene.metaballs;
     int index = 0;
 
-    shader.setFloat(index++, glowThreshold);
-    shader.setFloat(index++, glowIntensity);
+    shader.setFloat(index++, 0.2);
+    shader.setFloat(index++, 0.5);
     shader.setFloat(index++, metaballs.length.toDouble());
+    // print(metaballs[4].visualPosition);
 
     for (final VisualMetaball metaball in metaballs) {
-      shader.setFloat(index++, metaball.visualPosition.dx);
-      shader.setFloat(index++, metaball.visualPosition.dy);
+      shader.setFloat(index++, metaball.visualPosition.dx * size.width);
+      shader.setFloat(index++, metaball.visualPosition.dy * size.height);
 
       // Due to the algorithm used, the radius of the rendered metaball will be
       // double the radius it was given. We divide by 2 so we don't need to do
       // this on the GPU.
-      shader.setFloat(index++, metaball.visualRadius / 2);
+      shader.setFloat(index++, ((metaball.visualRadius * 40) + 30) / 2);
+      index++;
     }
   }
 }

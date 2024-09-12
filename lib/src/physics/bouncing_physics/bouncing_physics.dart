@@ -6,7 +6,7 @@ class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     required this.maxForce,
     required this.friction,
-    required this.massMultiplier,
+    required this.metaballMass,
     required this.hasInitialSpeed,
   });
 
@@ -27,7 +27,7 @@ class BouncingPhysics extends MetaballsPhysics {
   /// The mass determines the amount of force required to move the metaball.
   /// A higher mass multiplier means more force is needed to achieve the same
   /// acceleration.
-  final double massMultiplier;
+  final double metaballMass;
 
   /// Determines whether the metaball should be initialized with an initial speed.
   ///

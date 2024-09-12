@@ -41,6 +41,15 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
     );
   }
 
+  double _normalizeRadian(double radian) {
+    // Normalize the radian to be within the range of 0 to 2 * pi
+    radian = radian % (2 * pi);
+    if (radian < 0) {
+      radian += 2 * pi;
+    }
+    return radian;
+  }
+
   @override
   void tickMetaball(Duration elapsed, Metaball metaball, MetaballBouncingPhysicsState? state) {
     // Should not happen as we always create a state.
@@ -50,32 +59,16 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
 
     final double dt = elapsed.inMilliseconds / 1000.0;
 
-    // Calculate mass based on radius
-    final double mass = metaball.radius * metaball.radius * config.massMultiplier;
-
     // Calculate direction components
     final double directionX = cos(state.direction);
     final double directionY = sin(state.direction);
 
-    // Calculate acceleration
-    final double ax = (state.force / mass) * directionX;
-    final double ay = (state.force / mass) * directionY;
+    final double accelerationOverDt = config.maxForce * dt;
 
     // Update velocity with acceleration
     state.velocity = Offset(
-      state.velocity.dx + ax * dt,
-      state.velocity.dy + ay * dt,
-    );
-
-    // Apply friction
-    final double speed = state.velocity.distance;
-    final double frictionForce = config.friction * speed;
-    final double frictionAx = (frictionForce / mass) * (state.velocity.dx / speed);
-    final double frictionAy = (frictionForce / mass) * (state.velocity.dy / speed);
-
-    state.velocity = Offset(
-      state.velocity.dx - frictionAx * dt,
-      state.velocity.dy - frictionAy * dt,
+      state.velocity.dx + (-config.friction * state.velocity.dx) + (accelerationOverDt * directionX),
+      state.velocity.dy + (-config.friction * state.velocity.dy) + (accelerationOverDt * directionY),
     );
 
     // Update position
@@ -88,13 +81,13 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
     final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
     final bool outOfBoundsRight = metaball.position.dx > 1 && directionX > 0;
     if (outOfBoundsLeft || outOfBoundsRight) {
-      state.direction = pi - state.direction;
+      state.direction = _normalizeRadian(pi - state.direction);
     }
 
     final bool outOfBoundsTop = metaball.position.dy < 0 && directionY < 0;
     final bool outOfBoundsBottom = metaball.position.dy > 1 && directionY > 0;
     if (outOfBoundsTop || outOfBoundsBottom) {
-      state.direction = -state.direction;
+      state.direction = _normalizeRadian(-state.direction);
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/pointer.dart';
 
@@ -20,8 +21,6 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
   void handlePointer(MetaballsScene scene, Pointer pointer) {}
 
   void effectUpdated(Effect oldEffect) {}
-
-  void dispose() {}
 
   double getTimeScale() {
     return 1.0;
@@ -47,11 +46,19 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
     return _scene!;
   }
 
+  @mustCallSuper
+  void detach() {
+    _effect = null;
+    _scene = null;
+  }
+
+  @mustCallSuper
   void attach(MetaballsScene scene, Effect effect) {
     _effect = effect;
     _scene = scene;
   }
 
+  @mustCallSuper
   void update(Effect newEffect) {
     if (_effect == newEffect) {
       return;
