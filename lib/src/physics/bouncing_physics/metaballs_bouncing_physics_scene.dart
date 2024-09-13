@@ -67,8 +67,12 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
 
     // Update velocity with acceleration
     state.velocity = Offset(
-      state.velocity.dx + (-config.friction * state.velocity.dx) + (accelerationOverDt * directionX),
-      state.velocity.dy + (-config.friction * state.velocity.dy) + (accelerationOverDt * directionY),
+      state.velocity.dx +
+          ((-config.friction * state.velocity.dx * dt) / config.metaballMass) +
+          (accelerationOverDt * directionX),
+      state.velocity.dy +
+          ((-config.friction * state.velocity.dy * dt) / config.metaballMass) +
+          (accelerationOverDt * directionY),
     );
 
     // Update position

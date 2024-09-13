@@ -99,7 +99,11 @@ class MetaballsScene with ChangeNotifier {
     if (difference != 0) {
       if (difference > 0) {
         for (int i = 0; i < difference; i++) {
-          _metaballs.add(_createMetaball());
+          final Metaball metaball = _createMetaball();
+          _metaballs.add(metaball);
+          if (physics.runtimeType == _physics.runtimeType) {
+            _physicsScene.adoptMetaball(metaball, null);
+          }
         }
       } else {
         for (int i = 0; i > difference; i--) {
@@ -111,12 +115,6 @@ class MetaballsScene with ChangeNotifier {
     if (physics != _physics) {
       if (physics.runtimeType == _physics.runtimeType) {
         _physicsScene.update(physics);
-        if (difference > 0) {
-          final int newCount = _metaballs.length;
-          for (int i = oldCount; i < newCount; i++) {
-            _physicsScene.adoptMetaball(_metaballs[i], null);
-          }
-        }
       } else {
         final List<MetaballPhysicsState?> oldStates = <MetaballPhysicsState?>[];
         final int minCount = min(_metaballs.length, oldCount);

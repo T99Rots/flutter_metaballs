@@ -118,7 +118,6 @@ class MetaballsRenderer extends RenderBox {
     shader.setFloat(index++, 0.2);
     shader.setFloat(index++, 0.5);
     shader.setFloat(index++, metaballs.length.toDouble());
-    // print(metaballs[4].visualPosition);
 
     for (final VisualMetaball metaball in metaballs) {
       shader.setFloat(index++, metaball.visualPosition.dx * size.width);

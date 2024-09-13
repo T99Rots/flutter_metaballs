@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
@@ -36,6 +37,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// If this metaball already existed in a previous [MetaballPhysicsScene],
   /// [oldState] will be the old [MetaballPhysicsState] assigned to this
   /// metaball.
+  @mustCallSuper
   void adoptMetaball(Metaball metaball, MetaballPhysicsState? oldState) {
     final State? state = createState(oldState);
     if (state != null) {
@@ -54,6 +56,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   ///
   /// In case this physics scene does keep state for this [metaball], this
   /// method should return it.
+  @mustCallSuper
   State? dropMetaball(Metaball metaball) {
     return _stateCache.remove(metaball);
   }
@@ -74,6 +77,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// May update the physics state of the current metaballs if required.
   void physicsConfigUpdated(Config oldConfig) {}
 
+  @mustCallSuper
   void tick(Duration frameTime) {
     visitMetaballs((Metaball metaball, State? state) {
       tickMetaball(frameTime, metaball, state);
@@ -81,6 +85,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   }
 
   /// Allows you to iterate over every metaball and its physics state.
+  @mustCallSuper
   void visitMetaballs(MetaballsPhysicsSceneMetaballsVisitor<State> visitor) {
     scene.visitMetaballs((Metaball metaball) {
       final State? state = getPhysicsState(metaball);
@@ -108,16 +113,19 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
     return _scene!;
   }
 
+  @mustCallSuper
   void attach(MetaballsScene scene, Config config) {
     _config = config;
     _scene = scene;
   }
 
+  @mustCallSuper
   void detach() {
     _config = null;
     _scene = null;
   }
 
+  @mustCallSuper
   void update(Config newConfig) {
     if (_config == newConfig) {
       return;

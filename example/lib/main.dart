@@ -36,15 +36,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return const Stack(
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: Alignment.bottomCenter,
-              radius: 1.5,
-              colors: [
-                Color.fromARGB(255, 13, 35, 61),
-                Colors.black,
-              ],
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.bottomCenter,
+                radius: 1.5,
+                colors: [
+                  Color.fromARGB(255, 13, 35, 61),
+                  Colors.black,
+                ],
+              ),
             ),
           ),
         ),
@@ -61,11 +63,12 @@ class _HomePageState extends State<HomePage> {
           glowThreshold: 0.5,
           effect: DefaultEffect(),
           physics: BouncingPhysics(
-            maxForce: 10,
-            friction: 0.9,
+            maxForce: 2,
+            friction: 100,
             metaballMass: 10,
             hasInitialSpeed: false,
           ),
+          count: 40,
         ),
       ],
     );

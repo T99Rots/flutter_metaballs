@@ -40,6 +40,11 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(covariant Metaballs oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _scene.update(
+      effect: widget.effect,
+      physics: widget.physics,
+      count: widget.count,
+    );
   }
 
   @override
@@ -51,12 +56,14 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return PointerDetector(
       onPointerAdded: _scene.handlePointer,
-      child: MetaballsRenderWidget(
-        gradient: widget.gradient,
-        color: widget.color,
-        glowThreshold: widget.glowThreshold,
-        glowIntensity: widget.glowIntensity,
-        scene: _scene,
+      child: RepaintBoundary(
+        child: MetaballsRenderWidget(
+          gradient: widget.gradient,
+          color: widget.color,
+          glowThreshold: widget.glowThreshold,
+          glowIntensity: widget.glowIntensity,
+          scene: _scene,
+        ),
       ),
     );
   }
