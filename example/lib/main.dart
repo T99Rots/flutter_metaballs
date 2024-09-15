@@ -68,7 +68,6 @@ class _HomePageState extends State<HomePage> {
             metaballMass: 10,
             hasInitialSpeed: false,
           ),
-          count: 40,
         ),
       ],
     );

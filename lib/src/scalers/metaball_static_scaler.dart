@@ -1,0 +1,37 @@
+import 'package:metaballs/src/metaballs_scene.dart';
+import 'package:metaballs/src/models/metaball.dart';
+
+import 'metaball_scaler.dart';
+
+/// A class representing a static size for a metaball.
+///
+/// The `MetaballStaticSize` class provides a fixed size for a metaball,
+/// regardless of the view size or radius. This can be useful in scenarios
+/// where a constant size is needed for rendering metaballs, ensuring
+/// uniformity and predictability in their appearance.
+///
+/// Example:
+/// ```dart
+/// MetaballStaticSize(
+///   size: 10.0,
+/// )
+/// ```
+///
+/// In this example, a `MetaballStaticSize` object is created with a fixed
+/// size of 10.0. This size will be used for rendering the metaball.
+class MetaballStaticScaler implements MetaballScaler {
+  const MetaballStaticScaler({
+    required this.size,
+  });
+
+  final double size;
+
+  @override
+  void applyScaling(MetaballsScene scene) {
+    scene.visitMetaballs((Metaball metaball) {
+      metaball.transform
+        ..scaleSize(0)
+        ..translateSize(size);
+    });
+  }
+}

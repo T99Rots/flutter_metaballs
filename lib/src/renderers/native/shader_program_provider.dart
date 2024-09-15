@@ -8,8 +8,8 @@ class ShaderProgramProvider {
   static Future<FragmentProgram>? _programFuture;
 
   static Future<FragmentShader> createShaderInstance() async {
-    final programFuture = _programFuture ??= FragmentProgram.fromAsset(_path);
-    final program = await programFuture;
+    final Future<FragmentProgram> programFuture = _programFuture ??= FragmentProgram.fromAsset(_path);
+    final FragmentProgram program = await programFuture;
 
     return program.fragmentShader();
   }

@@ -51,13 +51,13 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
   }
 
   @override
-  void tickMetaball(Duration elapsed, Metaball metaball, MetaballBouncingPhysicsState? state) {
+  void tickMetaball(Duration frameTime, Metaball metaball, MetaballBouncingPhysicsState? state) {
     // Should not happen as we always create a state.
     if (state == null) {
       return;
     }
 
-    final double dt = elapsed.inMilliseconds / 1000.0;
+    final double dt = frameTime.inMilliseconds / 1000.0;
 
     // Calculate direction components
     final double directionX = cos(state.direction);
@@ -76,20 +76,18 @@ class MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysic
     );
 
     // Update position
-    metaball.position = Offset(
-      metaball.position.dx + state.velocity.dx * dt,
-      metaball.position.dy + state.velocity.dy * dt,
-    );
+    metaball.x += state.velocity.dx * dt;
+    metaball.y += state.velocity.dy * dt;
 
     // Ensure metaball stays in bounds
-    final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
-    final bool outOfBoundsRight = metaball.position.dx > 1 && directionX > 0;
+    final bool outOfBoundsLeft = metaball.x < 0 && directionX < 0;
+    final bool outOfBoundsRight = metaball.x > 1 && directionX > 0;
     if (outOfBoundsLeft || outOfBoundsRight) {
       state.direction = _normalizeRadian(pi - state.direction);
     }
 
-    final bool outOfBoundsTop = metaball.position.dy < 0 && directionY < 0;
-    final bool outOfBoundsBottom = metaball.position.dy > 1 && directionY > 0;
+    final bool outOfBoundsTop = metaball.y < 0 && directionY < 0;
+    final bool outOfBoundsBottom = metaball.y > 1 && directionY > 0;
     if (outOfBoundsTop || outOfBoundsBottom) {
       state.direction = _normalizeRadian(-state.direction);
     }

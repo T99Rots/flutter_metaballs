@@ -4,11 +4,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball.dart';
-import 'package:metaballs/src/models/visual_metaball.dart';
 import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
 import 'package:metaballs/src/pointer.dart';
+import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
 typedef MetaballsVisitor = void Function(Metaball metaball);
 
@@ -18,15 +18,14 @@ class MetaballsScene with ChangeNotifier {
     required MetaballsEffect effect,
     required MetaballsPhysics physics,
     required int count,
-  }) {
+    required MetaballScaler metaballScaler,
+  })  : _effect = effect,
+        _effectState = effect.createState(),
+        _physics = physics,
+        _physicsScene = physics.createScene(),
+        _metaballScaler = metaballScaler {
     _ticker = vsync.createTicker(_tick)..start();
-
-    _physicsScene = physics.createScene();
     _physicsScene.attach(this, physics);
-    _physics = physics;
-
-    _effect = effect;
-    _effectState = effect.createState();
     _effectState.attach(this, effect);
 
     for (int i = 0; i < count; i++) {
@@ -40,20 +39,22 @@ class MetaballsScene with ChangeNotifier {
   final Random _random = Random();
   final List<Metaball> _metaballs = <Metaball>[];
 
-  late MetaballsEffectStateAny _effectState;
-  late MetaballsEffect _effect;
+  MetaballScaler _metaballScaler;
 
-  late MetaballsPhysicsSceneAny _physicsScene;
-  late MetaballsPhysics _physics;
+  MetaballsEffectStateAny _effectState;
+  MetaballsEffect _effect;
 
-  Duration lastFrame = Duration.zero;
+  MetaballsPhysicsSceneAny _physicsScene;
+  MetaballsPhysics _physics;
+
+  Size? _viewportSize;
+  Duration _lastFrame = Duration.zero;
+  MetaballRenderStage _stage = MetaballRenderStage.none;
 
   Metaball _createMetaball() {
     return Metaball(
-      position: Offset(
-        _random.nextDouble(),
-        _random.nextDouble(),
-      ),
+      x: _random.nextDouble(),
+      y: _random.nextDouble(),
       radius: _random.nextDouble(),
       createdAt: Duration.zero,
     );
@@ -65,23 +66,56 @@ class MetaballsScene with ChangeNotifier {
     }
   }
 
+  void _applyRenderTransform(Size viewportSize) {
+    _effectState.beforeRenderTransform(this);
+    for (final Metaball metaball in _metaballs) {
+      metaball.transform.reset();
+    }
+
+    _metaballScaler.applyScaling(this);
+
+    for (final Metaball metaball in _metaballs) {
+      final double renderRadius = metaball.transform.transformRadius(metaball.radius);
+
+      metaball.transform
+        ..scalePosition(
+          viewportSize.width - renderRadius,
+          viewportSize.height - renderRadius,
+        )
+        ..translatePosition(
+          renderRadius / 2,
+          renderRadius / 2,
+        );
+    }
+    _effectState.beforeRender(this);
+    _stage = MetaballRenderStage.render;
+  }
+
   void _tick(Duration elapsed) {
-    Duration frameTime = elapsed - lastFrame;
+    Duration frameTime = elapsed - _lastFrame;
     if (frameTime > Duration(milliseconds: 100)) {
       frameTime = Duration(milliseconds: 100);
     }
 
-    lastFrame = elapsed;
-    _effectState.beforePhysics(this);
+    _lastFrame = elapsed;
+    _stage = MetaballRenderStage.physics;
     final double timeScale = _effectState.getTimeScale();
-    _physicsScene.tick(frameTime * timeScale);
     _effectState.beforePhysics(this);
+    _physicsScene.tick(frameTime * timeScale);
+    _effectState.afterPhysics(this);
+    _stage = MetaballRenderStage.transform;
+
+    final Size? viewportSize = _viewportSize;
+    if (viewportSize != null) {
+      _applyRenderTransform(viewportSize);
+    }
     notifyListeners();
   }
 
   void update({
     required MetaballsEffect effect,
     required MetaballsPhysics physics,
+    required MetaballScaler metaballScaler,
     required int count,
   }) {
     if (effect != _effect) {
@@ -138,6 +172,7 @@ class MetaballsScene with ChangeNotifier {
 
     _effect = effect;
     _physics = physics;
+    _metaballScaler = metaballScaler;
   }
 
   @override
@@ -150,5 +185,35 @@ class MetaballsScene with ChangeNotifier {
     _effectState.handlePointer(this, pointer);
   }
 
-  List<VisualMetaball> get metaballs => _metaballs;
+  void updateViewportSize(Size size) {
+    _viewportSize = size;
+    if (_stage == MetaballRenderStage.transform) {
+      _applyRenderTransform(size);
+    }
+  }
+
+  List<Metaball> get metaballs => _metaballs;
+
+  Duration get elapsed => _lastFrame;
+
+  Size get viewportSize {
+    assert(
+      _viewportSize != null,
+      'Tried accessing viewportSize before this was available.\n'
+      'Most likely you tried doing so from beforePhysics or afterPhysics, try '
+      'using beforeRenderTransform instead or check whether size is available '
+      'using hasSize.',
+    );
+
+    return _viewportSize!;
+  }
+
+  bool get hasSize => _viewportSize != null;
+}
+
+enum MetaballRenderStage {
+  none,
+  physics,
+  transform,
+  render,
 }

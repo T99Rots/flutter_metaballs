@@ -2,7 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/visual_metaball.dart';
+import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/models/metaball_render_data.dart';
 
 import 'shader_program_provider.dart';
 
@@ -32,6 +33,9 @@ class MetaballsRenderer extends RenderBox {
     if (attached) {
       _scene.removeListener(markNeedsPaint);
       newScene.addListener(markNeedsPaint);
+      if (hasSize) {
+        newScene.updateViewportSize(size);
+      }
     }
 
     _scene = newScene;
@@ -67,6 +71,7 @@ class MetaballsRenderer extends RenderBox {
   @override
   void performLayout() {
     size = constraints.biggest;
+    _scene.updateViewportSize(size);
   }
 
   @override
@@ -112,21 +117,23 @@ class MetaballsRenderer extends RenderBox {
   }
 
   void _updateShader(FragmentShader shader) {
-    final List<VisualMetaball> metaballs = _scene.metaballs;
+    final List<Metaball> metaballs = _scene.metaballs;
     int index = 0;
 
     shader.setFloat(index++, 0.2);
     shader.setFloat(index++, 0.5);
     shader.setFloat(index++, metaballs.length.toDouble());
 
-    for (final VisualMetaball metaball in metaballs) {
-      shader.setFloat(index++, metaball.visualPosition.dx * size.width);
-      shader.setFloat(index++, metaball.visualPosition.dy * size.height);
+    for (final Metaball metaball in metaballs) {
+      final MetaballRenderData renderData = metaball.transform.transformMetaball(metaball);
+
+      shader.setFloat(index++, renderData.x);
+      shader.setFloat(index++, renderData.y);
 
       // Due to the algorithm used, the radius of the rendered metaball will be
       // double the radius it was given. We divide by 2 so we don't need to do
       // this on the GPU.
-      shader.setFloat(index++, ((metaball.visualRadius * 40) + 30) / 2);
+      shader.setFloat(index++, renderData.radius / 2);
       index++;
     }
   }
