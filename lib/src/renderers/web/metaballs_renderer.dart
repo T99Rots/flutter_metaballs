@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui_web' as ui;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -20,20 +21,23 @@ class MetaballsRenderer extends RenderBox {
   })  : _scene = scene,
         assert(glowThreshold >= 0 && glowThreshold <= 1),
         assert(glowIntensity >= 0 && glowIntensity <= 1) {
-    _id = platformViewsRegistry.getNextPlatformViewId();
-    _idString = 'metaballs_canvas:$_id';
-    _canvas = HTMLCanvasElement();
-    _context = _canvas.getContext('webgl2') as WebGL2RenderingContext;
-    _canvas.id = _idString;
-    _canvas.style
-      ..width = '100%'
-      ..height = '100%'
-      ..pointerEvents = 'none';
-    _createArgs = <String, dynamic>{
-      'id': _id,
-      'viewType': _idString,
-      'params': null,
-    };
+    ui.platformViewRegistry.registerViewFactory(_idString, (int viewId) {
+      _id = viewId;
+      _idString = 'metaballs_canvas:$_id';
+      _canvas = HTMLCanvasElement();
+      _context = _canvas.getContext('webgl2') as WebGL2RenderingContext;
+      _canvas.id = _idString;
+      _canvas.style
+        ..width = '100%'
+        ..height = '100%'
+        ..pointerEvents = 'none';
+      _createArgs = <String, dynamic>{
+        'id': _id,
+        'viewType': _idString,
+        'params': null,
+      };
+      return _canvas;
+    });
   }
 
   final Float32List _metaballsBuffer = Float32List(3 * 256);
@@ -74,7 +78,6 @@ class MetaballsRenderer extends RenderBox {
   @override
   void attach(PipelineOwner owner) {
     scene.addListener(_updateShader);
-    _id = platformViewsRegistry.getNextPlatformViewId();
     SystemChannels.platform_views.invokeMethod<void>('create', _createArgs).then((_) => _created = true);
     ShaderProgramProvider.createShaderInstance(_context).then(_handleShaderLoaded);
 

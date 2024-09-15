@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 
-import 'native/metaballs_renderer.dart' if (dart.library.html) 'web/metaballs_render_widget.dart';
+import 'web/metaballs_renderer.dart';
 
 class MetaballsRenderWidget extends LeafRenderObjectWidget {
   const MetaballsRenderWidget({
