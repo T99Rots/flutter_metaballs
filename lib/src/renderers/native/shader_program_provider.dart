@@ -4,7 +4,7 @@ import 'dart:ui';
 class ShaderProgramProvider {
   const ShaderProgramProvider._();
 
-  static const String _path = 'packages/metaballs/assets/shaders/metaballs.frag';
+  static const String _path = 'packages/metaballs/shaders/metaballs.frag';
   static Future<FragmentProgram>? _programFuture;
 
   static Future<FragmentShader> createShaderInstance() async {

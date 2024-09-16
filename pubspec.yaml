@@ -10,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_gpu:
+    sdk: flutter
+  flutter_gpu_shaders: ^0.1.2
+  native_assets_cli: ^0.7.3
   
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -18,4 +22,6 @@ dev_dependencies:
 
 flutter:
   shaders:
-    - assets/shaders/metaballs.frag
+    - shaders/metaballs.frag
+  assets:
+    - build/shaderbundles/

@@ -1,0 +1,10 @@
+{
+  "MetaballsVertex": {
+    "type": "vertex",
+    "file": "shaders/metaballs_gpu.vert"
+  },
+  "MetaballsFragment": {
+    "type": "fragment",
+    "file": "shaders/metaballs_gpu.frag"
+  }
+}
