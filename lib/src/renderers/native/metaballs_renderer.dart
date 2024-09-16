@@ -134,6 +134,9 @@ class MetaballsRenderer extends RenderBox {
       // double the radius it was given. We divide by 2 so we don't need to do
       // this on the GPU.
       shader.setFloat(index++, renderData.radius / 2);
+
+      // Due to a bug in flutter we need to skip an index in oder to get the
+      // correct alignment.
       index++;
     }
   }

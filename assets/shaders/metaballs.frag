@@ -4,7 +4,9 @@
 
 precision highp float;
 
-uniform float randombs;
+// Need this here because flutter for some reason skips the first uniform, so we can't use it.
+uniform float iDoNothing;
+
 uniform float glowThreshold;
 uniform float glowIntensity;
 uniform float count;
