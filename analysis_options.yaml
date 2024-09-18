@@ -1,4 +1,22 @@
-include: package:flutter_lints/flutter.yaml
+linter:
+  rules:
+    # =========================
+    # Rules that we DON'T WANT.
+    # =========================
+    # Does not work when tests and mocks are placed in the /lib folder.
+    depend_on_referenced_packages: false
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+    # ==============================
+    # Additional rules that we WANT.
+    # ==============================
+    always_declare_return_types: true
+    always_specify_types: true
+    flutter_style_todos: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unawaited_futures: true
+    avoid_dynamic_calls: true
+    directives_ordering: true

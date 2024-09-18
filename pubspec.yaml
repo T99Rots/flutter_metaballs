@@ -4,13 +4,17 @@ version: 1.5.0
 homepage: https://github.com/T99Rots/flutter_metaballs
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_gpu:
+    sdk: flutter
+  flutter_gpu_shaders: ^0.1.2
+  native_assets_cli: ^0.7.3
+  
 dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
@@ -18,4 +22,6 @@ dev_dependencies:
 
 flutter:
   shaders:
-    - lib/metaballs_shader.frag
+    - shaders/metaballs.frag
+  assets:
+    - build/shaderbundles/
