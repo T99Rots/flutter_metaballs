@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/pointer.dart';
 
 abstract class MetaballsEffect {
@@ -12,7 +11,6 @@ abstract class MetaballsEffect {
 typedef MetaballsEffectStateAny = MetaballsEffectState<MetaballsEffect>;
 
 abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
-  final List<Metaball> _effectMetaballs = <Metaball>[];
   MetaballsScene? _scene;
   Effect? _effect;
 
@@ -22,7 +20,7 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
   /// Gets called after physics have been applied.
   ///
   /// [scene.viewportSize] may not be available at this point. If you rely on
-  /// the viewport size use the [beforeRenderTransform] or [beforeRender].
+  /// the viewport size use the [beforeTransform] or [beforeRender].
   void afterPhysics(MetaballsScene scene) {}
 
   /// Gets called before the render transform gets applied.
@@ -30,7 +28,9 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
   /// This may get called right before the render runs, ideally you should not
   /// run heavy calculations at this point unless access [scene.viewportSize]
   /// is required.
-  void beforeRenderTransform(MetaballsScene scene) {}
+  void beforeTransform(MetaballsScene scene) {}
+
+  void beforeComposition(MetaballsScene scene) {}
 
   /// Gets called before rendering.
   ///

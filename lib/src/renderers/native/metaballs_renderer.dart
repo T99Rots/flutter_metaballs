@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
 
 import 'shader_program_provider.dart';
@@ -117,16 +116,14 @@ class MetaballsRenderer extends RenderBox {
   }
 
   void _updateShader(FragmentShader shader) {
-    final List<Metaball> metaballs = _scene.metaballs;
+    final List<MetaballRenderData> renderData = _scene.renderData;
     int index = 0;
 
     shader.setFloat(index++, 0.2);
     shader.setFloat(index++, 0.5);
-    shader.setFloat(index++, metaballs.length.toDouble());
+    shader.setFloat(index++, renderData.length.toDouble());
 
-    for (final Metaball metaball in metaballs) {
-      final MetaballRenderData renderData = metaball.transform.transformMetaball(metaball);
-
+    for (final MetaballRenderData renderData in renderData) {
       shader.setFloat(index++, renderData.x);
       shader.setFloat(index++, renderData.y);
 

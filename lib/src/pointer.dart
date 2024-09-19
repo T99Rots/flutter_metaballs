@@ -19,25 +19,33 @@ class Pointer extends ChangeNotifier {
   Offset _delta;
   Offset get delta => _delta;
 
+  bool _active = true;
+  bool get active => _active;
+
   void handleEvent(PointerEvent event) {
-    if (event.pointer != id) {
+    if (event.pointer != id || !_active) {
       return;
     }
 
-    bool shouldNotify = false;
-
-    if (_position != event.position) {
-      _position = event.position;
-      shouldNotify = true;
+    switch (event) {
+      case PointerRemovedEvent():
+      case PointerCancelEvent():
+      case PointerExitEvent():
+        _active = false;
+        break;
+      case PointerUpEvent():
+        if (kind != PointerDeviceKind.mouse) {
+          _active = false;
+        }
+        break;
     }
 
-    if (_delta != event.delta) {
-      _delta = event.delta;
-      shouldNotify = true;
-    }
+    _position = event.localPosition;
+    _delta = event.localDelta;
+    notifyListeners();
 
-    if (shouldNotify) {
-      notifyListeners();
+    if (!_active) {
+      dispose();
     }
   }
 }

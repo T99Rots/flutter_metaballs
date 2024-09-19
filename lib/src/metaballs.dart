@@ -41,7 +41,7 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
     effect: widget.effect,
     physics: widget.physics,
     count: widget.count,
-    metaballScaler: widget.size,
+    scaler: widget.size,
   );
 
   @override
@@ -64,6 +64,7 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return PointerDetector(
       onPointerAdded: _scene.handlePointer,
+      behavior: HitTestBehavior.translucent,
       child: RepaintBoundary(
         child: MetaballsRenderWidget(
           gradient: widget.gradient,

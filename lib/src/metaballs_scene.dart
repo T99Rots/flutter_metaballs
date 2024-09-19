@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/models/metaball_render_data.dart';
 import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
@@ -18,12 +19,12 @@ class MetaballsScene with ChangeNotifier {
     required MetaballsEffect effect,
     required MetaballsPhysics physics,
     required int count,
-    required MetaballScaler metaballScaler,
+    required MetaballScaler scaler,
   })  : _effect = effect,
         _effectState = effect.createState(),
         _physics = physics,
         _physicsScene = physics.createScene(),
-        _metaballScaler = metaballScaler {
+        _scaler = scaler {
     _ticker = vsync.createTicker(_tick)..start();
     _physicsScene.attach(this, physics);
     _effectState.attach(this, effect);
@@ -38,8 +39,9 @@ class MetaballsScene with ChangeNotifier {
   late final Ticker _ticker;
   final Random _random = Random();
   final List<Metaball> _metaballs = <Metaball>[];
+  final List<MetaballRenderData> renderData = <MetaballRenderData>[];
 
-  MetaballScaler _metaballScaler;
+  MetaballScaler _scaler;
 
   MetaballsEffectStateAny _effectState;
   MetaballsEffect _effect;
@@ -67,12 +69,12 @@ class MetaballsScene with ChangeNotifier {
   }
 
   void _applyRenderTransform(Size viewportSize) {
-    _effectState.beforeRenderTransform(this);
+    _effectState.beforeTransform(this);
     for (final Metaball metaball in _metaballs) {
       metaball.transform.reset();
     }
 
-    _metaballScaler.applyScaling(this);
+    _scaler.applyScaling(this);
 
     for (final Metaball metaball in _metaballs) {
       final double renderRadius = metaball.transform.transformRadius(metaball.radius);
@@ -86,6 +88,13 @@ class MetaballsScene with ChangeNotifier {
           renderRadius / 2,
           renderRadius / 2,
         );
+    }
+    _effectState.beforeComposition(this);
+    _stage = MetaballRenderStage.composition;
+
+    renderData.clear();
+    for (final Metaball metaball in _metaballs) {
+      renderData.add(metaball.transform.transformMetaball(metaball));
     }
     _effectState.beforeRender(this);
     _stage = MetaballRenderStage.render;
@@ -172,7 +181,7 @@ class MetaballsScene with ChangeNotifier {
 
     _effect = effect;
     _physics = physics;
-    _metaballScaler = metaballScaler;
+    _scaler = metaballScaler;
   }
 
   @override
@@ -209,11 +218,18 @@ class MetaballsScene with ChangeNotifier {
   }
 
   bool get hasSize => _viewportSize != null;
+
+  MetaballScaler get scaler => _scaler;
+
+  MetaballsEffect get effect => _effect;
+
+  MetaballsPhysics get physics => _physics;
 }
 
 enum MetaballRenderStage {
   none,
   physics,
   transform,
+  composition,
   render,
 }
