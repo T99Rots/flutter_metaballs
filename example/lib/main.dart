@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
             maxPercentage: 1.35,
             minPercentage: 0.1,
           ),
-          count: 30,
+          count: 3,
           physics: BouncingPhysics(
             maxForce: 2,
             friction: 100,

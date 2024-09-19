@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/animation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
-import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
-import 'package:metaballs/src/pointer.dart';
 
 class FollowEffect extends MetaballsEffect {
   const FollowEffect({
@@ -22,81 +21,109 @@ class FollowEffect extends MetaballsEffect {
 }
 
 class _FollowEffectState extends MetaballsEffectState<FollowEffect> {
-  final Map<int, _PointerEffectData> _pointerCache = <int, _PointerEffectData>{};
+  final Map<int, _PointerEffectData> _activePointers = <int, _PointerEffectData>{};
+  final Set<_PointerEffectData> _removedPointers = <_PointerEffectData>{};
 
   @override
-  void handlePointer(MetaballsScene scene, Pointer pointer) {
-    _pointerCache[pointer.id] = _PointerEffectData(
-      added: scene.elapsed,
-      pointer: pointer,
-      scene: scene,
-    );
+  void handlePointerEvent(PointerEvent event) {
+    final _PointerEffectData? data;
+
+    print('event: ${event.runtimeType}');
+
+    switch (event) {
+      case PointerCancelEvent():
+      case PointerExitEvent():
+      case PointerPanZoomEndEvent():
+      case PointerUpEvent():
+      case PointerRemovedEvent():
+        print('removed');
+        final _PointerEffectData? pointer = _activePointers.remove(event.pointer);
+
+        if (effect.duration != Duration.zero && pointer != null) {
+          pointer.removed = scene.elapsed;
+          _removedPointers.add(pointer);
+        }
+
+        return;
+      default:
+        data = _activePointers[event.pointer];
+    }
+
+    if (data == null) {
+      if (event is PointerHoverEvent) {
+        return;
+      }
+
+      _activePointers[event.pointer] = _PointerEffectData(
+        added: scene.elapsed,
+        id: event.pointer,
+        position: event.position,
+      );
+
+      return;
+    }
+
+    data.position = event.localPosition;
   }
 
   @override
-  void beforeRender(MetaballsScene scene) {
-    for (final _PointerEffectData data in _pointerCache.values) {
-      double t;
-      if (data.pointer.active) {
-        final int elapsedSinceAdded = (scene.elapsed - data.added).inMicroseconds;
-        t = min(1.0, elapsedSinceAdded / effect.duration.inMicroseconds);
-      } else {
-        if (effect.duration == Duration.zero) {
-          continue;
-        }
-
-        final int timeSinceRemoved = (scene.elapsed - data.removed!).inMicroseconds;
-        t = 1.0 - (timeSinceRemoved / effect.duration.inMicroseconds);
-      }
-
-      if (t < 0) {
-        continue;
-      }
-
-      final Offset position = data.pointer.position;
+  void beforeRender() {
+    for (final _PointerEffectData data in _activePointers.values) {
+      final int elapsedSinceAdded = (scene.elapsed - data.added).inMicroseconds;
+      final double t = min(1.0, elapsedSinceAdded / effect.duration.inMicroseconds);
 
       scene.renderData.add(
         MetaballRenderData(
           radius: effect.curve.transform(t) * effect.radius,
-          x: position.dx,
-          y: position.dy,
+          x: data.position.dx,
+          y: data.position.dy,
         ),
       );
     }
+
+    _removedPointers.removeWhere((_PointerEffectData data) {
+      final Duration? removed = data.removed;
+      if (removed == null) {
+        return true;
+      }
+
+      final int timeSinceRemoved = (scene.elapsed - removed).inMicroseconds;
+      final double t = 1.0 - (timeSinceRemoved / effect.duration.inMicroseconds);
+
+      if (t < 0) {
+        return true;
+      }
+
+      final int timeAlive = (removed - data.added).inMicroseconds;
+      final double maxAliveT = min(1.0, timeAlive / effect.duration.inMicroseconds);
+
+      scene.renderData.add(
+        MetaballRenderData(
+          radius: effect.curve.transform(t) * maxAliveT * effect.radius,
+          x: data.position.dx,
+          y: data.position.dy,
+        ),
+      );
+      return false;
+    });
   }
 
   @override
   void detach() {
-    for (final _PointerEffectData effectData in _pointerCache.values) {
-      effectData.dispose();
-    }
-    _pointerCache.clear();
+    _activePointers.clear();
     super.detach();
   }
 }
 
 class _PointerEffectData {
   _PointerEffectData({
+    required this.id,
     required this.added,
-    required this.pointer,
-    required this.scene,
-  }) {
-    pointer.addListener(_handleUpdate);
-  }
+    required this.position,
+  });
 
-  final MetaballsScene scene;
-  final Pointer pointer;
+  final int id;
   final Duration added;
   Duration? removed;
-
-  void _handleUpdate() {
-    if (!pointer.active) {
-      removed = scene.elapsed;
-      dispose();
-    }
-  }
-
-  void dispose() {
-    pointer.removeListener(_handleUpdate);
-  }
+  Offset position;
 }

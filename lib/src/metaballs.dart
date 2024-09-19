@@ -2,9 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
-import 'package:metaballs/src/pointer_detector.dart';
 import 'package:metaballs/src/renderers/metaballs_render_widget.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
+
+import 'pointer_event_listener.dart';
 
 class Metaballs extends StatefulWidget {
   const Metaballs({
@@ -62,8 +63,8 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return PointerDetector(
-      onPointerAdded: _scene.handlePointer,
+    return PointerEventListener(
+      onPointerEvent: _scene.handlePointerEvent,
       behavior: HitTestBehavior.translucent,
       child: RepaintBoundary(
         child: MetaballsRenderWidget(

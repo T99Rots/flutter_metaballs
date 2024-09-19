@@ -8,7 +8,6 @@ import 'package:metaballs/src/models/metaball_render_data.dart';
 import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
-import 'package:metaballs/src/pointer.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
 typedef MetaballsVisitor = void Function(Metaball metaball);
@@ -69,7 +68,7 @@ class MetaballsScene with ChangeNotifier {
   }
 
   void _applyRenderTransform(Size viewportSize) {
-    _effectState.beforeTransform(this);
+    _effectState.beforeTransform();
     for (final Metaball metaball in _metaballs) {
       metaball.transform.reset();
     }
@@ -89,29 +88,29 @@ class MetaballsScene with ChangeNotifier {
           renderRadius / 2,
         );
     }
-    _effectState.beforeComposition(this);
+    _effectState.beforeComposition();
     _stage = MetaballRenderStage.composition;
 
     renderData.clear();
     for (final Metaball metaball in _metaballs) {
       renderData.add(metaball.transform.transformMetaball(metaball));
     }
-    _effectState.beforeRender(this);
+    _effectState.beforeRender();
     _stage = MetaballRenderStage.render;
   }
 
   void _tick(Duration elapsed) {
     Duration frameTime = elapsed - _lastFrame;
+    _lastFrame = elapsed;
     if (frameTime > Duration(milliseconds: 100)) {
       frameTime = Duration(milliseconds: 100);
     }
 
-    _lastFrame = elapsed;
     _stage = MetaballRenderStage.physics;
     final double timeScale = _effectState.getTimeScale();
-    _effectState.beforePhysics(this);
+    _effectState.beforePhysics();
     _physicsScene.tick(frameTime * timeScale);
-    _effectState.afterPhysics(this);
+    _effectState.afterPhysics();
     _stage = MetaballRenderStage.transform;
 
     final Size? viewportSize = _viewportSize;
@@ -190,8 +189,8 @@ class MetaballsScene with ChangeNotifier {
     super.dispose();
   }
 
-  void handlePointer(Pointer pointer) {
-    _effectState.handlePointer(this, pointer);
+  void handlePointerEvent(PointerEvent event) {
+    _effectState.handlePointerEvent(event);
   }
 
   void updateViewportSize(Size size) {

@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/pointer.dart';
 
 abstract class MetaballsEffect {
   const MetaballsEffect();
@@ -15,32 +14,32 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
   Effect? _effect;
 
   /// Gets called before physics have been applied.
-  void beforePhysics(MetaballsScene scene) {}
+  void beforePhysics() {}
 
   /// Gets called after physics have been applied.
   ///
   /// [scene.viewportSize] may not be available at this point. If you rely on
   /// the viewport size use the [beforeTransform] or [beforeRender].
-  void afterPhysics(MetaballsScene scene) {}
+  void afterPhysics() {}
 
   /// Gets called before the render transform gets applied.
   ///
   /// This may get called right before the render runs, ideally you should not
   /// run heavy calculations at this point unless access [scene.viewportSize]
   /// is required.
-  void beforeTransform(MetaballsScene scene) {}
+  void beforeTransform() {}
 
-  void beforeComposition(MetaballsScene scene) {}
+  void beforeComposition() {}
 
   /// Gets called before rendering.
   ///
   /// This may get called right before the render runs, ideally you should not
   /// run heavy calculations at this point unless access [scene.viewportSize]
   /// is required.
-  void beforeRender(MetaballsScene scene) {}
+  void beforeRender() {}
 
   /// Gets called every time a new pointer gets added to the widget.
-  void handlePointer(MetaballsScene scene, Pointer pointer) {}
+  void handlePointerEvent(PointerEvent pointer) {}
 
   /// Gets called when the [Effect] class has been updated.
   void effectUpdated(Effect oldEffect) {}
