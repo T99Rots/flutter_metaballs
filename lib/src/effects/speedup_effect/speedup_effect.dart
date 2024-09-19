@@ -42,11 +42,11 @@ class SpeedupEffect extends MetaballsEffect {
 
   @override
   MetaballsEffectState<SpeedupEffect> createState() {
-    return SpeedupEffectState();
+    return _SpeedupEffectState();
   }
 }
 
-class SpeedupEffectState extends MetaballsEffectState<SpeedupEffect> {
+class _SpeedupEffectState extends MetaballsEffectState<SpeedupEffect> {
   final Map<int, double> _pointerFrameDeltas = <int, double>{};
 
   @override
@@ -62,7 +62,6 @@ class SpeedupEffectState extends MetaballsEffectState<SpeedupEffect> {
 
   @override
   double getTimeScale() {
-    // Calculate average delta
     if (_pointerFrameDeltas.isEmpty) {
       return 1;
     }
