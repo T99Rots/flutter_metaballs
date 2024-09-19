@@ -1,5 +1,6 @@
 export 'src/effects/default_effect/default_effect.dart';
 export 'src/effects/follow_effect/follow_effect.dart';
+export 'src/effects/speedup_effect/speedup_effect.dart';
 export 'src/metaballs.dart';
 export 'src/physics/bouncing_physics/bouncing_physics.dart';
 export 'src/scalers/metaball_scaler.dart';

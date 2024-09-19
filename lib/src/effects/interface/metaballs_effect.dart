@@ -39,7 +39,7 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
   void beforeRender() {}
 
   /// Gets called every time a new pointer gets added to the widget.
-  void handlePointerEvent(PointerEvent pointer) {}
+  void handlePointerEvent(PointerEvent event) {}
 
   /// Gets called when the [Effect] class has been updated.
   void effectUpdated(Effect oldEffect) {}

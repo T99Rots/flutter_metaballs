@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
           ),
           glowIntensity: 0.5,
           glowThreshold: 0.5,
-          effect: FollowEffect(),
+          effect: SpeedupEffect(),
           size: MetaballScaler.dynamicRange(
             maxPercentage: 1.35,
             minPercentage: 0.1,
