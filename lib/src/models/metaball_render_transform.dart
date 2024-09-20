@@ -45,8 +45,10 @@ class MetaballRenderTransform {
 
   MetaballRenderData transformMetaball(Metaball metaball) {
     return MetaballRenderData(
-      x: (metaball.x * _xScale) + _xTranslation,
-      y: (metaball.y * _yScale) + _yTranslation,
+      position: Offset(
+        (metaball.position.dx * _xScale) + _xTranslation,
+        (metaball.position.dy * _yScale) + _yTranslation,
+      ),
       radius: (metaball.radius * _radiusScale) + _radiusTranslation,
     );
   }

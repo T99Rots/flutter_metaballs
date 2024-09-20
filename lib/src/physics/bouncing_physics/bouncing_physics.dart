@@ -15,7 +15,7 @@ import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
 /// of the widget.
 ///
 /// ```dart
-/// final physics = BouncingPhysics(
+/// BouncingPhysics(
 ///   maxForce: 10.0,
 ///   friction: 0.5,
 ///   metaballMass: 1.0,
@@ -135,18 +135,20 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     );
 
     // Update position
-    metaball.x += state.velocity.dx * dt;
-    metaball.y += state.velocity.dy * dt;
+    metaball.position = Offset(
+      metaball.position.dx + state.velocity.dx * dt,
+      metaball.position.dy + state.velocity.dy * dt,
+    );
 
     // Ensure metaball stays in bounds
-    final bool outOfBoundsLeft = metaball.x < 0 && directionX < 0;
-    final bool outOfBoundsRight = metaball.x > 1 && directionX > 0;
+    final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
+    final bool outOfBoundsRight = metaball.position.dx > 1 && directionX > 0;
     if (outOfBoundsLeft || outOfBoundsRight) {
       state.direction = _normalizeRadian(pi - state.direction);
     }
 
-    final bool outOfBoundsTop = metaball.y < 0 && directionY < 0;
-    final bool outOfBoundsBottom = metaball.y > 1 && directionY > 0;
+    final bool outOfBoundsTop = metaball.position.dy < 0 && directionY < 0;
+    final bool outOfBoundsBottom = metaball.position.dy > 1 && directionY > 0;
     if (outOfBoundsTop || outOfBoundsBottom) {
       state.direction = _normalizeRadian(-state.direction);
     }

@@ -50,12 +50,15 @@ class MetaballsScene with ChangeNotifier {
 
   Size? _viewportSize;
   Duration _lastFrame = Duration.zero;
+  Duration _frameTime = Duration.zero;
   MetaballRenderStage _stage = MetaballRenderStage.none;
 
   Metaball _createMetaball() {
     return Metaball(
-      x: _random.nextDouble(),
-      y: _random.nextDouble(),
+      position: Offset(
+        _random.nextDouble(),
+        _random.nextDouble(),
+      ),
       radius: _random.nextDouble(),
       createdAt: Duration.zero,
     );
@@ -100,16 +103,16 @@ class MetaballsScene with ChangeNotifier {
   }
 
   void _tick(Duration elapsed) {
-    Duration frameTime = elapsed - _lastFrame;
+    _frameTime = elapsed - _lastFrame;
     _lastFrame = elapsed;
-    if (frameTime > Duration(milliseconds: 100)) {
-      frameTime = Duration(milliseconds: 100);
+    if (_frameTime > Duration(milliseconds: 100)) {
+      _frameTime = Duration(milliseconds: 100);
     }
+    _frameTime *= _effectState.getTimeScale();
 
     _stage = MetaballRenderStage.physics;
-    final double timeScale = _effectState.getTimeScale();
     _effectState.beforePhysics();
-    _physicsScene.tick(frameTime * timeScale);
+    _physicsScene.tick(_frameTime);
     _effectState.afterPhysics();
     _stage = MetaballRenderStage.transform;
 
@@ -223,6 +226,8 @@ class MetaballsScene with ChangeNotifier {
   MetaballsEffect get effect => _effect;
 
   MetaballsPhysics get physics => _physics;
+
+  Duration get frameTime => _frameTime;
 }
 
 enum MetaballRenderStage {

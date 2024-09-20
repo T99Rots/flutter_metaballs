@@ -1,18 +1,17 @@
+import 'package:flutter/rendering.dart';
+
 import 'metaball_render_transform.dart';
 
 class Metaball {
   Metaball({
-    required this.x,
-    required this.y,
+    required this.position,
     required this.radius,
     required this.createdAt,
   });
 
   Duration createdAt;
 
-  double x;
-
-  double y;
+  Offset position;
 
   /// The radius of the metaball.
   ///

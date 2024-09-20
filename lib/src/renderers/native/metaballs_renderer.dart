@@ -124,8 +124,8 @@ class MetaballsRenderer extends RenderBox {
     shader.setFloat(index++, renderData.length.toDouble());
 
     for (final MetaballRenderData renderData in renderData) {
-      shader.setFloat(index++, renderData.x);
-      shader.setFloat(index++, renderData.y);
+      shader.setFloat(index++, renderData.position.dx);
+      shader.setFloat(index++, renderData.position.dy);
 
       // Due to the algorithm used, the radius of the rendered metaball will be
       // double the radius it was given. We divide by 2 so we don't need to do

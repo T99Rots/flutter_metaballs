@@ -1,11 +1,11 @@
+import 'dart:ui';
+
 class MetaballRenderData {
-  const MetaballRenderData({
+  MetaballRenderData({
     required this.radius,
-    required this.x,
-    required this.y,
+    required this.position,
   });
 
-  final double x;
-  final double y;
-  final double radius;
+  Offset position;
+  double radius;
 }
