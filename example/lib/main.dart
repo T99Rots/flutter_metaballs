@@ -59,13 +59,6 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
           ),
-          glowIntensity: 0.5,
-          glowThreshold: 0.5,
-          size: MetaballScaler.dynamicRange(
-            maxPercentage: 1.35,
-            minPercentage: 0.1,
-          ),
-          count: 30,
         ),
       ],
     );

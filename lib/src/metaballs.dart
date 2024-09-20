@@ -19,8 +19,8 @@ class Metaballs extends StatefulWidget {
     this.color = const Color(0xff0080ff),
     this.physics = const BouncingPhysics(),
     this.size = const MetaballScaler.dynamicRange(
-      minPercentage: 0.4,
-      maxPercentage: 0.6,
+      minPercentage: 0.1,
+      maxPercentage: 1,
     ),
   });
 
