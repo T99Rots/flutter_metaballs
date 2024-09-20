@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
+import 'package:metaballs/src/physics/bouncing_physics/bouncing_physics.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
 import 'package:metaballs/src/renderers/metaballs_render_widget.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
@@ -10,13 +11,13 @@ import 'pointer_event_listener.dart';
 class Metaballs extends StatefulWidget {
   const Metaballs({
     super.key,
+    this.effect,
     this.gradient,
-    required this.effect,
-    required this.physics,
     this.count = 40,
     this.glowThreshold = 0.7,
     this.glowIntensity = 0.6,
     this.color = const Color(0xff0080ff),
+    this.physics = const BouncingPhysics(),
     this.size = const MetaballScaler.dynamicRange(
       minPercentage: 0.4,
       maxPercentage: 0.6,
@@ -28,7 +29,7 @@ class Metaballs extends StatefulWidget {
   final double glowThreshold;
   final double glowIntensity;
   final Gradient? gradient;
-  final MetaballsEffect effect;
+  final MetaballsEffect? effect;
   final MetaballsPhysics physics;
   final MetaballScaler size;
 

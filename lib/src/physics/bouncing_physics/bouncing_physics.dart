@@ -29,10 +29,10 @@ import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
 /// to simulate bouncing physics.
 class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
-    required this.maxForce,
-    required this.friction,
-    required this.metaballMass,
-    required this.hasInitialSpeed,
+    this.maxForce = 1,
+    this.friction = 100,
+    this.metaballMass = 10,
+    this.hasInitialSpeed = false,
   });
 
   /// The maximum force that can be applied to a metaball for acceleration.
