@@ -2,9 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:metaballs/src/models/metaball.dart';
-import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
-import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
 
 /// Applies bouncing physics to metaballs.
 ///

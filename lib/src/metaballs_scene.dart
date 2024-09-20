@@ -5,9 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
-import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
 import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
-import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
 typedef MetaballsVisitor = void Function(Metaball metaball);
