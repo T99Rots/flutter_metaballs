@@ -98,10 +98,10 @@ mixin AnimatedPointerTrackerMixin<Effect extends MetaballsEffect> on MetaballsEf
       return;
     }
 
-    if (pointerSmoothing == 0) {
-      pointer._position = event.localPosition;
-    } else {
+    if (pointerSmoothing > 0) {
       pointer._targetPosition = event.localPosition;
+    } else {
+      pointer._position = event.localPosition;
     }
   }
 
