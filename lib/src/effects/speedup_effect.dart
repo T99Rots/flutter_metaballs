@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/src/gestures/events.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
+
+import 'metaballs_effect.dart';
 
 /// Applies a speedup effect to metaballs based on user interactions.
 ///

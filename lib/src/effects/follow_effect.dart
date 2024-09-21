@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/effects/mixins/animated_pointer_tracker_mixin.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
+
+import 'metaballs_effect.dart';
 
 /// Applies a follow effect to metaballs based on user interactions.
 ///

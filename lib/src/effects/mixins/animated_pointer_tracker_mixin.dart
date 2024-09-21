@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
+import 'package:metaballs/src/effects/metaballs_effect.dart';
 
 mixin AnimatedPointerTrackerMixin<Effect extends MetaballsEffect> on MetaballsEffectState<Effect> {
   final Set<PointerEffectData> _removedPointers = <PointerEffectData>{};

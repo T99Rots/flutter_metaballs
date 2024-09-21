@@ -2,8 +2,9 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
+
+import 'metaballs_effect.dart';
 
 /// Creates a ripple effect with metaballs.
 ///

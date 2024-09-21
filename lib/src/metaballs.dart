@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
+import 'package:metaballs/src/effects/metaballs_effect.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/physics/bouncing_physics/bouncing_physics.dart';
-import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
+import 'package:metaballs/src/physics/bouncing_physics.dart';
+import 'package:metaballs/src/physics/metaballs_physics.dart';
 import 'package:metaballs/src/renderers/metaballs_render_widget.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 

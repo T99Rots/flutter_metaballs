@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
+import 'package:metaballs/src/effects/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
-import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
+import 'package:metaballs/src/physics/metaballs_physics.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
 typedef MetaballsVisitor = void Function(Metaball metaball);

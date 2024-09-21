@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/src/animation/curves.dart';
-import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
 import 'package:metaballs/src/effects/mixins/animated_pointer_tracker_mixin.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
+
+import 'metaballs_effect.dart';
 
 class GrowEffect extends MetaballsEffect {
   const GrowEffect({
