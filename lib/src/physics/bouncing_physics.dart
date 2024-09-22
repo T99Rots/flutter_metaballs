@@ -29,9 +29,9 @@ class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     this.maxForce = 1,
     this.friction = 10,
-    this.metaballMass = 5,
+    this.metaballMass = 10,
     this.hasInitialSpeed = false,
-  });
+  }) : assert(maxForce > 0, '');
 
   /// The maximum force that can be applied to a metaball for acceleration.
   ///
@@ -75,13 +75,13 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     }
 
     final double direction = _random.nextDouble() * pi * 2;
-    final double force = _random.nextDouble() * config.maxForce;
+    final double force = _random.nextDouble();
 
     Offset? initialVelocity = oldState?.velocity;
     if (initialVelocity == null) {
       if (config.hasInitialSpeed) {
         // Calculate terminal velocity
-        final double terminalVelocity = force / config.friction;
+        final double terminalVelocity = (force * config.maxForce) / config.friction;
         // Calculate velocity components based on direction
         final double velocityX = terminalVelocity * cos(direction);
         final double velocityY = terminalVelocity * sin(direction);
@@ -116,21 +116,37 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     }
 
     // Apply physics
+    final double aspectRatio = scene.viewportSize.aspectRatio;
+    final double yRatio = sqrt(1 / aspectRatio);
+    final double xRatio = aspectRatio * yRatio;
     final double deltaTime = frameTime.inMicroseconds / 1e6;
     final double directionX = cos(state.direction);
     final double directionY = sin(state.direction);
+    final double force = state.force * config.maxForce;
 
     state.forceVector = Offset(
-      state.force * directionX,
-      state.force * directionY,
+      force * directionX * xRatio,
+      force * directionY * yRatio,
     );
-    state.resistanceVector = -state.velocity * config.friction;
+    state.resistanceVector = Offset(
+      -state.velocity.dx * config.friction * xRatio,
+      -state.velocity.dy * config.friction * yRatio,
+    );
 
     final Offset netForce = state.forceVector + state.resistanceVector;
-    final Offset acceleration = netForce / config.metaballMass;
+    final Offset acceleration = Offset(
+      netForce.dx / config.metaballMass / xRatio,
+      netForce.dy / config.metaballMass / yRatio,
+    );
 
-    state.velocity += acceleration * deltaTime;
-    metaball.position += state.velocity * deltaTime;
+    state.velocity = Offset(
+      state.velocity.dx + acceleration.dx * deltaTime,
+      state.velocity.dy + acceleration.dy * deltaTime,
+    );
+    metaball.position = Offset(
+      metaball.position.dx + state.velocity.dx * deltaTime,
+      metaball.position.dy + state.velocity.dy * deltaTime,
+    );
 
     // Ensure metaball stays in bounds
     final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
@@ -158,39 +174,27 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
         ..strokeWidth = 2;
 
       visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
-        if (state == null) {
+        if (state == null || config.maxForce <= 0) {
           return;
         }
 
         final Offset realPosition = metaball.transform.transformPosition(metaball.position) + offset;
+        final double scale = 30 / config.maxForce;
 
         canvas.drawLine(
           realPosition,
-          realPosition + (state.forceVector * 30),
+          realPosition + (state.forceVector * scale),
           forcePaint,
         );
         canvas.drawLine(
           realPosition,
-          realPosition + (state.resistanceVector * 30),
+          realPosition + (state.resistanceVector * scale),
           resistancePaint,
         );
       });
 
       return true;
     }());
-  }
-
-  @override
-  void physicsConfigUpdated(BouncingPhysics oldConfig) {
-    if (oldConfig.maxForce != config.maxForce) {
-      visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
-        if (state == null) {
-          return;
-        }
-
-        state.force *= oldConfig.maxForce / config.maxForce;
-      });
-    }
   }
 }
 
