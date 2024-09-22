@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
           ),
-          effect: RippleEffect(),
+          effect: SpeedupEffect(),
         ),
       ],
     );

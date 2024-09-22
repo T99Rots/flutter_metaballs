@@ -20,5 +20,5 @@ class Metaball {
   /// of the metaball as this could be offset by [radiusOffset].
   double radius;
 
-  MetaballRenderTransform transform = MetaballRenderTransform();
+  final MetaballRenderTransform transform = MetaballRenderTransform();
 }

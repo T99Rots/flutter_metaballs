@@ -94,4 +94,6 @@ abstract class MetaballsEffectState<Effect extends MetaballsEffect> {
     _effect = newEffect;
     effectUpdated(oldEffect);
   }
+
+  void debugPaint(PaintingContext context, Offset offset) {}
 }

@@ -106,6 +106,24 @@ mixin AnimatedPointerTrackerMixin<Effect extends MetaballsEffect> on MetaballsEf
   }
 
   @override
+  void debugPaint(PaintingContext context, Offset offset) {
+    assert(() {
+      final Paint paint = Paint()
+        ..color = Color(0xffffffff)
+        ..strokeWidth = 2;
+      final Canvas canvas = context.canvas;
+      for (final PointerEffectData pointer in pointers) {
+        canvas.drawCircle(pointer._targetPosition, 10, paint);
+        canvas.drawCircle(pointer._position, 10, paint);
+        canvas.drawLine(pointer._targetPosition, pointer._position, paint);
+      }
+      return true;
+    }());
+
+    super.debugPaint(context, offset);
+  }
+
+  @override
   @mustCallSuper
   void detach() {
     _activePointers.clear();

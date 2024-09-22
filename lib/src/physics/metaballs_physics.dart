@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/models/metaball.dart';
 
@@ -81,6 +80,8 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   ///
   /// May update the physics state of the current metaballs if required.
   void physicsConfigUpdated(Config oldConfig) {}
+
+  void debugPaint(PaintingContext context, Offset offset) {}
 
   @mustCallSuper
   void tick(Duration frameTime) {

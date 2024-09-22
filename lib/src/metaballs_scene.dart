@@ -127,19 +127,18 @@ class MetaballsScene with ChangeNotifier {
     required MetaballScaler metaballScaler,
     required int count,
   }) {
-    final MetaballsEffectStateAny? oldEffectState = _effectState;
     if (effect != _effect) {
       if (effect == null) {
         _effectState?.detach();
         _effectState = null;
-      } else if (oldEffectState == null) {
+      } else if (_effectState == null) {
         _effectState = effect.createState()..attach(this, effect);
       } else if (effect.runtimeType == _effect.runtimeType) {
-        oldEffectState.update(effect);
+        _effectState!.update(effect);
       } else {
-        oldEffectState.detach();
+        _effectState!.detach();
         _effectState = effect.createState();
-        oldEffectState.attach(this, effect);
+        _effectState!.attach(this, effect);
       }
     }
 
@@ -205,6 +204,14 @@ class MetaballsScene with ChangeNotifier {
     if (_stage == MetaballRenderStage.transform) {
       _applyRenderTransform(size);
     }
+  }
+
+  void debugPaint(PaintingContext context, Offset offset) {
+    assert(() {
+      _physicsScene.debugPaint(context, offset);
+      _effectState?.debugPaint(context, offset);
+      return true;
+    }());
   }
 
   List<Metaball> get metaballs => _metaballs;

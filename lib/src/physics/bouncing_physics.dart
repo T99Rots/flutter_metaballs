@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'dart:ui';
 
+import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
 
@@ -28,8 +28,8 @@ import 'package:metaballs/src/physics/metaballs_physics.dart';
 class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     this.maxForce = 1,
-    this.friction = 100,
-    this.metaballMass = 10,
+    this.friction = 10,
+    this.metaballMass = 5,
     this.hasInitialSpeed = false,
   });
 
@@ -95,6 +95,7 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
       velocity: initialVelocity,
       direction: direction,
       force: force,
+      mass: config.metaballMass,
     );
   }
 
@@ -114,29 +115,22 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
       return;
     }
 
-    final double dt = frameTime.inMilliseconds / 1000.0;
-
-    // Calculate direction components
+    // Apply physics
+    final double deltaTime = frameTime.inMicroseconds / 1e6;
     final double directionX = cos(state.direction);
     final double directionY = sin(state.direction);
 
-    final double accelerationOverDt = config.maxForce * dt;
-
-    // Update velocity with acceleration
-    state.velocity = Offset(
-      state.velocity.dx +
-          ((-config.friction * state.velocity.dx * dt) / config.metaballMass) +
-          (accelerationOverDt * directionX),
-      state.velocity.dy +
-          ((-config.friction * state.velocity.dy * dt) / config.metaballMass) +
-          (accelerationOverDt * directionY),
+    state.forceVector = Offset(
+      state.force * directionX,
+      state.force * directionY,
     );
+    state.resistanceVector = -state.velocity * config.friction;
 
-    // Update position
-    metaball.position = Offset(
-      metaball.position.dx + state.velocity.dx * dt,
-      metaball.position.dy + state.velocity.dy * dt,
-    );
+    final Offset netForce = state.forceVector + state.resistanceVector;
+    final Offset acceleration = netForce / config.metaballMass;
+
+    state.velocity += acceleration * deltaTime;
+    metaball.position += state.velocity * deltaTime;
 
     // Ensure metaball stays in bounds
     final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
@@ -150,6 +144,40 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     if (outOfBoundsTop || outOfBoundsBottom) {
       state.direction = _normalizeRadian(-state.direction);
     }
+  }
+
+  @override
+  void debugPaint(PaintingContext context, Offset offset) {
+    assert(() {
+      final Canvas canvas = context.canvas;
+      final Paint forcePaint = Paint()
+        ..color = Color(0x8000ff00)
+        ..strokeWidth = 2;
+      final Paint resistancePaint = Paint()
+        ..color = Color(0x80ff0000)
+        ..strokeWidth = 2;
+
+      visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
+        if (state == null) {
+          return;
+        }
+
+        final Offset realPosition = metaball.transform.transformPosition(metaball.position) + offset;
+
+        canvas.drawLine(
+          realPosition,
+          realPosition + (state.forceVector * 30),
+          forcePaint,
+        );
+        canvas.drawLine(
+          realPosition,
+          realPosition + (state.resistanceVector * 30),
+          resistancePaint,
+        );
+      });
+
+      return true;
+    }());
   }
 
   @override
@@ -171,10 +199,18 @@ class _MetaballBouncingPhysicsState extends MetaballPhysicsState {
     required super.velocity,
     required this.direction,
     required this.force,
+    required this.mass,
   });
+
+  Offset resistanceVector = Offset.zero;
+
+  Offset forceVector = Offset.zero;
 
   /// The amount of force this metaball has.
   double force;
+
+  /// The mass of this metaball.
+  double mass;
 
   /// The direction a metaball wants to move in in radians.
   double direction;

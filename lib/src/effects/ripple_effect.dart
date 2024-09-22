@@ -1,7 +1,7 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/src/rendering/object.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
 
 import 'metaballs_effect.dart';
@@ -91,7 +91,7 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
       _ripples.add(
         _Ripple(
           added: scene.elapsed,
-          origin: event.localPosition.getUV(scene.viewportSize),
+          uvOrigin: event.localPosition.getUV(scene.viewportSize),
         ),
       );
     }
@@ -105,50 +105,88 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
     return (cos(pi + (pow(x, effect.punch).toDouble() * pi * 2)) + 1) / 2;
   }
 
-  double _getMaxDistance(Size size, Offset point) {
-    final double dx = max(point.dx, size.width - point.dx);
-    final double dy = max(point.dy, size.height - point.dy);
-    return sqrt(dx * dx + dy * dy);
-  }
-
-  @override
-  void beforeRender() {
+  void beforePhysics() {
     _ripples.removeWhere((_Ripple ripple) {
       final double width = scene.viewportSize.width;
       final double height = scene.viewportSize.height;
       final double multiplier = sqrt(width * width + height * height);
       final double scaledWidth = multiplier * effect.width;
       final double scaledSpeed = multiplier * effect.speed;
-      final Offset origin = ripple.origin.getXY(scene.viewportSize);
+      final Offset origin = ripple.uvOrigin.getXY(scene.viewportSize);
       final double elapsedSeconds = (scene.elapsed - ripple.added).inMilliseconds / 1000;
-      final double offset = elapsedSeconds * scaledSpeed;
+      final double outerRadius = elapsedSeconds * scaledSpeed;
 
+      if (outerRadius > scaledWidth) {
+        final double dx = max(origin.dx, width - origin.dx);
+        final double dy = max(origin.dy, height - origin.dy);
+        final bool outOfScreen = sqrt(dx * dx + dy * dy) < outerRadius - scaledWidth;
+        if (outOfScreen) {
+          return true;
+        }
+      }
+
+      ripple.origin = origin;
+      ripple.width = scaledWidth;
+      ripple.outerRadius = outerRadius;
+
+      return false;
+    });
+  }
+
+  @override
+  void beforeRender() {
+    for (final _Ripple ripple in _ripples) {
       for (final MetaballRenderData metaball in scene.renderData) {
-        final Offset diff = origin - metaball.position;
-        final double normalizedDistance = (diff.distance - offset) / scaledWidth;
+        final Offset diff = ripple.origin - metaball.position;
+        final double normalizedDistance = (diff.distance - ripple.outerRadius) / ripple.width;
         final double wavePoint = _getWavePoint(normalizedDistance + 1);
 
         metaball.radius *= 1 + (wavePoint * effect.radiusMultiplier);
         metaball.position -= diff * wavePoint * effect.distanceMultiplier;
       }
+    }
+  }
 
-      if (offset > scaledWidth) {
-        return _getMaxDistance(scene.viewportSize, origin) < offset - scaledWidth;
+  @override
+  void debugPaint(PaintingContext context, Offset offset) {
+    assert(() {
+      final Canvas canvas = context.canvas;
+      final Paint circlePaint = Paint()..color = Color(0x80ffff00);
+      final Paint doughnutPaint = Paint()
+        ..color = Color(0x80ffff00)
+        ..style = PaintingStyle.stroke;
+      for (final _Ripple ripple in _ripples) {
+        if (ripple.outerRadius < ripple.width) {
+          canvas.drawCircle(
+            ripple.origin,
+            ripple.outerRadius,
+            circlePaint,
+          );
+        } else {
+          doughnutPaint.strokeWidth = ripple.width;
+          canvas.drawCircle(
+            ripple.origin,
+            ripple.outerRadius - (ripple.width / 2),
+            doughnutPaint,
+          );
+        }
       }
-
-      return false;
-    });
+      return true;
+    }());
   }
 }
 
 class _Ripple {
-  const _Ripple({
+  _Ripple({
     required this.added,
-    required this.origin,
+    required this.uvOrigin,
   });
 
-  final Offset origin;
+  final Offset uvOrigin;
   final Duration added;
+  double width = 0;
+  double outerRadius = 0;
+  Offset origin = Offset.zero;
 }
 
 extension on Offset {

@@ -137,4 +137,20 @@ class MetaballsRenderer extends RenderBox {
       index++;
     }
   }
+
+  @override
+  void debugPaint(PaintingContext context, Offset offset) {
+    assert(() {
+      if (debugPaintSizeEnabled) {
+        debugPaintSize(context, offset);
+      }
+      if (debugPaintBaselinesEnabled) {
+        _scene.debugPaint(context, offset);
+      }
+      if (debugPaintPointersEnabled) {
+        debugPaintPointers(context, offset);
+      }
+      return true;
+    }());
+  }
 }
