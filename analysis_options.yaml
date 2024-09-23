@@ -1,16 +1,10 @@
+analyzer:
+  errors:
+    library_private_types_in_public_api: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    # =========================
-    # Rules that we DON'T WANT.
-    # =========================
-    # Does not work when tests and mocks are placed in the /lib folder.
-    depend_on_referenced_packages: false
-
-    # ==============================
-    # Additional rules that we WANT.
-    # ==============================
     always_declare_return_types: true
     always_specify_types: true
     flutter_style_todos: true

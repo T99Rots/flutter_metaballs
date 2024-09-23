@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:metaball_demo/cards/color_gradient/color_gradient_card.dart';
-import 'package:metaball_demo/cards/effects/effects_card.dart';
-import 'package:metaball_demo/cards/general/general_card.dart';
-import 'package:metaball_demo/cards/physics/physics_card.dart';
-import 'package:metaball_demo/cards/size/size_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/color_gradient_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/debug/debug_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/effects/effects_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/general/general_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/physics/physics_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/size/size_card.dart';
 
 class MetaballsDrawer extends StatelessWidget {
   const MetaballsDrawer({super.key});
@@ -29,6 +30,7 @@ class MetaballsDrawer extends StatelessWidget {
             const PhysicsCard(),
             const EffectsCard(),
             const ColorGradientCard(),
+            const DebugCard(),
           ],
         ),
       ),

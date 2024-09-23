@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metaball_demo/cards/color_gradient/color_presets.dart';
-import 'package:metaball_demo/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/better_dropdown.dart';
 import 'package:metaball_demo/widgets/card_with_title.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/color_presets.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/gradient_direction_selector.dart';
 
 class ColorGradientCard extends StatelessWidget {

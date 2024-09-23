@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metaball_demo/cards/color_gradient/cubit/color_gradient_cubit.dart';
-import 'package:metaball_demo/screens/home_screen/widgets/metaballs_drawer.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/metaballs_drawer.dart';
 import 'package:metaballs/metaballs.dart';
 
 class HomeScreen extends StatefulWidget {

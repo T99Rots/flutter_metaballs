@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:metaball_demo/cards/color_gradient/color_presets.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/color_presets.dart';
 
 part 'color_gradient_cubit_state.dart';
 

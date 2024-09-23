@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metaball_demo/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/screens/home_screen/home_screen.dart';
 import 'package:metaball_demo/widgets/color_scheme_provider.dart';
+import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/debug/cubit/debug_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/effects/cubit/effects_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/general/cubit/general_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/physics/cubit/physics_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/size/cubit/size_cubit.dart';
 import 'package:nested/nested.dart';
 
 void main() {
@@ -26,6 +31,21 @@ class MyApp extends StatelessWidget {
         providers: <SingleChildWidget>[
           BlocProvider<ColorGradientCubit>(
             create: (_) => ColorGradientCubit(),
+          ),
+          BlocProvider<DebugCubit>(
+            create: (_) => DebugCubit(),
+          ),
+          BlocProvider<EffectsCubit>(
+            create: (_) => EffectsCubit(),
+          ),
+          BlocProvider<GeneralCubit>(
+            create: (_) => GeneralCubit(),
+          ),
+          BlocProvider<PhysicsCubit>(
+            create: (_) => PhysicsCubit(),
+          ),
+          BlocProvider<SizeCubit>(
+            create: (_) => SizeCubit(),
           ),
         ],
         child: const ColorSchemeProvider(
