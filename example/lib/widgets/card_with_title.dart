@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 
-class CardWithTitle extends StatelessWidget {
-  const CardWithTitle({
+abstract class CardWithTitle extends StatelessWidget {
+  const factory CardWithTitle({
+    required Widget child,
+    Key? key,
+    required String title,
+  }) = _CardWithTitleDefault;
+
+  const factory CardWithTitle.list({
+    required Widget child,
+    Key? key,
+    required String title,
+  }) = _CardWithTitleList;
+
+  const CardWithTitle._({
     super.key,
     required this.child,
     required this.title,
@@ -33,13 +45,44 @@ class CardWithTitle extends StatelessWidget {
             const Divider(
               height: 1,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              child: child,
-            )
+            buildChild(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildChild(BuildContext context);
+}
+
+class _CardWithTitleDefault extends CardWithTitle {
+  const _CardWithTitleDefault({
+    super.key,
+    required super.child,
+    required super.title,
+  }) : super._();
+
+  @override
+  Widget buildChild(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      child: child,
+    );
+  }
+}
+
+class _CardWithTitleList extends CardWithTitle {
+  const _CardWithTitleList({
+    super.key,
+    required super.child,
+    required super.title,
+  }) : super._();
+
+  @override
+  Widget buildChild(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+      child: child,
     );
   }
 }

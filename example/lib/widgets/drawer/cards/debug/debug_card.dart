@@ -6,10 +6,21 @@ class DebugCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CardWithTitle(
+    return CardWithTitle.list(
       title: 'Debugging',
       child: Column(
-        children: <Widget>[],
+        children: <Widget>[
+          SwitchListTile(
+            title: const Text('Effects debugging'),
+            value: true,
+            onChanged: (_) {},
+          ),
+          SwitchListTile(
+            title: const Text('Physics debugging'),
+            value: true,
+            onChanged: (_) {},
+          ),
+        ],
       ),
     );
   }

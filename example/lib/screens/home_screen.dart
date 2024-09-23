@@ -20,14 +20,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: BlocBuilder<ColorGradientCubit, ColorGradientCubitState>(
         builder: (BuildContext context, ColorGradientCubitState state) {
-          return Metaballs(
-            gradient: LinearGradient(
-              colors: <Color>[
-                state.preset.startColor,
-                state.preset.endColor,
-              ],
-              begin: state.alignment,
-              end: -state.alignment,
+          return DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.bottomCenter,
+                radius: 1.5,
+                colors: <Color>[
+                  Color.fromARGB(255, 13, 35, 61),
+                  Colors.black,
+                ],
+              ),
+            ),
+            child: Metaballs(
+              gradient: LinearGradient(
+                colors: <Color>[
+                  state.preset.startColor,
+                  state.preset.endColor,
+                ],
+                begin: state.alignment,
+                end: -state.alignment,
+              ),
             ),
           );
         },

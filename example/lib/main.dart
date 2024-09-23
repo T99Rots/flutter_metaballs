@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metaball_demo/screens/home_screen/home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:metaball_demo/screens/home_screen.dart';
 import 'package:metaball_demo/widgets/color_scheme_provider.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/debug/cubit/debug_cubit.dart';
@@ -17,7 +18,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+  });
 
   // This widget is the root of your application.
   @override
@@ -26,6 +29,10 @@ class MyApp extends StatelessWidget {
       title: 'Metaballs Demo',
       theme: ThemeData.dark(
         useMaterial3: true,
+      ).copyWith(
+        textTheme: GoogleFonts.nunitoTextTheme(
+          ThemeData.dark().textTheme,
+        ),
       ),
       home: MultiBlocProvider(
         providers: <SingleChildWidget>[

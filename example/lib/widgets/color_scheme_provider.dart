@@ -17,7 +17,7 @@ class ColorSchemeProvider extends StatelessWidget {
       builder: (BuildContext context, ColorGradientCubitState state) {
         final ThemeData theme = Theme.of(context);
         final ColorScheme colorScheme = computeColorScheme(state.preset, theme.colorScheme);
-        return Theme(
+        return AnimatedTheme(
           data: theme.copyWith(
             colorScheme: colorScheme,
             textSelectionTheme: theme.textSelectionTheme.copyWith(
