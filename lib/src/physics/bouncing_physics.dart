@@ -14,17 +14,17 @@ import 'package:metaballs/src/physics/metaballs_physics.dart';
 ///
 /// ```dart
 /// BouncingPhysics(
-///   maxForce: 10.0,
-///   friction: 0.5,
-///   metaballMass: 1.0,
+///   maxForce: 1.0,
+///   friction: 10.0,
+///   metaballMass: 10.0,
 ///   hasInitialSpeed: true,
 /// );
 /// ```
 ///
 /// This example creates a `BouncingPhysics` instance with a maximum force of
-/// 10.0, a friction coefficient of 0.5, a metaball mass multiplier of 1.0,
-/// and initial speed enabled. These settings will be applied to the metaballs
-/// to simulate bouncing physics.
+/// 1.0, a friction coefficient of 10.0, a metaball mass of 10.0, and initial
+/// speed enabled. These settings will be applied to the metaballs to simulate
+/// bouncing physics.
 class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     this.maxForce = 1,
@@ -116,10 +116,10 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     }
 
     // Apply physics
-    final double aspectRatio = scene.viewportSize.aspectRatio;
+    final double deltaTime = frameTime.inMicroseconds / 1e6;
+    final double aspectRatio = scene.hasSize ? scene.viewportSize.aspectRatio : 1;
     final double yRatio = sqrt(1 / aspectRatio);
     final double xRatio = aspectRatio * yRatio;
-    final double deltaTime = frameTime.inMicroseconds / 1e6;
     final double directionX = cos(state.direction);
     final double directionY = sin(state.direction);
     final double force = state.force * config.maxForce;
@@ -206,8 +206,10 @@ class _MetaballBouncingPhysicsState extends MetaballPhysicsState {
     required this.mass,
   });
 
+  /// A vector representing the resistance applied to the metaball.
   Offset resistanceVector = Offset.zero;
 
+  /// A vector representing the force applied to the metaball.
   Offset forceVector = Offset.zero;
 
   /// The amount of force this metaball has.

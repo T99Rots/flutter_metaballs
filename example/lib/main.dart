@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:metaballs/metaballs.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:metaball_demo/cards/color_gradient/cubit/color_gradient_cubit.dart';
+import 'package:metaball_demo/screens/home_screen/home_screen.dart';
+import 'package:metaball_demo/widgets/color_scheme_provider.dart';
+import 'package:nested/nested.dart';
 
 void main() {
   // enable dithering to smooth out the gradients and metaballs
@@ -8,60 +12,27 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Metaballs Demo',
-      theme: ThemeData.dark(),
-      home: const HomePage(),
+      theme: ThemeData.dark(
+        useMaterial3: true,
+      ),
+      home: MultiBlocProvider(
+        providers: <SingleChildWidget>[
+          BlocProvider<ColorGradientCubit>(
+            create: (_) => ColorGradientCubit(),
+          ),
+        ],
+        child: const ColorSchemeProvider(
+          child: HomeScreen(),
+        ),
+      ),
       debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int colorEffectIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return const Stack(
-      children: [
-        Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.bottomCenter,
-                radius: 1.5,
-                colors: [
-                  Color.fromARGB(255, 13, 35, 61),
-                  Colors.black,
-                ],
-              ),
-            ),
-          ),
-        ),
-        Metaballs(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 255, 21, 0),
-              Color.fromARGB(255, 255, 153, 0),
-            ],
-            begin: Alignment.bottomRight,
-            end: Alignment.topLeft,
-          ),
-          effect: SpeedupEffect(),
-        ),
-      ],
     );
   }
 }

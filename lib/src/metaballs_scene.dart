@@ -103,8 +103,8 @@ class MetaballsScene with ChangeNotifier {
   void _tick(Duration elapsed) {
     _frameTime = elapsed - _lastFrame;
     _lastFrame = elapsed;
-    if (_frameTime > Duration(milliseconds: 100)) {
-      _frameTime = Duration(milliseconds: 100);
+    if (_frameTime > const Duration(milliseconds: 100)) {
+      _frameTime = const Duration(milliseconds: 100);
     }
     _frameTime *= _effectState?.getTimeScale() ?? 1;
 

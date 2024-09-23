@@ -6,6 +6,7 @@ typedef PointerEventCallback = void Function(PointerEvent event);
 
 class PointerEventListener extends SingleChildRenderObjectWidget {
   const PointerEventListener({
+    super.key,
     super.child,
     required this.onPointerEvent,
     this.mouseCursor = MouseCursor.defer,

@@ -24,5 +24,7 @@ class OrbitEffectState extends MetaballsEffectState<OrbitEffect> with AnimatedPo
   Duration get animationDuration => effect.animationDuration;
 
   @override
-  void beforePhysics() {}
+  void beforePhysics() {
+    super.beforePhysics();
+  }
 }

@@ -3,10 +3,10 @@ import 'package:metaballs/src/effects/metaballs_effect.dart';
 import 'package:metaballs/src/metaballs_scene.dart';
 import 'package:metaballs/src/physics/bouncing_physics.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
-import 'package:metaballs/src/renderers/metaballs_render_widget.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
+import 'package:metaballs/src/widgets/metaballs_animated_renderer_widget.dart';
 
-import 'pointer_event_listener.dart';
+import 'widgets/pointer_event_listener.dart';
 
 class Metaballs extends StatefulWidget {
   const Metaballs({
@@ -22,6 +22,8 @@ class Metaballs extends StatefulWidget {
       minPercentage: 0.1,
       maxPercentage: 1,
     ),
+    this.duration = const Duration(milliseconds: 300),
+    this.curve = Curves.easeInOut,
   });
 
   final int count;
@@ -32,12 +34,14 @@ class Metaballs extends StatefulWidget {
   final MetaballsEffect? effect;
   final MetaballsPhysics physics;
   final MetaballScaler size;
+  final Duration duration;
+  final Curve curve;
 
   @override
   State<Metaballs> createState() => _MetaballsState();
 }
 
-class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
+class _MetaballsState extends State<Metaballs> with SingleTickerProviderStateMixin {
   late final MetaballsScene _scene = MetaballsScene(
     vsync: this,
     effect: widget.effect,
@@ -47,33 +51,19 @@ class _MetaballsState extends State<Metaballs> with TickerProviderStateMixin {
   );
 
   @override
-  void didUpdateWidget(covariant Metaballs oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _scene.update(
-      effect: widget.effect,
-      physics: widget.physics,
-      count: widget.count,
-      metaballScaler: widget.size,
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PointerEventListener(
       onPointerEvent: _scene.handlePointerEvent,
       behavior: HitTestBehavior.translucent,
       child: RepaintBoundary(
-        child: MetaballsRenderWidget(
+        child: MetaballsAnimatedRendererWidget(
           gradient: widget.gradient,
           color: widget.color,
           glowThreshold: widget.glowThreshold,
           glowIntensity: widget.glowIntensity,
           scene: _scene,
+          curve: widget.curve,
+          duration: widget.duration,
         ),
       ),
     );

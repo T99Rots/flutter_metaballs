@@ -81,8 +81,17 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// May update the physics state of the current metaballs if required.
   void physicsConfigUpdated(Config oldConfig) {}
 
+  /// Gets called during rendering when debug paint is enabled.
+  ///
+  /// Can be used to visualize parts of the metaball physics for debugging
+  /// purposes.
   void debugPaint(PaintingContext context, Offset offset) {}
 
+  /// Ticks every metaball in the [scene].
+  ///
+  /// Gets called only once every tick. Should normally not be overwritten,
+  /// instead [tickMetaball] should be overwritten to apply physics to the
+  /// individual metaballs.
   @mustCallSuper
   void tick(Duration frameTime) {
     visitMetaballs((Metaball metaball, State? state) {
