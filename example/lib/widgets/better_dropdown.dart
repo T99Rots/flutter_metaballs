@@ -7,8 +7,10 @@ class BetterDropdown<T> extends StatefulWidget {
     required this.items,
     required this.value,
     required this.onChange,
+    required this.label,
   });
 
+  final String label;
   final List<DropdownMenuItem<T>> items;
   final T value;
   final Function(T? value) onChange;
@@ -27,9 +29,9 @@ class _BetterDropdownState<T> extends State<BetterDropdown<T>> {
         Positioned.fill(
           child: InputDecorator(
             isFocused: _isOpen,
-            decoration: const InputDecoration(
-              label: Text('Select Color Preset'),
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              label: Text(widget.label),
+              border: const OutlineInputBorder(),
             ),
           ),
         ),

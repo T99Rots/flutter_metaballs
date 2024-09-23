@@ -28,17 +28,19 @@ class MetaballsDrawer extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView(
-                children: const <Widget>[
-                  GeneralCard(),
-                  SizeCard(),
-                  PhysicsCard(),
-                  EffectsCard(),
-                  ColorGradientCard(),
-                  ExportCard(),
-                  InfoCard(),
-                  DebugCard(),
-                ],
+              child: RepaintBoundary(
+                child: ListView(
+                  children: const <Widget>[
+                    GeneralCard(),
+                    SizeCard(),
+                    PhysicsCard(),
+                    EffectsCard(),
+                    ColorGradientCard(),
+                    ExportCard(),
+                    InfoCard(),
+                    DebugCard(),
+                  ],
+                ),
               ),
             )
           ],

@@ -18,6 +18,7 @@ class ColorGradientCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               BetterDropdown<ColorPreset>(
+                label: 'Select Color Preset',
                 items: _getDropdownMenuItems(),
                 value: state.preset,
                 onChange: (ColorPreset? value) {
