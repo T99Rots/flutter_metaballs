@@ -11,33 +11,36 @@ class PhysicsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardWithTitle(
+    return CardWithTitle.list(
       title: 'Physics',
       child: BlocBuilder<PhysicsCubit, PhysicsState>(
         builder: (BuildContext context, PhysicsState state) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              BetterDropdown<PhysicsType>(
-                label: 'Select physics type',
-                items: const <DropdownMenuItem<PhysicsType>>[
-                  DropdownMenuItem<PhysicsType>(
-                    value: PhysicsType.bouncing,
-                    child: Text('Bouncing Physics'),
-                  ),
-                  DropdownMenuItem<PhysicsType>(
-                    value: PhysicsType.lavaLamp,
-                    child: Text('Lava Lamp Physics'),
-                  ),
-                ],
-                value: state.type,
-                onChange: (PhysicsType? value) {
-                  if (value == null) {
-                    return;
-                  }
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: BetterDropdown<PhysicsType>(
+                  label: 'Select physics type',
+                  items: const <DropdownMenuItem<PhysicsType>>[
+                    DropdownMenuItem<PhysicsType>(
+                      value: PhysicsType.bouncing,
+                      child: Text('Bouncing Physics'),
+                    ),
+                    DropdownMenuItem<PhysicsType>(
+                      value: PhysicsType.lavaLamp,
+                      child: Text('Lava Lamp Physics'),
+                    ),
+                  ],
+                  value: state.type,
+                  onChange: (PhysicsType? value) {
+                    if (value == null) {
+                      return;
+                    }
 
-                  context.read<PhysicsCubit>().setPhysicsType(value);
-                },
+                    context.read<PhysicsCubit>().setPhysicsType(value);
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               switch (state) {

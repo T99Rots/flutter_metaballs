@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/src/animation/curves.dart';
+import 'package:flutter/animation.dart';
 import 'package:metaballs/src/effects/mixins/animated_pointer_tracker_mixin.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
 
@@ -22,10 +22,39 @@ class GrowEffect extends MetaballsEffect {
   final Curve curve;
 
   @override
-  MetaballsEffectState<GrowEffect> createState() => GrowEffectState();
+  MetaballsEffectState<GrowEffect> createState() => _GrowEffectState();
+
+  @override
+  int get hashCode => Object.hash(
+        multiplier,
+        radius,
+        movementSmoothing,
+        duration,
+        curve,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is GrowEffect && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  GrowEffect copyWith({
+    double? multiplier,
+    double? radius,
+    double? movementSmoothing,
+    Duration? duration,
+    Curve? curve,
+  }) {
+    return GrowEffect(
+      multiplier: multiplier ?? this.multiplier,
+      radius: radius ?? this.radius,
+      movementSmoothing: movementSmoothing ?? this.movementSmoothing,
+      duration: duration ?? this.duration,
+      curve: curve ?? this.curve,
+    );
+  }
 }
 
-class GrowEffectState extends MetaballsEffectState<GrowEffect> with AnimatedPointerTrackerMixin<GrowEffect> {
+class _GrowEffectState extends MetaballsEffectState<GrowEffect> with AnimatedPointerTrackerMixin<GrowEffect> {
   @override
   void beforeRender() {
     for (final MetaballRenderData metaball in scene.renderData) {

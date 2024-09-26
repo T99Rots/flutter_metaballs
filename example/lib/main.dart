@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:metaball_demo/screens/home_screen.dart';
-import 'package:metaball_demo/widgets/color_scheme_provider.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/debug/cubit/debug_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/effects/cubit/effects_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/general/cubit/general_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/physics/cubit/physics_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/size/cubit/size_cubit.dart';
+import 'package:metaball_demo/widgets/theme_brightness_button/cubit/theme_brightness_cubit.dart';
+import 'package:metaball_demo/widgets/theme_provider.dart';
 import 'package:nested/nested.dart';
 
 void main() {
@@ -27,13 +27,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Metaballs Demo',
-      theme: ThemeData.dark(
-        useMaterial3: true,
-      ).copyWith(
-        textTheme: GoogleFonts.nunitoTextTheme(
-          ThemeData.dark().textTheme,
-        ),
-      ),
       home: MultiBlocProvider(
         providers: <SingleChildWidget>[
           BlocProvider<ColorGradientCubit>(
@@ -54,8 +47,14 @@ class MyApp extends StatelessWidget {
           BlocProvider<SizeCubit>(
             create: (_) => SizeCubit(),
           ),
+          BlocProvider<BrightnessCubit>(
+            create: (_) => BrightnessCubit(),
+          ),
+          BlocProvider<EffectsCubit>(
+            create: (_) => EffectsCubit(),
+          ),
         ],
-        child: const ColorSchemeProvider(
+        child: const ThemeProvider(
           child: HomeScreen(),
         ),
       ),

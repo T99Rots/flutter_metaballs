@@ -21,7 +21,7 @@ import 'metaball_scaler.dart';
 /// size of 10.0. This size will be used for rendering the metaball.
 class MetaballStaticScaler implements MetaballScaler {
   const MetaballStaticScaler({
-    required this.size,
+    this.size = 20,
   });
 
   final double size;
@@ -33,5 +33,21 @@ class MetaballStaticScaler implements MetaballScaler {
         ..scaleSize(0)
         ..translateSize(size);
     });
+  }
+
+  @override
+  int get hashCode => size.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetaballStaticScaler && runtimeType == other.runtimeType && hashCode == other.hashCode;
+
+  MetaballStaticScaler copyWith({
+    double? size,
+  }) {
+    return MetaballStaticScaler(
+      size: size ?? this.size,
+    );
   }
 }

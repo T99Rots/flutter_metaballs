@@ -12,6 +12,8 @@ class MetaballsRenderer extends RenderBox {
     required this.glowThreshold,
     required this.glowIntensity,
     required this.color,
+    required this.effectsDebugging,
+    required this.physicsDebugging,
     required MetaballsScene scene,
   })  : _scene = scene,
         assert(glowThreshold >= 0 && glowThreshold <= 1),
@@ -21,6 +23,8 @@ class MetaballsRenderer extends RenderBox {
   Gradient? gradient;
   double glowThreshold;
   double glowIntensity;
+  bool effectsDebugging;
+  bool physicsDebugging;
 
   MetaballsScene _scene;
   MetaballsScene get scene => _scene;
@@ -98,6 +102,17 @@ class MetaballsRenderer extends RenderBox {
       _paintColor,
       offset,
     );
+
+    assert(() {
+      _scene.debugPaint(
+        context: context,
+        offset: offset,
+        effectsDebugging: effectsDebugging,
+        physicsDebugging: physicsDebugging,
+      );
+
+      return true;
+    }());
   }
 
   void _paintColor(PaintingContext context, Offset offset) {
@@ -119,8 +134,8 @@ class MetaballsRenderer extends RenderBox {
     final List<MetaballRenderData> renderData = _scene.renderData;
     int index = 0;
 
-    shader.setFloat(index++, 0.2);
-    shader.setFloat(index++, 0.5);
+    shader.setFloat(index++, glowThreshold);
+    shader.setFloat(index++, glowIntensity);
     shader.setFloat(index++, renderData.length.toDouble());
 
     for (final MetaballRenderData renderData in renderData) {
@@ -136,21 +151,5 @@ class MetaballsRenderer extends RenderBox {
       // correct alignment.
       index++;
     }
-  }
-
-  @override
-  void debugPaint(PaintingContext context, Offset offset) {
-    assert(() {
-      if (debugPaintSizeEnabled) {
-        debugPaintSize(context, offset);
-      }
-      if (debugPaintBaselinesEnabled) {
-        _scene.debugPaint(context, offset);
-      }
-      if (debugPaintPointersEnabled) {
-        debugPaintPointers(context, offset);
-      }
-      return true;
-    }());
   }
 }

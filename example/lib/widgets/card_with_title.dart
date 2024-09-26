@@ -30,8 +30,7 @@ abstract class CardWithTitle extends StatelessWidget {
         bottom: 10,
         right: 10,
       ),
-      child: Card(
-        color: Colors.white10,
+      child: Card.filled(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[

@@ -52,6 +52,32 @@ class FollowEffect extends MetaballsEffect {
 
   @override
   MetaballsEffectState<FollowEffect> createState() => _FollowEffectState();
+
+  @override
+  int get hashCode => Object.hash(
+        duration,
+        curve,
+        radius,
+        pointerSmoothing,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is FollowEffect && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  FollowEffect copyWith({
+    Duration? duration,
+    Curve? curve,
+    double? radius,
+    double? pointerSmoothing,
+  }) {
+    return FollowEffect(
+      duration: duration ?? this.duration,
+      curve: curve ?? this.curve,
+      radius: radius ?? this.radius,
+      pointerSmoothing: pointerSmoothing ?? this.pointerSmoothing,
+    );
+  }
 }
 
 class _FollowEffectState extends MetaballsEffectState<FollowEffect> with AnimatedPointerTrackerMixin<FollowEffect> {

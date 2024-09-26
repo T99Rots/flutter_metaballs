@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
+import 'package:metaball_demo/screens/login_example.dart';
+import 'package:metaball_demo/screens/metaballs_builder.dart';
 import 'package:metaball_demo/widgets/drawer/metaballs_drawer.dart';
-import 'package:metaballs/metaballs.dart';
+import 'package:metaball_demo/widgets/theme_brightness_button/theme_brightness_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,35 +16,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Metaballs Demo'),
-      ),
-      body: BlocBuilder<ColorGradientCubit, ColorGradientCubitState>(
-        builder: (BuildContext context, ColorGradientCubitState state) {
-          return DecoratedBox(
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment.bottomCenter,
-                radius: 1.5,
-                colors: <Color>[
-                  Color.fromARGB(255, 13, 35, 61),
-                  Colors.black,
-                ],
-              ),
-            ),
-            child: Metaballs(
-              gradient: LinearGradient(
-                colors: <Color>[
-                  state.preset.startColor,
-                  state.preset.endColor,
-                ],
-                begin: state.alignment,
-                end: -state.alignment,
-              ),
-            ),
+        title: Builder(builder: (BuildContext context) {
+          TextStyle style = DefaultTextStyle.of(context).style;
+
+          if (style.color!.computeLuminance() > 0.5) {
+            style = style.copyWith(
+              shadows: <Shadow>[
+                const Shadow(
+                  color: Colors.black54,
+                  blurRadius: 8,
+                ),
+              ],
+            );
+          }
+
+          return Text(
+            'Metaballs Demo',
+            style: style,
           );
-        },
+        }),
+        actions: const <Widget>[
+          ThemeBrightnessButton(),
+        ],
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+      ),
+      body: const MetaballsBuilder(
+        child: LoginExample(),
       ),
       drawer: const MetaballsDrawer(),
+      extendBodyBehindAppBar: true,
     );
   }
 }

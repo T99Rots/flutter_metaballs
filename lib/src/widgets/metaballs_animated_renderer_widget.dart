@@ -11,6 +11,8 @@ class MetaballsAnimatedRendererWidget extends ImplicitlyAnimatedWidget {
     required this.scene,
     required this.glowThreshold,
     required this.glowIntensity,
+    required this.effectsDebugging,
+    required this.physicsDebugging,
     required super.curve,
     required super.duration,
   });
@@ -20,6 +22,8 @@ class MetaballsAnimatedRendererWidget extends ImplicitlyAnimatedWidget {
   final MetaballsScene scene;
   final double glowThreshold;
   final double glowIntensity;
+  final bool effectsDebugging;
+  final bool physicsDebugging;
 
   @override
   AnimatedWidgetBaseState<MetaballsAnimatedRendererWidget> createState() => _MetaballsAnimatedRendererWidgetState();
@@ -68,6 +72,8 @@ class _MetaballsAnimatedRendererWidgetState extends AnimatedWidgetBaseState<Meta
       glowThreshold: _glowThresholdTween!.evaluate(animation),
       glowIntensity: _glowIntensityTween!.evaluate(animation),
       scene: widget.scene,
+      effectsDebugging: widget.effectsDebugging,
+      physicsDebugging: widget.physicsDebugging,
     );
   }
 }

@@ -11,6 +11,8 @@ class MetaballsRenderWidget extends LeafRenderObjectWidget {
     required this.scene,
     required this.glowThreshold,
     required this.glowIntensity,
+    required this.effectsDebugging,
+    required this.physicsDebugging,
   });
 
   final Color color;
@@ -18,6 +20,8 @@ class MetaballsRenderWidget extends LeafRenderObjectWidget {
   final MetaballsScene scene;
   final double glowThreshold;
   final double glowIntensity;
+  final bool effectsDebugging;
+  final bool physicsDebugging;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -27,6 +31,8 @@ class MetaballsRenderWidget extends LeafRenderObjectWidget {
       scene: scene,
       glowThreshold: glowThreshold,
       glowIntensity: glowIntensity,
+      effectsDebugging: effectsDebugging,
+      physicsDebugging: physicsDebugging,
     );
   }
 
@@ -37,5 +43,7 @@ class MetaballsRenderWidget extends LeafRenderObjectWidget {
     renderObject.scene = scene;
     renderObject.glowThreshold = glowThreshold;
     renderObject.glowIntensity = glowIntensity;
+    renderObject.effectsDebugging = effectsDebugging;
+    renderObject.physicsDebugging = physicsDebugging;
   }
 }

@@ -23,7 +23,7 @@ import 'metaball_scaler.dart';
 /// percentage of 3.
 class MetaballDynamicScaler implements MetaballScaler {
   const MetaballDynamicScaler({
-    required this.percentage,
+    this.percentage = 1,
   });
 
   /// A percentage of the widget volume the metaballs will use.
@@ -42,4 +42,12 @@ class MetaballDynamicScaler implements MetaballScaler {
         ..translateSize(targetSize);
     });
   }
+
+  @override
+  int get hashCode => percentage.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetaballDynamicScaler && runtimeType == other.runtimeType && hashCode == other.hashCode;
 }

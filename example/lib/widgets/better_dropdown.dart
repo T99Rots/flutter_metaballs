@@ -26,30 +26,30 @@ class _BetterDropdownState<T> extends State<BetterDropdown<T>> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Positioned.fill(
-          child: InputDecorator(
-            isFocused: _isOpen,
-            decoration: InputDecoration(
-              label: Text(widget.label),
-              border: const OutlineInputBorder(),
-            ),
+        InputDecorator(
+          isFocused: _isOpen,
+          decoration: InputDecoration(
+            label: Text(widget.label),
+            border: const OutlineInputBorder(),
           ),
         ),
-        DropdownButtonHideUnderline(
-          child: ClipRRect(
-            child: DropdownButton2<T>(
-              onChanged: widget.onChange,
-              value: widget.value,
-              items: widget.items,
-              buttonStyleData: const ButtonStyleData(
-                padding: EdgeInsets.only(
-                  right: 8,
+        Positioned.fill(
+          child: DropdownButtonHideUnderline(
+            child: ClipRRect(
+              child: DropdownButton2<T>(
+                onChanged: widget.onChange,
+                value: widget.value,
+                items: widget.items,
+                buttonStyleData: const ButtonStyleData(
+                  padding: EdgeInsets.only(
+                    right: 8,
+                  ),
                 ),
+                onMenuStateChange: (bool isOpen) {
+                  _isOpen = isOpen;
+                  setState(() {});
+                },
               ),
-              onMenuStateChange: (bool isOpen) {
-                _isOpen = isOpen;
-                setState(() {});
-              },
             ),
           ),
         ),

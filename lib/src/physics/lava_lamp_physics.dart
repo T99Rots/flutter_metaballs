@@ -6,11 +6,11 @@ import 'package:metaballs/src/physics/metaballs_physics.dart';
 
 class LavaLampPhysics extends MetaballsPhysics {
   const LavaLampPhysics({
-    required this.heatSourceTemperature,
-    required this.friction,
-    required this.forceMultiplier,
-    required this.ambientCooling,
-    required this.heatSourceFallOff,
+    this.heatSourceTemperature = 0,
+    this.friction = 0,
+    this.forceMultiplier = 0,
+    this.ambientCooling = 0,
+    this.heatSourceFallOff = 0,
   });
 
   final double heatSourceTemperature;
@@ -22,6 +22,36 @@ class LavaLampPhysics extends MetaballsPhysics {
   @override
   LavaLampPhysicsScene createScene() {
     return LavaLampPhysicsScene();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        heatSourceTemperature,
+        heatSourceFallOff,
+        friction,
+        forceMultiplier,
+        ambientCooling,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LavaLampPhysics && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  LavaLampPhysics copyWith({
+    double? heatSourceTemperature,
+    double? heatSourceFallOff,
+    double? friction,
+    double? forceMultiplier,
+    double? ambientCooling,
+  }) {
+    return LavaLampPhysics(
+      heatSourceTemperature: heatSourceTemperature ?? this.heatSourceTemperature,
+      heatSourceFallOff: heatSourceFallOff ?? this.heatSourceFallOff,
+      friction: friction ?? this.friction,
+      forceMultiplier: forceMultiplier ?? this.forceMultiplier,
+      ambientCooling: ambientCooling ?? this.ambientCooling,
+    );
   }
 }
 

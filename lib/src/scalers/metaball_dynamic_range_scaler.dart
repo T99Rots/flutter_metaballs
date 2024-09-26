@@ -26,8 +26,8 @@ import 'metaball_scaler.dart';
 /// volume, ensuring a balanced and responsive design.
 class MetaballDynamicRangeScaler implements MetaballScaler {
   const MetaballDynamicRangeScaler({
-    required this.minPercentage,
-    required this.maxPercentage,
+    this.minPercentage = 0.1,
+    this.maxPercentage = 1,
   });
 
   /// The minimum percentage of the widget volume the metaballs will use.
@@ -52,5 +52,23 @@ class MetaballDynamicRangeScaler implements MetaballScaler {
         ..scaleSize(range)
         ..translateSize(minSize);
     });
+  }
+
+  @override
+  int get hashCode => Object.hash(minPercentage, maxPercentage);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetaballDynamicRangeScaler && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  MetaballDynamicRangeScaler copyWith({
+    double? minPercentage,
+    double? maxPercentage,
+  }) {
+    return MetaballDynamicRangeScaler(
+      minPercentage: minPercentage ?? this.minPercentage,
+      maxPercentage: maxPercentage ?? this.maxPercentage,
+    );
   }
 }

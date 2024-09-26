@@ -44,7 +44,7 @@ abstract interface class MetaballScaler {
   /// create a `MetaballStaticSize` object with a fixed size of 10.0. This size
   /// will be used for rendering the metaball.
   const factory MetaballScaler.static({
-    required double size,
+    double size,
   }) = MetaballStaticScaler;
 
   /// A class representing a range-based size for a metaball.
@@ -67,8 +67,8 @@ abstract interface class MetaballScaler {
   /// and a maximum size of 15.0. The size will vary between these values based
   /// on the radius.
   const factory MetaballScaler.staticRange({
-    required double max,
-    required double min,
+    double max,
+    double min,
   }) = MetaballStaticRangeScaler;
 
   /// A class for dynamic metaball sizing.
@@ -87,7 +87,7 @@ abstract interface class MetaballScaler {
   /// In this example, a `MetaballScaler.dynamic` factory constructor is used to
   /// create a `MetaballDynamicSize` object with a percentage of 3.
   const factory MetaballScaler.dynamic({
-    required double percentage,
+    double percentage,
   }) = MetaballDynamicScaler;
 
   /// Adjusts metaball size based on a range of screen size percentages.
@@ -110,8 +110,8 @@ abstract interface class MetaballScaler {
   /// a maximum percentage of 5. The metaballs will occupy between 3% and 5% of the
   /// viewport's volume, ensuring a balanced and responsive design.
   const factory MetaballScaler.dynamicRange({
-    required double maxPercentage,
-    required double minPercentage,
+    double maxPercentage,
+    double minPercentage,
   }) = MetaballDynamicRangeScaler;
 
   /// Calculates the render size of a metaball.

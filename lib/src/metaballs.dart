@@ -11,6 +11,7 @@ import 'widgets/pointer_event_listener.dart';
 class Metaballs extends StatefulWidget {
   const Metaballs({
     super.key,
+    this.child,
     this.effect,
     this.gradient,
     this.count = 40,
@@ -18,12 +19,11 @@ class Metaballs extends StatefulWidget {
     this.glowIntensity = 0.6,
     this.color = const Color(0xff0080ff),
     this.physics = const BouncingPhysics(),
-    this.size = const MetaballScaler.dynamicRange(
-      minPercentage: 0.1,
-      maxPercentage: 1,
-    ),
+    this.size = const MetaballScaler.dynamicRange(),
     this.duration = const Duration(milliseconds: 300),
     this.curve = Curves.easeInOut,
+    this.effectsDebugging = false,
+    this.physicsDebugging = false,
   });
 
   final int count;
@@ -36,6 +36,10 @@ class Metaballs extends StatefulWidget {
   final MetaballScaler size;
   final Duration duration;
   final Curve curve;
+  final Widget? child;
+
+  final bool effectsDebugging;
+  final bool physicsDebugging;
 
   @override
   State<Metaballs> createState() => _MetaballsState();
@@ -51,20 +55,43 @@ class _MetaballsState extends State<Metaballs> with SingleTickerProviderStateMix
   );
 
   @override
+  void didUpdateWidget(covariant Metaballs oldWidget) {
+    _scene.update(
+      effect: widget.effect,
+      physics: widget.physics,
+      metaballScaler: widget.size,
+      count: widget.count,
+    );
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Widget? child = widget.child;
+
     return PointerEventListener(
       onPointerEvent: _scene.handlePointerEvent,
       behavior: HitTestBehavior.translucent,
-      child: RepaintBoundary(
-        child: MetaballsAnimatedRendererWidget(
-          gradient: widget.gradient,
-          color: widget.color,
-          glowThreshold: widget.glowThreshold,
-          glowIntensity: widget.glowIntensity,
-          scene: _scene,
-          curve: widget.curve,
-          duration: widget.duration,
-        ),
+      child: Stack(
+        children: <Widget>[
+          RepaintBoundary(
+            child: MetaballsAnimatedRendererWidget(
+              gradient: widget.gradient,
+              color: widget.color,
+              glowThreshold: widget.glowThreshold,
+              glowIntensity: widget.glowIntensity,
+              scene: _scene,
+              curve: widget.curve,
+              duration: widget.duration,
+              effectsDebugging: widget.effectsDebugging,
+              physicsDebugging: widget.physicsDebugging,
+            ),
+          ),
+          if (child != null)
+            Positioned.fill(
+              child: child,
+            )
+        ],
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/gestures.dart';
-import 'package:flutter/src/rendering/object.dart';
+import 'package:flutter/rendering.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
 
 import 'metaballs_effect.dart';
@@ -81,11 +80,41 @@ class RippleEffect extends MetaballsEffect {
 
   @override
   _RippleEffectState createState() => _RippleEffectState();
+
+  @override
+  int get hashCode => Object.hash(
+        speed,
+        width,
+        radiusMultiplier,
+        distanceMultiplier,
+        punch,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is RippleEffect && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  RippleEffect copyWith({
+    double? speed,
+    double? width,
+    double? radiusMultiplier,
+    double? distanceMultiplier,
+    double? punch,
+  }) {
+    return RippleEffect(
+      speed: speed ?? this.speed,
+      width: width ?? this.width,
+      radiusMultiplier: radiusMultiplier ?? this.radiusMultiplier,
+      distanceMultiplier: distanceMultiplier ?? this.distanceMultiplier,
+      punch: punch ?? this.punch,
+    );
+  }
 }
 
 class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
   final Set<_Ripple> _ripples = <_Ripple>{};
 
+  @override
   void handlePointerEvent(PointerEvent event) {
     if (event is PointerDownEvent) {
       _ripples.add(
@@ -105,6 +134,7 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
     return (cos(pi + (pow(x, effect.punch).toDouble() * pi * 2)) + 1) / 2;
   }
 
+  @override
   void beforePhysics() {
     _ripples.removeWhere((_Ripple ripple) {
       final double width = scene.viewportSize.width;
@@ -151,9 +181,9 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
   void debugPaint(PaintingContext context, Offset offset) {
     assert(() {
       final Canvas canvas = context.canvas;
-      final Paint circlePaint = Paint()..color = Color(0x80ffff00);
+      final Paint circlePaint = Paint()..color = const Color(0x80ffff00);
       final Paint doughnutPaint = Paint()
-        ..color = Color(0x80ffff00)
+        ..color = const Color(0x80ffff00)
         ..style = PaintingStyle.stroke;
       for (final _Ripple ripple in _ripples) {
         if (ripple.outerRadius < ripple.width) {

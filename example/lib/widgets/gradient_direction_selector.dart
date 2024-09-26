@@ -17,96 +17,102 @@ class GradientDirectionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      width: 180,
-      child: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: AnimatedContainer(
-              curve: Curves.easeOut,
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                gradient: gradient,
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InputDecorator(
-              decoration: const InputDecoration(
-                label: Text('Select alignment'),
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _DirectionButton(
-                          alignment: Alignment.topLeft,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                        _DirectionButton(
-                          alignment: Alignment.topCenter,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                        _DirectionButton(
-                          alignment: Alignment.topRight,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _DirectionButton(
-                          alignment: Alignment.centerLeft,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                        _DirectionButton(
-                          alignment: Alignment.centerRight,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _DirectionButton(
-                          alignment: Alignment.bottomLeft,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                        _DirectionButton(
-                          alignment: Alignment.bottomCenter,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                        _DirectionButton(
-                          alignment: Alignment.bottomRight,
-                          currentAlignment: alignment,
-                          onChange: onChange,
-                        ),
-                      ],
-                    )
-                  ],
+    final ThemeData theme = Theme.of(context);
+    final IconThemeData iconTheme = theme.iconTheme.copyWith(color: theme.colorScheme.onSurface);
+
+    return IconTheme(
+      data: iconTheme,
+      child: SizedBox(
+        height: 180,
+        width: 180,
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: AnimatedContainer(
+                curve: Curves.easeOut,
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  gradient: gradient,
+                  borderRadius: BorderRadius.circular(5),
                 ),
               ),
             ),
-          ),
-        ],
+            Material(
+              color: Colors.transparent,
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  label: Text('Select alignment'),
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _DirectionButton(
+                            alignment: Alignment.topLeft,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                          _DirectionButton(
+                            alignment: Alignment.topCenter,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                          _DirectionButton(
+                            alignment: Alignment.topRight,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _DirectionButton(
+                            alignment: Alignment.centerLeft,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                          _DirectionButton(
+                            alignment: Alignment.centerRight,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _DirectionButton(
+                            alignment: Alignment.bottomLeft,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                          _DirectionButton(
+                            alignment: Alignment.bottomCenter,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                          _DirectionButton(
+                            alignment: Alignment.bottomRight,
+                            currentAlignment: alignment,
+                            onChange: onChange,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

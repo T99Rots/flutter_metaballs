@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/color_gradient_card.dart';
 import 'package:metaball_demo/widgets/drawer/cards/debug/debug_card.dart';
 import 'package:metaball_demo/widgets/drawer/cards/effects/effects_card.dart';
+import 'package:metaball_demo/widgets/drawer/cards/examples/examples_card.dart';
 import 'package:metaball_demo/widgets/drawer/cards/export/export_card.dart';
 import 'package:metaball_demo/widgets/drawer/cards/general/general_card.dart';
 import 'package:metaball_demo/widgets/drawer/cards/info/info_card.dart';
@@ -14,7 +15,6 @@ class MetaballsDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xff141218),
       width: 340,
       child: SafeArea(
         child: Column(
@@ -37,6 +37,7 @@ class MetaballsDrawer extends StatelessWidget {
                     EffectsCard(),
                     ColorGradientCard(),
                     ExportCard(),
+                    ExamplesCard(),
                     InfoCard(),
                     DebugCard(),
                   ],

@@ -23,8 +23,8 @@ import 'metaball_scaler.dart';
 /// between these values based on the radius.
 class MetaballStaticRangeScaler implements MetaballScaler {
   const MetaballStaticRangeScaler({
-    required this.max,
-    required this.min,
+    this.max = 30,
+    this.min = 10,
   });
 
   final double min;
@@ -38,5 +38,23 @@ class MetaballStaticRangeScaler implements MetaballScaler {
         ..scaleSize(range)
         ..translateSize(min);
     });
+  }
+
+  @override
+  int get hashCode => Object.hash(min, max);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetaballStaticRangeScaler && runtimeType == other.runtimeType && hashCode == other.hashCode;
+
+  MetaballStaticRangeScaler copyWith({
+    double? max,
+    double? min,
+  }) {
+    return MetaballStaticRangeScaler(
+      max: max ?? this.max,
+      min: min ?? this.min,
+    );
   }
 }

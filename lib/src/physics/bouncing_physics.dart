@@ -29,9 +29,11 @@ class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     this.maxForce = 1,
     this.friction = 10,
-    this.metaballMass = 10,
+    this.mass = 10,
     this.hasInitialSpeed = false,
-  }) : assert(maxForce > 0, '');
+  })  : assert(maxForce >= 0, 'maxForce can not be a negative value.'),
+        assert(mass > 0, 'mass must be a positive value.'),
+        assert(friction >= 0, 'friction can not be a negative value');
 
   /// The maximum force that can be applied to a metaball for acceleration.
   ///
@@ -50,7 +52,7 @@ class BouncingPhysics extends MetaballsPhysics {
   /// The mass determines the amount of force required to move the metaball.
   /// A higher mass multiplier means more force is needed to achieve the same
   /// acceleration.
-  final double metaballMass;
+  final double mass;
 
   /// Determines whether the metaball should be initialized with an initial speed.
   ///
@@ -62,6 +64,33 @@ class BouncingPhysics extends MetaballsPhysics {
   @override
   _MetaballsBouncingPhysicsScene createScene() {
     return _MetaballsBouncingPhysicsScene();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        maxForce,
+        friction,
+        mass,
+        hasInitialSpeed,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BouncingPhysics && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  BouncingPhysics copyWith({
+    double? maxForce,
+    double? friction,
+    double? metaballMass,
+    bool? hasInitialSpeed,
+  }) {
+    return BouncingPhysics(
+      maxForce: maxForce ?? this.maxForce,
+      friction: friction ?? this.friction,
+      mass: metaballMass ?? mass,
+      hasInitialSpeed: hasInitialSpeed ?? this.hasInitialSpeed,
+    );
   }
 }
 
@@ -95,7 +124,7 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
       velocity: initialVelocity,
       direction: direction,
       force: force,
-      mass: config.metaballMass,
+      mass: config.mass,
     );
   }
 
@@ -135,8 +164,8 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
 
     final Offset netForce = state.forceVector + state.resistanceVector;
     final Offset acceleration = Offset(
-      netForce.dx / config.metaballMass / xRatio,
-      netForce.dy / config.metaballMass / yRatio,
+      netForce.dx / config.mass / xRatio,
+      netForce.dy / config.mass / yRatio,
     );
 
     state.velocity = Offset(
@@ -167,10 +196,10 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     assert(() {
       final Canvas canvas = context.canvas;
       final Paint forcePaint = Paint()
-        ..color = Color(0x8000ff00)
+        ..color = const Color(0x8000ff00)
         ..strokeWidth = 2;
       final Paint resistancePaint = Paint()
-        ..color = Color(0x80ff0000)
+        ..color = const Color(0x80ff0000)
         ..strokeWidth = 2;
 
       visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
@@ -195,6 +224,11 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
 
       return true;
     }());
+  }
+
+  @override
+  void physicsConfigUpdated(BouncingPhysics oldConfig) {
+    print('${oldConfig.maxForce} => ${config.maxForce}');
   }
 }
 

@@ -206,10 +206,19 @@ class MetaballsScene with ChangeNotifier {
     }
   }
 
-  void debugPaint(PaintingContext context, Offset offset) {
+  void debugPaint({
+    required PaintingContext context,
+    required Offset offset,
+    required bool effectsDebugging,
+    required bool physicsDebugging,
+  }) {
     assert(() {
-      _physicsScene.debugPaint(context, offset);
-      _effectState?.debugPaint(context, offset);
+      if (physicsDebugging) {
+        _physicsScene.debugPaint(context, offset);
+      }
+      if (effectsDebugging) {
+        _effectState?.debugPaint(context, offset);
+      }
       return true;
     }());
   }

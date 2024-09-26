@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/src/gestures/events.dart';
+import 'package:flutter/gestures.dart';
 
 import 'metaballs_effect.dart';
 
@@ -44,6 +44,27 @@ class SpeedupEffect extends MetaballsEffect {
   @override
   MetaballsEffectState<SpeedupEffect> createState() {
     return _SpeedupEffectState();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        maxSpeedup,
+        speedupRate,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SpeedupEffect && other.runtimeType == runtimeType && other.hashCode == hashCode;
+
+  SpeedupEffect copyWith({
+    double? maxSpeedup,
+    double? speedupRate,
+  }) {
+    return SpeedupEffect(
+      maxSpeedup: maxSpeedup ?? this.maxSpeedup,
+      speedupRate: speedupRate ?? this.speedupRate,
+    );
   }
 }
 

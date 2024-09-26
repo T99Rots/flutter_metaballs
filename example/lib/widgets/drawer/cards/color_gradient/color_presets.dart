@@ -26,7 +26,7 @@ class ColorPreset with EquatableMixin {
     ),
     ColorPreset(
       name: 'Fantasy Fuchsia',
-      startColor: Color.fromARGB(255, 255, 60, 120),
+      startColor: Color(0xFFFF3C78),
       endColor: Color.fromARGB(255, 237, 120, 255),
     ),
     ColorPreset(

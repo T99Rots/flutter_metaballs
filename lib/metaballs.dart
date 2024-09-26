@@ -1,7 +1,15 @@
+export 'src/effects/attract_effect.dart';
 export 'src/effects/follow_effect.dart';
 export 'src/effects/grow_effect.dart';
+export 'src/effects/metaballs_effect.dart';
 export 'src/effects/ripple_effect.dart';
 export 'src/effects/speedup_effect.dart';
 export 'src/metaballs.dart';
 export 'src/physics/bouncing_physics.dart';
+export 'src/physics/lava_lamp_physics.dart';
+export 'src/physics/metaballs_physics.dart';
+export 'src/scalers/metaball_dynamic_range_scaler.dart';
+export 'src/scalers/metaball_dynamic_scaler.dart';
 export 'src/scalers/metaball_scaler.dart';
+export 'src/scalers/metaball_static_range_scaler.dart';
+export 'src/scalers/metaball_static_scaler.dart';
