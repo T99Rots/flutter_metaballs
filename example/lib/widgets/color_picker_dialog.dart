@@ -43,8 +43,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
               ),
               const SizedBox(height: 20),
               SizedBox(
-                width: 300,
-                height: 429,
+                width: 340,
                 child: ColorPicker(
                   enableAlpha: false,
                   portraitOnly: true,

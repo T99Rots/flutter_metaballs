@@ -5,20 +5,23 @@ import 'metaballs_effect.dart';
 
 class AttractEffect extends MetaballsEffect {
   const AttractEffect({
-    this.animationCurve = Curves.easeInOut,
-    this.animationDuration = const Duration(milliseconds: 100),
+    this.curve = Curves.easeInOut,
+    this.duration = const Duration(milliseconds: 100),
+    this.pointerSmoothing = 0,
   });
 
-  final Duration animationDuration;
-  final Curve animationCurve;
+  final Duration duration;
+  final Curve curve;
+  final double pointerSmoothing;
 
   @override
   _AttractEffectState createState() => _AttractEffectState();
 
   @override
   int get hashCode => Object.hash(
-        animationDuration,
-        animationCurve,
+        duration,
+        curve,
+        pointerSmoothing,
       );
 
   @override
@@ -27,20 +30,25 @@ class AttractEffect extends MetaballsEffect {
       other is AttractEffect && other.runtimeType == runtimeType && other.hashCode == hashCode;
 
   AttractEffect copyWith({
-    Duration? animationDuration,
-    Curve? animationCurve,
+    Duration? duration,
+    Curve? curve,
+    double? pointerSmoothing,
   }) {
     return AttractEffect(
-      animationDuration: animationDuration ?? this.animationDuration,
-      animationCurve: animationCurve ?? this.animationCurve,
+      duration: duration ?? this.duration,
+      curve: curve ?? this.curve,
+      pointerSmoothing: pointerSmoothing ?? this.pointerSmoothing,
     );
   }
 }
 
 class _AttractEffectState extends MetaballsEffectState<AttractEffect> with AnimatedPointerTrackerMixin<AttractEffect> {
   @override
-  Curve get animationCurve => effect.animationCurve;
+  Curve get animationCurve => effect.curve;
 
   @override
-  Duration get animationDuration => effect.animationDuration;
+  Duration get animationDuration => effect.duration;
+
+  @override
+  double get pointerSmoothing => effect.pointerSmoothing;
 }

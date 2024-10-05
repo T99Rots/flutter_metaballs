@@ -31,7 +31,9 @@ class EffectsCubit extends Cubit<EffectState> {
     });
   }
 
-  void setDuration(Duration newValue) {
+  // region FollowEffect
+
+  void setFollowEffectDuration(Duration newValue) {
     final EffectState state = this.state;
     if (state is! FollowEffectState) {
       return;
@@ -44,7 +46,7 @@ class EffectsCubit extends Cubit<EffectState> {
     );
   }
 
-  void setCurve(Curve newValue) {
+  void setFollowEffectCurve(Curve newValue) {
     final EffectState state = this.state;
     if (state is! FollowEffectState) {
       return;
@@ -57,7 +59,7 @@ class EffectsCubit extends Cubit<EffectState> {
     );
   }
 
-  void setRadius(double newValue) {
+  void setFollowEffectRadius(double newValue) {
     final EffectState state = this.state;
     if (state is! FollowEffectState) {
       return;
@@ -70,7 +72,7 @@ class EffectsCubit extends Cubit<EffectState> {
     );
   }
 
-  void setPointerSmoothing(double newValue) {
+  void setFollowEffectPointerSmoothing(double newValue) {
     final EffectState state = this.state;
     if (state is! FollowEffectState) {
       return;
@@ -82,4 +84,217 @@ class EffectsCubit extends Cubit<EffectState> {
       ),
     );
   }
+
+  // endregion
+
+  // region GrowEffect
+
+  void setGrowEffectDuration(Duration newValue) {
+    final EffectState state = this.state;
+    if (state is! GrowEffectState) {
+      return;
+    }
+
+    emit(
+      GrowEffectState(
+        effect: state.effect.copyWith(duration: newValue),
+      ),
+    );
+  }
+
+  void setGrowEffectCurve(Curve newValue) {
+    final EffectState state = this.state;
+    if (state is! GrowEffectState) {
+      return;
+    }
+
+    emit(
+      GrowEffectState(
+        effect: state.effect.copyWith(curve: newValue),
+      ),
+    );
+  }
+
+  void setGrowEffectMultiplier(double newValue) {
+    final EffectState state = this.state;
+    if (state is! GrowEffectState) {
+      return;
+    }
+
+    emit(
+      GrowEffectState(
+        effect: state.effect.copyWith(multiplier: newValue),
+      ),
+    );
+  }
+
+  void setGrowEffectRadius(double newValue) {
+    final EffectState state = this.state;
+    if (state is! GrowEffectState) {
+      return;
+    }
+
+    emit(
+      GrowEffectState(
+        effect: state.effect.copyWith(radius: newValue),
+      ),
+    );
+  }
+
+  void setGrowEffectMovementSmoothing(double newValue) {
+    final EffectState state = this.state;
+    if (state is! GrowEffectState) {
+      return;
+    }
+
+    emit(
+      GrowEffectState(
+        effect: state.effect.copyWith(pointerSmoothing: newValue),
+      ),
+    );
+  }
+
+  // endregion
+
+  // region AttractEffect
+
+  void setAttractEffectDuration(Duration newValue) {
+    final EffectState state = this.state;
+    if (state is! AttractEffectState) {
+      return;
+    }
+
+    emit(
+      AttractEffectState(
+        effect: state.effect.copyWith(duration: newValue),
+      ),
+    );
+  }
+
+  void setAttractEffectCurve(Curve newValue) {
+    final EffectState state = this.state;
+    if (state is! AttractEffectState) {
+      return;
+    }
+
+    emit(
+      AttractEffectState(
+        effect: state.effect.copyWith(curve: newValue),
+      ),
+    );
+  }
+
+  void setAttractEffectPointerSmoothing(double newValue) {
+    final EffectState state = this.state;
+    if (state is! AttractEffectState) {
+      return;
+    }
+
+    emit(
+      AttractEffectState(
+        effect: state.effect.copyWith(pointerSmoothing: newValue),
+      ),
+    );
+  }
+
+  // endregion
+
+  // region RippleEffect
+
+  void setRippleEffectSpeed(double newValue) {
+    final EffectState state = this.state;
+    if (state is! RippleEffectState) {
+      return;
+    }
+
+    emit(
+      RippleEffectState(
+        effect: state.effect.copyWith(speed: newValue),
+      ),
+    );
+  }
+
+  void setRippleEffectWidth(double newValue) {
+    final EffectState state = this.state;
+    if (state is! RippleEffectState) {
+      return;
+    }
+
+    emit(
+      RippleEffectState(
+        effect: state.effect.copyWith(width: newValue),
+      ),
+    );
+  }
+
+  void setRippleEffectRadiusMultiplier(double newValue) {
+    final EffectState state = this.state;
+    if (state is! RippleEffectState) {
+      return;
+    }
+
+    emit(
+      RippleEffectState(
+        effect: state.effect.copyWith(radiusMultiplier: newValue),
+      ),
+    );
+  }
+
+  void setRippleEffectDistanceMultiplier(double newValue) {
+    final EffectState state = this.state;
+    if (state is! RippleEffectState) {
+      return;
+    }
+
+    emit(
+      RippleEffectState(
+        effect: state.effect.copyWith(distanceMultiplier: newValue),
+      ),
+    );
+  }
+
+  void setRippleEffectPunch(double newValue) {
+    final EffectState state = this.state;
+    if (state is! RippleEffectState) {
+      return;
+    }
+
+    emit(
+      RippleEffectState(
+        effect: state.effect.copyWith(punch: newValue),
+      ),
+    );
+  }
+
+  // endregion
+
+  // region SpeedupEffect
+
+  void setSpeedupEffectMaxSpeedup(double newValue) {
+    final EffectState state = this.state;
+    if (state is! SpeedupEffectState) {
+      return;
+    }
+
+    emit(
+      SpeedupEffectState(
+        effect: state.effect.copyWith(maxSpeedup: newValue),
+      ),
+    );
+  }
+
+  void setSpeedupEffectSpeedupRate(double newValue) {
+    final EffectState state = this.state;
+    if (state is! SpeedupEffectState) {
+      return;
+    }
+
+    emit(
+      SpeedupEffectState(
+        effect: state.effect.copyWith(speedupRate: newValue),
+      ),
+    );
+  }
+
+  // endregion
 }

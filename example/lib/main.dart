@@ -4,6 +4,7 @@ import 'package:metaball_demo/screens/home_screen.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/debug/cubit/debug_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/effects/cubit/effects_cubit.dart';
+import 'package:metaball_demo/widgets/drawer/cards/examples/cubit/examples_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/general/cubit/general_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/physics/cubit/physics_cubit.dart';
 import 'package:metaball_demo/widgets/drawer/cards/size/cubit/size_cubit.dart';
@@ -27,37 +28,43 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Metaballs Demo',
-      home: MultiBlocProvider(
-        providers: <SingleChildWidget>[
-          BlocProvider<ColorGradientCubit>(
-            create: (_) => ColorGradientCubit(),
+      builder: (BuildContext context, Widget? child) {
+        return MultiBlocProvider(
+          providers: <SingleChildWidget>[
+            BlocProvider<ColorGradientCubit>(
+              create: (_) => ColorGradientCubit(),
+            ),
+            BlocProvider<DebugCubit>(
+              create: (_) => DebugCubit(),
+            ),
+            BlocProvider<EffectsCubit>(
+              create: (_) => EffectsCubit(),
+            ),
+            BlocProvider<GeneralCubit>(
+              create: (_) => GeneralCubit(),
+            ),
+            BlocProvider<PhysicsCubit>(
+              create: (_) => PhysicsCubit(),
+            ),
+            BlocProvider<SizeCubit>(
+              create: (_) => SizeCubit(),
+            ),
+            BlocProvider<BrightnessCubit>(
+              create: (_) => BrightnessCubit(),
+            ),
+            BlocProvider<EffectsCubit>(
+              create: (_) => EffectsCubit(),
+            ),
+            BlocProvider<ExamplesCubit>(
+              create: (_) => ExamplesCubit(),
+            ),
+          ],
+          child: ThemeProvider(
+            child: child!,
           ),
-          BlocProvider<DebugCubit>(
-            create: (_) => DebugCubit(),
-          ),
-          BlocProvider<EffectsCubit>(
-            create: (_) => EffectsCubit(),
-          ),
-          BlocProvider<GeneralCubit>(
-            create: (_) => GeneralCubit(),
-          ),
-          BlocProvider<PhysicsCubit>(
-            create: (_) => PhysicsCubit(),
-          ),
-          BlocProvider<SizeCubit>(
-            create: (_) => SizeCubit(),
-          ),
-          BlocProvider<BrightnessCubit>(
-            create: (_) => BrightnessCubit(),
-          ),
-          BlocProvider<EffectsCubit>(
-            create: (_) => EffectsCubit(),
-          ),
-        ],
-        child: const ThemeProvider(
-          child: HomeScreen(),
-        ),
-      ),
+        );
+      },
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

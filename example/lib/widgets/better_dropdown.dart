@@ -24,6 +24,11 @@ class _BetterDropdownState<T> extends State<BetterDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.items.map((DropdownMenuItem<T> a) => a.value).contains(widget.value)) {
+      print('${widget.value} => ${widget.items.map((DropdownMenuItem<T> a) => a.value).join(', ')}');
+      return const Text('No');
+    }
+
     return Stack(
       children: <Widget>[
         InputDecorator(

@@ -21,7 +21,7 @@ class DynamicRangeScalerView extends StatelessWidget {
           state.scaler.minPercentage,
           state.scaler.maxPercentage,
         ),
-        max: 10,
+        max: 5,
         divisions: 250,
         onChanged: (RangeValues values) => context.read<SizeCubit>().setDynamicRange(
               values.start,

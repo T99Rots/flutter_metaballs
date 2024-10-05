@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metaball_demo/widgets/better_dropdown.dart';
 import 'package:metaball_demo/widgets/card_with_title.dart';
+import 'package:metaball_demo/widgets/color_picker_dialog.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/color_presets.dart';
 import 'package:metaball_demo/widgets/drawer/cards/color_gradient/cubit/color_gradient_cubit.dart';
 import 'package:metaball_demo/widgets/gradient_direction_selector.dart';
@@ -19,7 +20,7 @@ class ColorGradientCard extends StatelessWidget {
             children: <Widget>[
               BetterDropdown<ColorPreset>(
                 label: 'Select Color Preset',
-                items: _getDropdownMenuItems(),
+                items: _getDropdownMenuItems(state),
                 value: state.preset,
                 onChange: (ColorPreset? value) {
                   if (value == null) {
@@ -35,7 +36,7 @@ class ColorGradientCard extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll<Color>(state.preset.startColor),
                     ),
-                    onPressed: () {},
+                    onPressed: () => _showStartColorPicker(context, state),
                     child: const SizedBox(width: 80),
                   ),
                   const SizedBox(width: 20),
@@ -45,7 +46,7 @@ class ColorGradientCard extends StatelessWidget {
                         state.preset.endColor,
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () => _showEndColorPicker(context, state),
                     child: const SizedBox(width: 80),
                   ),
                 ],
@@ -72,8 +73,15 @@ class ColorGradientCard extends StatelessWidget {
     );
   }
 
-  List<DropdownMenuItem<ColorPreset>> _getDropdownMenuItems() {
+  List<DropdownMenuItem<ColorPreset>> _getDropdownMenuItems(ColorGradientCubitState state) {
     final List<DropdownMenuItem<ColorPreset>> items = <DropdownMenuItem<ColorPreset>>[];
+
+    final List<ColorPreset> presets = List<ColorPreset>.of(ColorPreset.presets);
+    if (!presets.contains(state.preset)) {
+      presets.add(state.preset);
+    }
+
+    print(presets);
 
     for (final ColorPreset preset in ColorPreset.presets) {
       items.add(
@@ -109,5 +117,35 @@ class ColorGradientCard extends StatelessWidget {
     }
 
     return items;
+  }
+
+  void _showStartColorPicker(BuildContext context, ColorGradientCubitState state) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ColorPickerDialog(
+          title: 'Start color',
+          initialColor: state.preset.startColor,
+          onChange: (Color value) {
+            context.read<ColorGradientCubit>().setStartColor(value);
+          },
+        );
+      },
+    );
+  }
+
+  void _showEndColorPicker(BuildContext context, ColorGradientCubitState state) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ColorPickerDialog(
+          title: 'End color',
+          initialColor: state.preset.endColor,
+          onChange: (Color value) {
+            context.read<ColorGradientCubit>().setEndColor(value);
+          },
+        );
+      },
+    );
   }
 }

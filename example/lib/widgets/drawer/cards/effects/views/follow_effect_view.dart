@@ -24,13 +24,13 @@ class FollowEffectView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: CurvesDropdown(
             curve: effect.curve,
-            onChanged: (Curve value) => context.read<EffectsCubit>().setCurve(value),
+            onChanged: (Curve value) => context.read<EffectsCubit>().setFollowEffectCurve(value),
           ),
         ),
         const SizedBox(height: 20),
         DurationSlider(
           value: effect.duration,
-          onChanged: (Duration value) => context.read<EffectsCubit>().setDuration(value),
+          onChanged: (Duration value) => context.read<EffectsCubit>().setFollowEffectDuration(value),
         ),
         SliderWrapper(
           label: 'Radius',
@@ -38,7 +38,7 @@ class FollowEffectView extends StatelessWidget {
           slider: Slider(
             value: effect.radius,
             max: 100,
-            onChanged: (double value) => context.read<EffectsCubit>().setRadius(value),
+            onChanged: (double value) => context.read<EffectsCubit>().setFollowEffectRadius(value),
           ),
         ),
         SliderWrapper(
@@ -47,7 +47,7 @@ class FollowEffectView extends StatelessWidget {
           slider: Slider(
             value: effect.pointerSmoothing,
             divisions: 100,
-            onChanged: (double value) => context.read<EffectsCubit>().setPointerSmoothing(value),
+            onChanged: (double value) => context.read<EffectsCubit>().setFollowEffectPointerSmoothing(value),
           ),
         ),
       ],

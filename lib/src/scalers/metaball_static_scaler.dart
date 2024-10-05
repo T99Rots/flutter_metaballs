@@ -21,7 +21,7 @@ import 'metaball_scaler.dart';
 /// size of 10.0. This size will be used for rendering the metaball.
 class MetaballStaticScaler implements MetaballScaler {
   const MetaballStaticScaler({
-    this.size = 20,
+    this.size = 40,
   });
 
   final double size;

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:metaball_demo/screens/login_example.dart';
 import 'package:metaball_demo/screens/metaballs_builder.dart';
 import 'package:metaball_demo/widgets/drawer/metaballs_drawer.dart';
 import 'package:metaball_demo/widgets/theme_brightness_button/theme_brightness_button.dart';
+
+import 'example_layout_builder.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: const MetaballsBuilder(
-        child: LoginExample(),
+        child: ExampleLayoutBuilder(),
       ),
       drawer: const MetaballsDrawer(),
       extendBodyBehindAppBar: true,

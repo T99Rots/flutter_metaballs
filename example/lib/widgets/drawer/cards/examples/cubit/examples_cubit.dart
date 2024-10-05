@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:metaball_demo/widgets/drawer/cards/examples/examples_card.dart';
 
-part 'examples_state.dart';
+class ExamplesCubit extends Cubit<ExampleLayouts> {
+  ExamplesCubit() : super(ExampleLayouts.none);
 
-class ExamplesCubit extends Cubit<ExamplesState> {
-  ExamplesCubit() : super(ExamplesInitial());
+  void setExample(ExampleLayouts example) {
+    emit(example);
+  }
 }

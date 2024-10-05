@@ -131,7 +131,7 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
       return 0;
     }
 
-    return (cos(pi + (pow(x, effect.punch).toDouble() * pi * 2)) + 1) / 2;
+    return pow(sin(pi * pow(x, effect.punch)), 2).toDouble();
   }
 
   @override
@@ -182,9 +182,14 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
     assert(() {
       final Canvas canvas = context.canvas;
       final Paint circlePaint = Paint()..color = const Color(0x80ffff00);
+      final Paint centerPaint = Paint()
+        ..color = const Color(0x80ff00ff)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5;
       final Paint doughnutPaint = Paint()
         ..color = const Color(0x80ffff00)
         ..style = PaintingStyle.stroke;
+      final double center = 1 - pow(0.5, 1 / effect.punch).toDouble();
       for (final _Ripple ripple in _ripples) {
         if (ripple.outerRadius < ripple.width) {
           canvas.drawCircle(
@@ -200,7 +205,13 @@ class _RippleEffectState extends MetaballsEffectState<RippleEffect> {
             doughnutPaint,
           );
         }
+
+        final double scaledCenter = ripple.outerRadius - center * ripple.width;
+        if (scaledCenter > 0) {
+          canvas.drawCircle(ripple.origin, scaledCenter, centerPaint);
+        }
       }
+
       return true;
     }());
   }

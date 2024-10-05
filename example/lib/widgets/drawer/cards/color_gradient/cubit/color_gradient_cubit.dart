@@ -24,6 +24,7 @@ class ColorGradientCubit extends Cubit<ColorGradientCubitState> {
   }
 
   void setStartColor(Color color) {
+    print(color);
     emit(
       ColorGradientCubitState(
         preset: ColorPreset(

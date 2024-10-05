@@ -42,4 +42,29 @@ class SizeCubit extends Cubit<SizeState> {
       ),
     ));
   }
+
+  void setDynamic(double value) {
+    emit(SizeDynamicState(
+      scaler: MetaballDynamicScaler(
+        percentage: value,
+      ),
+    ));
+  }
+
+  void setStatic(double value) {
+    emit(SizeStaticState(
+      scaler: MetaballStaticScaler(
+        size: value,
+      ),
+    ));
+  }
+
+  void setStaticRange(double min, double max) {
+    emit(SizeStaticRangeState(
+      scaler: MetaballStaticRangeScaler(
+        min: min,
+        max: max,
+      ),
+    ));
+  }
 }

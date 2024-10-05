@@ -23,8 +23,8 @@ import 'metaball_scaler.dart';
 /// between these values based on the radius.
 class MetaballStaticRangeScaler implements MetaballScaler {
   const MetaballStaticRangeScaler({
-    this.max = 30,
-    this.min = 10,
+    this.max = 60,
+    this.min = 40,
   });
 
   final double min;

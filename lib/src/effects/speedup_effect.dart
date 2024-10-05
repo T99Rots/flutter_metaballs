@@ -94,7 +94,10 @@ class _SpeedupEffectState extends MetaballsEffectState<SpeedupEffect> {
     }
 
     final double averageDelta = sum / _pointerFrameDeltas.length;
-    final double scale = min(effect.maxSpeedup, 1 + effect.speedupRate * log(averageDelta + 1) / log(10));
+    final double scale = min(
+      effect.maxSpeedup,
+      1 + effect.speedupRate * log(averageDelta + 1) / log(10),
+    );
 
     _pointerFrameDeltas.clear();
 

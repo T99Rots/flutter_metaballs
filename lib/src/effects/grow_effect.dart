@@ -12,12 +12,12 @@ class GrowEffect extends MetaballsEffect {
     this.radius = 100,
     this.duration = const Duration(milliseconds: 300),
     this.curve = Curves.ease,
-    this.movementSmoothing = 0.3,
+    this.pointerSmoothing = 0.3,
   });
 
   final double multiplier;
   final double radius;
-  final double movementSmoothing;
+  final double pointerSmoothing;
   final Duration duration;
   final Curve curve;
 
@@ -28,7 +28,7 @@ class GrowEffect extends MetaballsEffect {
   int get hashCode => Object.hash(
         multiplier,
         radius,
-        movementSmoothing,
+        pointerSmoothing,
         duration,
         curve,
       );
@@ -40,14 +40,14 @@ class GrowEffect extends MetaballsEffect {
   GrowEffect copyWith({
     double? multiplier,
     double? radius,
-    double? movementSmoothing,
+    double? pointerSmoothing,
     Duration? duration,
     Curve? curve,
   }) {
     return GrowEffect(
       multiplier: multiplier ?? this.multiplier,
       radius: radius ?? this.radius,
-      movementSmoothing: movementSmoothing ?? this.movementSmoothing,
+      pointerSmoothing: pointerSmoothing ?? this.pointerSmoothing,
       duration: duration ?? this.duration,
       curve: curve ?? this.curve,
     );
@@ -80,5 +80,5 @@ class _GrowEffectState extends MetaballsEffectState<GrowEffect> with AnimatedPoi
   Duration get animationDuration => effect.duration;
 
   @override
-  double get pointerSmoothing => effect.movementSmoothing;
+  double get pointerSmoothing => effect.pointerSmoothing;
 }
