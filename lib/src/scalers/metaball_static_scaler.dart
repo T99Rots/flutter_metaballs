@@ -1,5 +1,5 @@
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/models/transform.dart';
 
 import 'metaball_scaler.dart';
 
@@ -27,12 +27,10 @@ class MetaballStaticScaler implements MetaballScaler {
   final double size;
 
   @override
-  void applyScaling(MetaballsScene scene) {
-    scene.visitMetaballs((Metaball metaball) {
-      metaball.transform
-        ..scaleSize(0)
-        ..translateSize(size);
-    });
+  Transform1D getTransform(MetaballsScene scene) {
+    return Transform1D()
+      ..scale(0)
+      ..translate(size);
   }
 
   @override

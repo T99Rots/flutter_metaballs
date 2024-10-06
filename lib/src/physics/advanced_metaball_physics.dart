@@ -125,7 +125,7 @@ mixin AdvancedMetaballPhysicsSceneMixin<Physics extends MetaballsPhysics, State 
 
         for (int i = 0; i < state.debugForceVectors.length; i++) {
           final VectorDebugData vectorData = state.debugForceVectors[i];
-          final Offset realPosition = metaball.transform.transformPosition(metaball.position) + offset;
+          final Offset realPosition = metaball.transform.apply(metaball.position) + offset;
           forcePaint.color = vectorData.debugColor;
 
           canvas.drawLine(

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/effects/metaballs_effect.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/models/metaball_render_data.dart';
+import 'package:metaballs/src/models/transform.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
@@ -76,17 +77,17 @@ class MetaballsScene with ChangeNotifier {
       metaball.transform.reset();
     }
 
-    _scaler.applyScaling(this);
+    final Transform1D radiusTransform = _scaler.getTransform(this);
 
     for (final Metaball metaball in _metaballs) {
-      final double renderRadius = metaball.transform.transformRadius(metaball.radius);
+      final double renderRadius = radiusTransform.apply(metaball.radius);
 
       metaball.transform
-        ..scalePosition(
+        ..scale(
           viewportSize.width - renderRadius,
           viewportSize.height - renderRadius,
         )
-        ..translatePosition(
+        ..translate(
           renderRadius / 2,
           renderRadius / 2,
         );
@@ -96,7 +97,10 @@ class MetaballsScene with ChangeNotifier {
 
     renderData.clear();
     for (final Metaball metaball in _metaballs) {
-      renderData.add(metaball.transform.transformMetaball(metaball));
+      renderData.add(MetaballRenderData(
+        position: metaball.transform.apply(metaball.position),
+        radius: radiusTransform.apply(metaball.radius),
+      ));
     }
     _effectState?.beforeRender();
     _stage = MetaballRenderStage.render;

@@ -1,5 +1,5 @@
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/models/transform.dart';
 
 import 'metaball_scaler.dart';
 
@@ -31,13 +31,11 @@ class MetaballStaticRangeScaler implements MetaballScaler {
   final double max;
 
   @override
-  void applyScaling(MetaballsScene scene) {
+  Transform1D getTransform(MetaballsScene scene) {
     final double range = max - min;
-    scene.visitMetaballs((Metaball metaball) {
-      metaball.transform
-        ..scaleSize(range)
-        ..translateSize(min);
-    });
+    return Transform1D()
+      ..scale(range)
+      ..translate(min);
   }
 
   @override

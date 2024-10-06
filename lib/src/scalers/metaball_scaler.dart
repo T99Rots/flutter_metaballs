@@ -1,4 +1,5 @@
 import 'package:metaballs/src/metaballs_scene.dart';
+import 'package:metaballs/src/models/transform.dart';
 
 import 'metaball_dynamic_range_scaler.dart';
 import 'metaball_dynamic_scaler.dart';
@@ -124,5 +125,5 @@ abstract interface class MetaballScaler {
   /// - [radius]: The radius of the metaball.
   ///
   /// Returns the calculated render size of the metaball.
-  void applyScaling(MetaballsScene scene);
+  Transform1D getTransform(MetaballsScene scene);
 }

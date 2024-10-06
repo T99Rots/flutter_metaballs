@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 
-import 'metaball_render_transform.dart';
+import 'transform.dart';
 
 class Metaball {
   Metaball({
@@ -20,5 +20,5 @@ class Metaball {
   /// of the metaball as this could be offset by [radiusOffset].
   double radius;
 
-  final MetaballRenderTransform transform = MetaballRenderTransform();
+  final Transform2D transform = Transform2D();
 }

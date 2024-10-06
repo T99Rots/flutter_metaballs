@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:metaballs/src/metaballs_scene.dart';
-import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/models/transform.dart';
 
 import 'metaball_scaler.dart';
 
@@ -37,7 +37,7 @@ class MetaballDynamicRangeScaler implements MetaballScaler {
   final double maxPercentage;
 
   @override
-  void applyScaling(MetaballsScene scene) {
+  Transform1D getTransform(MetaballsScene scene) {
     final Size viewSize = scene.viewportSize;
     final double volume = viewSize.height * viewSize.width;
     final double minVolume = volume * (minPercentage / 100);
@@ -47,11 +47,9 @@ class MetaballDynamicRangeScaler implements MetaballScaler {
     final double maxSize = 2 * sqrt(maxVolume / pi);
     final double range = maxSize - minSize;
 
-    scene.visitMetaballs((Metaball metaball) {
-      metaball.transform
-        ..scaleSize(range)
-        ..translateSize(minSize);
-    });
+    return Transform1D()
+      ..scale(range)
+      ..translate(minSize);
   }
 
   @override
