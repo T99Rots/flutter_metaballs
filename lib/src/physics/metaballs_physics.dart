@@ -16,10 +16,10 @@ typedef MetaballsPhysicsSceneMetaballsVisitor<State extends MetaballPhysicsState
 
 typedef MetaballsPhysicsSceneAny = MetaballsPhysicsScene<MetaballsPhysics, MetaballPhysicsState>;
 
-abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State extends MetaballPhysicsState> {
+abstract class MetaballsPhysicsScene<Physics extends MetaballsPhysics, State extends MetaballPhysicsState> {
   final Map<Metaball, State> _stateCache = <Metaball, State>{};
   MetaballsScene? _scene;
-  Config? _config;
+  Physics? _physics;
 
   /// Should create a physics state for a metaball.
   ///
@@ -47,6 +47,7 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
     if (state != null) {
       _stateCache[metaball] = state;
     }
+    state;
   }
 
   /// Gets called when a metaball is removed from this physics scene.
@@ -76,10 +77,10 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
   /// the passed metaball based on how much time has passed since the last tick.
   void tickMetaball(Duration frameTime, Metaball metaball, State? state) {}
 
-  /// Gets called whenever the physics config gets updated.
+  /// Gets called whenever the physics physics gets updated.
   ///
   /// May update the physics state of the current metaballs if required.
-  void physicsConfigUpdated(Config oldConfig) {}
+  void physicsUpdated(Physics oldPhysics) {}
 
   /// Gets called during rendering when debug paint is enabled.
   ///
@@ -108,54 +109,50 @@ abstract class MetaballsPhysicsScene<Config extends MetaballsPhysics, State exte
     });
   }
 
-  /// The current physics config.
-  Config get config {
+  /// The current physics physics.
+  Physics get physics {
     assert(
-      _config != null,
-      'Tried accessing MetaballsPhysicsConfig while the physics scene was not attached to a metaballs scene.',
+      _physics != null,
+      'Tried accessing MetaballsPhysicsScene.physics while the physics scene was not attached to a metaballs scene.',
     );
 
-    return _config!;
+    return _physics!;
   }
 
   /// The parent metaballs scene.
   MetaballsScene get scene {
     assert(
       _scene != null,
-      'Tried accessing MetaballsScene while the physics scene was not attached to a metaballs scene.',
+      'Tried accessing MetaballsPhysicsScene.scene while the physics scene was not attached to a metaballs scene.',
     );
 
     return _scene!;
   }
 
   @mustCallSuper
-  void attach(MetaballsScene scene, Config config) {
-    _config = config;
+  void attach(MetaballsScene scene, Physics physics) {
+    _physics = physics;
     _scene = scene;
   }
 
   @mustCallSuper
   void detach() {
-    _config = null;
+    _physics = null;
     _scene = null;
   }
 
   @mustCallSuper
-  void update(Config newConfig) {
-    if (_config == newConfig) {
+  void update(Physics newPhysics) {
+    if (_physics == newPhysics) {
       return;
     }
 
-    final Config oldConfig = config;
-    _config = newConfig;
-    physicsConfigUpdated(oldConfig);
+    final Physics oldPhysics = physics;
+    _physics = newPhysics;
+    physicsUpdated(oldPhysics);
   }
 }
 
-class MetaballPhysicsState {
-  MetaballPhysicsState({
-    required this.velocity,
-  });
-
-  Offset velocity;
+abstract class MetaballPhysicsState {
+  MetaballPhysicsState();
 }

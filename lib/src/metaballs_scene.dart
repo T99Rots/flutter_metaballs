@@ -8,6 +8,8 @@ import 'package:metaballs/src/models/metaball_render_data.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
 import 'package:metaballs/src/scalers/metaball_scaler.dart';
 
+import 'models/equalized_aspect_ratio.dart';
+
 typedef MetaballsVisitor = void Function(Metaball metaball);
 
 class MetaballsScene with ChangeNotifier {
@@ -248,6 +250,10 @@ class MetaballsScene with ChangeNotifier {
   MetaballsPhysics get physics => _physics;
 
   Duration get frameTime => _frameTime;
+
+  EqualizedAspectRatio get aspectRatio => EqualizedAspectRatio.fromRatio(
+        _viewportSize?.aspectRatio ?? 1,
+      );
 }
 
 enum MetaballRenderStage {

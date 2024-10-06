@@ -31,7 +31,7 @@ class PhysicsCubit extends Cubit<PhysicsState> {
 
   // region BouncingPhysics
 
-  void setMaxForce(double newValue) {
+  void setForce(double min, double max) {
     final PhysicsState state = this.state;
     if (state is! BouncingPhysicsState) {
       return;
@@ -40,7 +40,8 @@ class PhysicsCubit extends Cubit<PhysicsState> {
     emit(
       BouncingPhysicsState(
         physics: state.physics.copyWith(
-          maxForce: newValue,
+          minForce: min,
+          maxForce: max,
         ),
       ),
     );

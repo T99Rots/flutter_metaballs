@@ -19,13 +19,19 @@ class BouncingPhysicsView extends StatelessWidget {
     return Column(
       children: <Widget>[
         SliderWrapper(
-          label: 'Maximum Force',
-          value: physics.maxForce.toStringAsFixed(2),
-          slider: Slider(
-            value: physics.maxForce,
+          label: 'Force',
+          value: '${state.physics.minForce.toStringAsFixed(2)} - ${state.physics.maxForce.toStringAsFixed(2)}',
+          slider: RangeSlider(
+            values: RangeValues(
+              state.physics.minForce,
+              state.physics.maxForce,
+            ),
             max: 5,
             divisions: 100,
-            onChanged: (double newValue) => context.read<PhysicsCubit>().setMaxForce(newValue),
+            onChanged: (RangeValues values) => context.read<PhysicsCubit>().setForce(
+                  values.start,
+                  values.end,
+                ),
           ),
         ),
         SliderWrapper(
@@ -43,7 +49,7 @@ class BouncingPhysicsView extends StatelessWidget {
           value: physics.mass.toStringAsFixed(1),
           slider: Slider(
             value: physics.mass,
-            divisions: 100,
+            divisions: 99,
             max: 50,
             min: 0.5,
             onChanged: (double newValue) => context.read<PhysicsCubit>().setMetaballMass(newValue),

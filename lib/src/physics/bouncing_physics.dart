@@ -1,8 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
+import 'package:metaballs/src/models/equalized_aspect_ratio.dart';
 import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
+
+import 'advanced_metaball_physics.dart';
 
 /// Applies bouncing physics to metaballs.
 ///
@@ -28,18 +31,26 @@ import 'package:metaballs/src/physics/metaballs_physics.dart';
 class BouncingPhysics extends MetaballsPhysics {
   const BouncingPhysics({
     this.maxForce = 1,
+    this.minForce = 0,
     this.friction = 10,
     this.mass = 10,
     this.hasInitialSpeed = false,
   })  : assert(maxForce >= 0, 'maxForce can not be a negative value.'),
+        assert(minForce >= 0, 'minForce can not be a negative value.'),
         assert(mass > 0, 'mass must be a positive value.'),
         assert(friction >= 0, 'friction can not be a negative value');
 
-  /// The maximum force that can be applied to a metaball for acceleration.
+  /// The maximum force multiplier that can be applied to a metaball.
   ///
-  /// A higher max force results in greater acceleration and a higher top speed
-  /// for the metaballs.
+  /// A higher maximum force results in greater acceleration and a higher top
+  /// speed for the metaballs.
   final double maxForce;
+
+  /// The minimum force multiplier that can be applied to a metaball.
+  ///
+  /// A higher minimum force results in greater acceleration and a higher top
+  /// speed for the metaballs.
+  final double minForce;
 
   /// The friction coefficient that affects the metaball's motion.
   ///
@@ -69,6 +80,7 @@ class BouncingPhysics extends MetaballsPhysics {
   @override
   int get hashCode => Object.hash(
         maxForce,
+        minForce,
         friction,
         mass,
         hasInitialSpeed,
@@ -81,12 +93,14 @@ class BouncingPhysics extends MetaballsPhysics {
 
   BouncingPhysics copyWith({
     double? maxForce,
+    double? minForce,
     double? friction,
     double? metaballMass,
     bool? hasInitialSpeed,
   }) {
     return BouncingPhysics(
       maxForce: maxForce ?? this.maxForce,
+      minForce: minForce ?? this.minForce,
       friction: friction ?? this.friction,
       mass: metaballMass ?? mass,
       hasInitialSpeed: hasInitialSpeed ?? this.hasInitialSpeed,
@@ -94,7 +108,8 @@ class BouncingPhysics extends MetaballsPhysics {
   }
 }
 
-class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysics, _MetaballBouncingPhysicsState> {
+class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysics, _MetaballBouncingPhysicsState>
+    with AdvancedMetaballPhysicsSceneMixin<BouncingPhysics, _MetaballBouncingPhysicsState> {
   final Random _random = Random();
 
   @override
@@ -106,25 +121,24 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     final double direction = _random.nextDouble() * pi * 2;
     final double force = _random.nextDouble();
 
-    Offset? initialVelocity = oldState?.velocity;
-    if (initialVelocity == null) {
-      if (config.hasInitialSpeed) {
-        // Calculate terminal velocity
-        final double terminalVelocity = (force * config.maxForce) / config.friction;
-        // Calculate velocity components based on direction
-        final double velocityX = terminalVelocity * cos(direction);
-        final double velocityY = terminalVelocity * sin(direction);
-        initialVelocity = Offset(velocityX, velocityY);
-      } else {
-        initialVelocity = Offset.zero;
-      }
+    final Offset initialVelocity;
+    if (oldState is AdvancedMetaballPhysicsState) {
+      initialVelocity = oldState.velocity;
+    } else if (physics.hasInitialSpeed) {
+      final double terminalVelocity = (force * physics.maxForce) / physics.friction;
+      initialVelocity = Offset(
+        terminalVelocity * cos(direction),
+        terminalVelocity * sin(direction),
+      );
+    } else {
+      initialVelocity = Offset.zero;
     }
 
     return _MetaballBouncingPhysicsState(
       velocity: initialVelocity,
       direction: direction,
       force: force,
-      mass: config.mass,
+      mass: physics.mass,
     );
   }
 
@@ -138,43 +152,25 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
   }
 
   @override
-  void tickMetaball(Duration frameTime, Metaball metaball, _MetaballBouncingPhysicsState? state) {
+  void applyMetaballForces(Metaball metaball, _MetaballBouncingPhysicsState? state) {
     // Should not happen as we always create a state.
     if (state == null) {
       return;
     }
 
     // Apply physics
-    final double deltaTime = frameTime.inMicroseconds / 1e6;
-    final double aspectRatio = scene.hasSize ? scene.viewportSize.aspectRatio : 1;
-    final double yRatio = sqrt(1 / aspectRatio);
-    final double xRatio = aspectRatio * yRatio;
+    final EqualizedAspectRatio aspectRatio = scene.aspectRatio;
     final double directionX = cos(state.direction);
     final double directionY = sin(state.direction);
-    final double force = state.force * config.maxForce;
+    final double forceRange = physics.maxForce - physics.minForce;
+    final double force = physics.minForce + state.force * forceRange;
 
-    state.forceVector = Offset(
-      force * directionX * xRatio,
-      force * directionY * yRatio,
-    );
-    state.resistanceVector = Offset(
-      -state.velocity.dx * config.friction * xRatio,
-      -state.velocity.dy * config.friction * yRatio,
-    );
-
-    final Offset netForce = state.forceVector + state.resistanceVector;
-    final Offset acceleration = Offset(
-      netForce.dx / config.mass / xRatio,
-      netForce.dy / config.mass / yRatio,
-    );
-
-    state.velocity = Offset(
-      state.velocity.dx + acceleration.dx * deltaTime,
-      state.velocity.dy + acceleration.dy * deltaTime,
-    );
-    metaball.position = Offset(
-      metaball.position.dx + state.velocity.dx * deltaTime,
-      metaball.position.dy + state.velocity.dy * deltaTime,
+    state.applyForce(
+      Offset(
+        force * directionX * aspectRatio.x,
+        force * directionY * aspectRatio.y,
+      ),
+      const Color(0x8000ff00),
     );
 
     // Ensure metaball stays in bounds
@@ -192,65 +188,31 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
   }
 
   @override
-  void debugPaint(PaintingContext context, Offset offset) {
-    assert(() {
-      final Canvas canvas = context.canvas;
-      final Paint forcePaint = Paint()
-        ..color = const Color(0x8000ff00)
-        ..strokeWidth = 2;
-      final Paint resistancePaint = Paint()
-        ..color = const Color(0x80ff0000)
-        ..strokeWidth = 2;
-
+  void physicsUpdated(BouncingPhysics oldPhysics) {
+    if (oldPhysics.mass != physics.mass) {
       visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
-        if (state == null || config.maxForce <= 0) {
-          return;
-        }
-
-        final Offset realPosition = metaball.transform.transformPosition(metaball.position) + offset;
-        final double scale = 30 / config.maxForce;
-
-        canvas.drawLine(
-          realPosition,
-          realPosition + (state.forceVector * scale),
-          forcePaint,
-        );
-        canvas.drawLine(
-          realPosition,
-          realPosition + (state.resistanceVector * scale),
-          resistancePaint,
-        );
+        state?.mass = physics.mass;
       });
-
-      return true;
-    }());
+    }
   }
 
   @override
-  void physicsConfigUpdated(BouncingPhysics oldConfig) {
-    print('${oldConfig.maxForce} => ${config.maxForce}');
-  }
+  double get debugForceScale => 30 / physics.maxForce;
+
+  @override
+  double get friction => physics.friction;
 }
 
-class _MetaballBouncingPhysicsState extends MetaballPhysicsState {
+class _MetaballBouncingPhysicsState extends AdvancedMetaballPhysicsState {
   _MetaballBouncingPhysicsState({
     required super.velocity,
     required this.direction,
     required this.force,
-    required this.mass,
+    required super.mass,
   });
-
-  /// A vector representing the resistance applied to the metaball.
-  Offset resistanceVector = Offset.zero;
-
-  /// A vector representing the force applied to the metaball.
-  Offset forceVector = Offset.zero;
 
   /// The amount of force this metaball has.
   double force;
-
-  /// The mass of this metaball.
-  double mass;
 
   /// The direction a metaball wants to move in in radians.
   double direction;

@@ -42,9 +42,7 @@ class SpeedupEffect extends MetaballsEffect {
   final double speedupRate;
 
   @override
-  MetaballsEffectState<SpeedupEffect> createState() {
-    return _SpeedupEffectState();
-  }
+  MetaballsEffectState<SpeedupEffect> createState() => _SpeedupEffectState();
 
   @override
   int get hashCode => Object.hash(
