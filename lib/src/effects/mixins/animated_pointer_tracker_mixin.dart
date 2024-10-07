@@ -109,7 +109,7 @@ mixin AnimatedPointerTrackerMixin<Effect extends MetaballsEffect> on MetaballsEf
   void debugPaint(PaintingContext context, Offset offset) {
     assert(() {
       final Paint paint = Paint()
-        ..color = Color(0xffffffff)
+        ..color = const Color(0xffffffff)
         ..strokeWidth = 2;
       final Canvas canvas = context.canvas;
       for (final PointerEffectData pointer in pointers) {
@@ -145,7 +145,7 @@ class PointerEffectData {
   final int id;
 
   Duration? _removed;
-  Duration? get removed => removed;
+  Duration? get removed => _removed;
 
   Offset _position;
   Offset _targetPosition;

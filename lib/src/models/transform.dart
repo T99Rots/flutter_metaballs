@@ -27,10 +27,10 @@ class Transform2D {
     _yScale = 1.0;
   }
 
-  Offset apply(Offset position) {
+  Offset apply(Offset value) {
     return Offset(
-      (position.dx * _xScale) + _xTranslation,
-      (position.dy * _yScale) + _yTranslation,
+      (value.dx * _xScale) + _xTranslation,
+      (value.dy * _yScale) + _yTranslation,
     );
   }
 }

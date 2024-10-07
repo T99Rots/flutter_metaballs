@@ -23,30 +23,32 @@ class MetaballsScene with ChangeNotifier {
   })  : _effect = effect,
         _effectState = effect?.createState(),
         _physics = physics,
-        _physicsScene = physics.createScene(),
         _scaler = scaler {
     _ticker = vsync.createTicker(_tick)..start();
-    _physicsScene.attach(this, physics);
     _effectState?.attach(this, effect!);
 
     for (int i = 0; i < count; i++) {
       final Metaball metaball = _createMetaball();
+
+      final MetaballStateAny state = physics.createState();
+      state.attach(this, physics, metaball);
+      state.initState(null);
+      metaball.physicsState = state;
       _metaballs.add(metaball);
-      _physicsScene.adoptMetaball(metaball, null);
     }
   }
 
   late final Ticker _ticker;
   final Random _random = Random();
-  final List<Metaball> _metaballs = <Metaball>[];
   final List<MetaballRenderData> renderData = <MetaballRenderData>[];
+  final List<Metaball> _metaballs = <Metaball>[];
 
   MetaballScaler _scaler;
 
   MetaballsEffectStateAny? _effectState;
   MetaballsEffect? _effect;
 
-  MetaballsPhysicsSceneAny _physicsScene;
+  // MetaballsPhysicsSceneAny _physicsScene;
   MetaballsPhysics _physics;
 
   Size? _viewportSize;
@@ -116,7 +118,9 @@ class MetaballsScene with ChangeNotifier {
 
     _stage = MetaballRenderStage.physics;
     _effectState?.beforePhysics();
-    _physicsScene.tick(_frameTime);
+    for (final Metaball metaball in _metaballs) {
+      metaball.physicsState!.tick(frameTime);
+    }
     _effectState?.afterPhysics();
     _stage = MetaballRenderStage.transform;
 
@@ -156,36 +160,44 @@ class MetaballsScene with ChangeNotifier {
           final Metaball metaball = _createMetaball();
           _metaballs.add(metaball);
           if (physics.runtimeType == _physics.runtimeType) {
-            _physicsScene.adoptMetaball(metaball, null);
+            final MetaballStateAny state = physics.createState();
+            state.attach(this, physics, metaball);
+            state.initState(null);
+            metaball.physicsState = state;
           }
         }
       } else {
         for (int i = 0; i > difference; i--) {
-          _physicsScene.dropMetaball(_metaballs.removeLast());
+          final Metaball metaball = _metaballs.removeLast();
+          final MetaballStateAny state = metaball.physicsState!;
+          state.detach();
         }
       }
     }
 
     if (physics != _physics) {
       if (physics.runtimeType == _physics.runtimeType) {
-        _physicsScene.update(physics);
-      } else {
-        final List<MetaballPhysicsState?> oldStates = <MetaballPhysicsState?>[];
-        final int minCount = min(_metaballs.length, oldCount);
-
-        for (int i = 0; i < minCount; i++) {
-          oldStates.add(
-            _physicsScene.dropMetaball(
-              _metaballs[i],
-            ),
-          );
+        for (final Metaball metaball in _metaballs) {
+          metaball.physicsState!.update(physics);
         }
-        _physicsScene.detach();
-        _physicsScene = physics.createScene();
-        _physicsScene.attach(this, physics);
+      } else {
+        final List<MetaballStateAny?> oldStates = <MetaballStateAny?>[];
+
         for (int i = 0; i < _metaballs.length; i++) {
-          final MetaballPhysicsState? state = i < minCount ? oldStates[i] : null;
-          _physicsScene.adoptMetaball(_metaballs[i], state);
+          final Metaball metaball = _metaballs[i];
+          final MetaballStateAny? oldState;
+          if (i < oldCount) {
+            oldState = metaball.physicsState;
+          } else {
+            oldState = null;
+          }
+
+          final MetaballStateAny state = physics.createState();
+          state.attach(this, physics, metaball);
+          state.initState(oldState);
+          metaball.physicsState = state;
+
+          oldStates.add(state);
         }
       }
     }
@@ -220,7 +232,10 @@ class MetaballsScene with ChangeNotifier {
   }) {
     assert(() {
       if (physicsDebugging) {
-        _physicsScene.debugPaint(context, offset);
+        for (final Metaball metaball in _metaballs) {
+          final Offset metaballOffset = metaball.transform.apply(metaball.position) + offset;
+          metaball.physicsState!.debugPaint(context, metaballOffset);
+        }
       }
       if (effectsDebugging) {
         _effectState?.debugPaint(context, offset);

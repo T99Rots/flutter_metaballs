@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/physics/advanced_metaball_physics.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
 
@@ -21,8 +20,8 @@ class LavaLampPhysics extends MetaballsPhysics {
   final double ambientCooling;
 
   @override
-  LavaLampPhysicsScene createScene() {
-    return LavaLampPhysicsScene();
+  MetaballLavaLampPhysicsState createState() {
+    return MetaballLavaLampPhysicsState();
   }
 
   @override
@@ -56,46 +55,36 @@ class LavaLampPhysics extends MetaballsPhysics {
   }
 }
 
-class LavaLampPhysicsScene extends MetaballsPhysicsScene<LavaLampPhysics, MetaballLavaLampPhysicsState>
-    with AdvancedMetaballPhysicsSceneMixin<LavaLampPhysics, MetaballLavaLampPhysicsState> {
+class MetaballLavaLampPhysicsState extends AdvancedMetaballPhysicsState<LavaLampPhysics> {
   final Random _random = Random();
 
+  late double temperature;
+
   @override
-  MetaballLavaLampPhysicsState createState(MetaballPhysicsState? oldState) {
+  void initState(MetaballStateAny? oldState) {
     if (oldState is MetaballLavaLampPhysicsState) {
-      return oldState;
+      velocity = oldState.velocity;
+      temperature = oldState.temperature;
     }
 
-    final Offset initialVelocity;
     if (oldState is AdvancedMetaballPhysicsState) {
-      initialVelocity = oldState.velocity;
+      velocity = oldState.velocity;
     } else {
-      initialVelocity = Offset.zero;
+      velocity = Offset.zero;
     }
 
-    return MetaballLavaLampPhysicsState(
-      temperature: _random.nextDouble() * physics.heatSourceTemperature,
-      velocity: initialVelocity,
-      mass: 1,
-    );
+    temperature = _random.nextDouble() * physics.heatSourceTemperature;
   }
-
-  @override
-  void applyMetaballForces(Metaball metaball, MetaballLavaLampPhysicsState? state) {}
 
   @override
   double get debugForceScale => 30;
 
   @override
   double get friction => physics.friction;
-}
 
-class MetaballLavaLampPhysicsState extends AdvancedMetaballPhysicsState {
-  MetaballLavaLampPhysicsState({
-    required super.velocity,
-    required this.temperature,
-    required super.mass,
-  });
+  @override
+  void applyForces() {}
 
-  double temperature;
+  @override
+  double get mass => 1;
 }

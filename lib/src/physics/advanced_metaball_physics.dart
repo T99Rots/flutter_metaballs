@@ -1,26 +1,55 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:metaballs/src/models/equalized_aspect_ratio.dart';
-import 'package:metaballs/src/models/metaball.dart';
 
 import 'metaballs_physics.dart';
 
-class AdvancedMetaballPhysicsState extends MetaballPhysicsState {
-  AdvancedMetaballPhysicsState({
-    required this.mass,
-    this.netForce = Offset.zero,
-    this.velocity = Offset.zero,
-  });
+abstract class AdvancedMetaballPhysicsState<Physics extends MetaballsPhysics> extends MetaballState<Physics> {
+  AdvancedMetaballPhysicsState();
 
   final List<VectorDebugData> debugForceVectors = <VectorDebugData>[];
-  Offset velocity;
-  Offset netForce;
-  double mass;
+  Offset velocity = Offset.zero;
+  Offset netForce = Offset.zero;
 
-  void reset() {
-    debugForceVectors.clear();
+  @override
+  void tick(Duration frameTime) {
+    final EqualizedAspectRatio aspectRatio = scene.aspectRatio;
+    final double deltaTime = frameTime.inMicroseconds / 1e6;
+
     netForce = Offset.zero;
+
+    applyForces();
+
+    final Offset vector = Offset(
+      -velocity.dx * friction * aspectRatio.x,
+      -velocity.dy * friction * aspectRatio.y,
+    );
+    netForce += vector;
+    assert(() {
+      debugForceVectors.clear();
+      debugForceVectors.add(VectorDebugData(
+        debugColor: const Color(0x80ff0000),
+        vector: vector,
+      ));
+
+      return true;
+    }());
+
+    final Offset acceleration = Offset(
+      netForce.dx / mass / aspectRatio.x,
+      netForce.dy / mass / aspectRatio.y,
+    );
+    velocity += Offset(
+      acceleration.dx * deltaTime,
+      acceleration.dy * deltaTime,
+    );
+    metaball.position = Offset(
+      metaball.position.dx + velocity.dx * deltaTime,
+      metaball.position.dy + velocity.dy * deltaTime,
+    );
   }
+
+  void applyForces();
 
   void applyForce(Offset force, Color debugColor) {
     netForce += force;
@@ -34,82 +63,6 @@ class AdvancedMetaballPhysicsState extends MetaballPhysicsState {
     }());
   }
 
-  void applyResistance({
-    required EqualizedAspectRatio aspectRatio,
-    required double friction,
-  }) {
-    final Offset vector = Offset(
-      -velocity.dx * friction * aspectRatio.x,
-      -velocity.dy * friction * aspectRatio.y,
-    );
-    netForce += vector;
-    assert(() {
-      debugForceVectors.add(VectorDebugData(
-        debugColor: const Color(0x80ff0000),
-        vector: vector,
-      ));
-
-      return true;
-    }());
-  }
-
-  Offset getUpdatedPosition({
-    required EqualizedAspectRatio aspectRatio,
-    required Duration frameTime,
-    required Offset position,
-  }) {
-    final double deltaTime = frameTime.inMicroseconds / 1e6;
-
-    final Offset acceleration = Offset(
-      netForce.dx / mass / aspectRatio.x,
-      netForce.dy / mass / aspectRatio.y,
-    );
-
-    velocity += Offset(
-      acceleration.dx * deltaTime,
-      acceleration.dy * deltaTime,
-    );
-
-    return Offset(
-      position.dx + velocity.dx * deltaTime,
-      position.dy + velocity.dy * deltaTime,
-    );
-  }
-}
-
-mixin AdvancedMetaballPhysicsSceneMixin<Physics extends MetaballsPhysics, State extends AdvancedMetaballPhysicsState>
-    on MetaballsPhysicsScene<Physics, State> {
-  double get debugForceScale;
-
-  double get friction;
-
-  @override
-  @mustCallSuper
-  void tickMetaball(Duration frameTime, Metaball metaball, State? state) {
-    if (state == null) {
-      return;
-    }
-
-    final EqualizedAspectRatio aspectRatio = scene.aspectRatio;
-
-    state.reset();
-
-    applyMetaballForces(metaball, state);
-
-    state.applyResistance(
-      aspectRatio: aspectRatio,
-      friction: friction,
-    );
-
-    metaball.position = state.getUpdatedPosition(
-      aspectRatio: aspectRatio,
-      frameTime: frameTime,
-      position: metaball.position,
-    );
-  }
-
-  void applyMetaballForces(Metaball metaball, State? state);
-
   @override
   @mustCallSuper
   void debugPaint(PaintingContext context, Offset offset) {
@@ -118,27 +71,26 @@ mixin AdvancedMetaballPhysicsSceneMixin<Physics extends MetaballsPhysics, State 
       final Paint forcePaint = Paint()..strokeWidth = 2;
       final double scale = debugForceScale;
 
-      visitMetaballs((Metaball metaball, AdvancedMetaballPhysicsState? state) {
-        if (state == null) {
-          return;
-        }
+      for (int i = 0; i < debugForceVectors.length; i++) {
+        final VectorDebugData vectorData = debugForceVectors[i];
+        forcePaint.color = vectorData.debugColor;
 
-        for (int i = 0; i < state.debugForceVectors.length; i++) {
-          final VectorDebugData vectorData = state.debugForceVectors[i];
-          final Offset realPosition = metaball.transform.apply(metaball.position) + offset;
-          forcePaint.color = vectorData.debugColor;
-
-          canvas.drawLine(
-            realPosition,
-            realPosition + (vectorData.vector * scale),
-            forcePaint,
-          );
-        }
-      });
+        canvas.drawLine(
+          offset,
+          offset + (vectorData.vector * scale),
+          forcePaint,
+        );
+      }
 
       return true;
     }());
   }
+
+  double get debugForceScale;
+
+  double get mass;
+
+  double get friction;
 }
 
 class VectorDebugData {

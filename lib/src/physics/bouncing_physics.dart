@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:metaballs/src/models/equalized_aspect_ratio.dart';
-import 'package:metaballs/src/models/metaball.dart';
 import 'package:metaballs/src/physics/metaballs_physics.dart';
 
 import 'advanced_metaball_physics.dart';
@@ -73,8 +72,8 @@ class BouncingPhysics extends MetaballsPhysics {
   final bool hasInitialSpeed;
 
   @override
-  _MetaballsBouncingPhysicsScene createScene() {
-    return _MetaballsBouncingPhysicsScene();
+  _MetaballBouncingPhysicsState createState() {
+    return _MetaballBouncingPhysicsState();
   }
 
   @override
@@ -108,38 +107,74 @@ class BouncingPhysics extends MetaballsPhysics {
   }
 }
 
-class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysics, _MetaballBouncingPhysicsState>
-    with AdvancedMetaballPhysicsSceneMixin<BouncingPhysics, _MetaballBouncingPhysicsState> {
+class _MetaballBouncingPhysicsState extends AdvancedMetaballPhysicsState<BouncingPhysics> {
   final Random _random = Random();
 
+  late double force;
+  late double direction;
+
   @override
-  _MetaballBouncingPhysicsState createState(MetaballPhysicsState? oldState) {
+  double get debugForceScale => 30 / physics.maxForce;
+
+  @override
+  double get friction => physics.friction;
+
+  @override
+  double get mass => physics.mass;
+
+  @override
+  void initState(MetaballStateAny? oldState) {
     if (oldState is _MetaballBouncingPhysicsState) {
-      return oldState;
+      velocity = oldState.velocity;
+      direction = oldState.direction;
+      force = oldState.force;
     }
 
-    final double direction = _random.nextDouble() * pi * 2;
-    final double force = _random.nextDouble();
+    direction = _random.nextDouble() * pi * 2;
+    force = _random.nextDouble();
 
-    final Offset initialVelocity;
     if (oldState is AdvancedMetaballPhysicsState) {
-      initialVelocity = oldState.velocity;
+      velocity = oldState.velocity;
     } else if (physics.hasInitialSpeed) {
       final double terminalVelocity = (force * physics.maxForce) / physics.friction;
-      initialVelocity = Offset(
+      velocity = Offset(
         terminalVelocity * cos(direction),
         terminalVelocity * sin(direction),
       );
     } else {
-      initialVelocity = Offset.zero;
+      velocity = Offset.zero;
+    }
+  }
+
+  @override
+  void applyForces() {
+    // Apply physics
+    final EqualizedAspectRatio aspectRatio = scene.aspectRatio;
+    final double directionX = cos(direction);
+    final double directionY = sin(direction);
+    final double forceRange = physics.maxForce - physics.minForce;
+    final double scaledForce = physics.minForce + force * forceRange;
+
+    applyForce(
+      Offset(
+        scaledForce * directionX * aspectRatio.x,
+        scaledForce * directionY * aspectRatio.y,
+      ),
+      const Color(0x8000ff00),
+    );
+
+    // Ensure metaball stays in bounds
+    final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
+    final bool outOfBoundsRight = metaball.position.dx > 1 && directionX > 0;
+    if (outOfBoundsLeft || outOfBoundsRight) {
+      direction = _normalizeRadian(pi - direction);
     }
 
-    return _MetaballBouncingPhysicsState(
-      velocity: initialVelocity,
-      direction: direction,
-      force: force,
-      mass: physics.mass,
-    );
+    final bool outOfBoundsTop = metaball.position.dy < 0 && directionY < 0;
+    final bool outOfBoundsBottom = metaball.position.dy > 1 && directionY > 0;
+    if (outOfBoundsTop || outOfBoundsBottom) {
+      direction = _normalizeRadian(-direction);
+    }
   }
 
   double _normalizeRadian(double radian) {
@@ -150,70 +185,4 @@ class _MetaballsBouncingPhysicsScene extends MetaballsPhysicsScene<BouncingPhysi
     }
     return radian;
   }
-
-  @override
-  void applyMetaballForces(Metaball metaball, _MetaballBouncingPhysicsState? state) {
-    // Should not happen as we always create a state.
-    if (state == null) {
-      return;
-    }
-
-    // Apply physics
-    final EqualizedAspectRatio aspectRatio = scene.aspectRatio;
-    final double directionX = cos(state.direction);
-    final double directionY = sin(state.direction);
-    final double forceRange = physics.maxForce - physics.minForce;
-    final double force = physics.minForce + state.force * forceRange;
-
-    state.applyForce(
-      Offset(
-        force * directionX * aspectRatio.x,
-        force * directionY * aspectRatio.y,
-      ),
-      const Color(0x8000ff00),
-    );
-
-    // Ensure metaball stays in bounds
-    final bool outOfBoundsLeft = metaball.position.dx < 0 && directionX < 0;
-    final bool outOfBoundsRight = metaball.position.dx > 1 && directionX > 0;
-    if (outOfBoundsLeft || outOfBoundsRight) {
-      state.direction = _normalizeRadian(pi - state.direction);
-    }
-
-    final bool outOfBoundsTop = metaball.position.dy < 0 && directionY < 0;
-    final bool outOfBoundsBottom = metaball.position.dy > 1 && directionY > 0;
-    if (outOfBoundsTop || outOfBoundsBottom) {
-      state.direction = _normalizeRadian(-state.direction);
-    }
-  }
-
-  @override
-  void physicsUpdated(BouncingPhysics oldPhysics) {
-    if (oldPhysics.mass != physics.mass) {
-      visitMetaballs((Metaball metaball, _MetaballBouncingPhysicsState? state) {
-        state?.mass = physics.mass;
-      });
-    }
-  }
-
-  @override
-  double get debugForceScale => 30 / physics.maxForce;
-
-  @override
-  double get friction => physics.friction;
-}
-
-class _MetaballBouncingPhysicsState extends AdvancedMetaballPhysicsState {
-  _MetaballBouncingPhysicsState({
-    required super.velocity,
-    required this.direction,
-    required this.force,
-    required super.mass,
-  });
-
-  /// The amount of force this metaball has.
-  double force;
-
-  /// The direction a metaball wants to move in in radians.
-  double direction;
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/rendering.dart';
+import 'package:metaballs/metaballs.dart';
 
 import 'transform.dart';
 
@@ -21,4 +22,6 @@ class Metaball {
   double radius;
 
   final Transform2D transform = Transform2D();
+
+  MetaballStateAny? physicsState;
 }
