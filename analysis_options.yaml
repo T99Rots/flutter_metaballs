@@ -1,4 +1,18 @@
+analyzer:
+  errors:
+    library_private_types_in_public_api: ignore
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    always_declare_return_types: true
+    always_specify_types: true
+    flutter_style_todos: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unawaited_futures: true
+    avoid_dynamic_calls: true
+    directives_ordering: true
