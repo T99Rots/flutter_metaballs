@@ -1,3 +1,9 @@
+## Unreleased (Flutter GPU branch)
+
+* Migrate the shader build hook to `hooks` 2.x and `flutter_gpu_shaders` 0.5.2.
+* Require Dart 3.10.0 and Flutter 3.38.1 in the package and example, and update the FVM pin.
+* Preserve the shader bundle asset path and document the separate shader compilation and GPU renderer blockers in `doc/flutter_gpu_migration.md`.
+
 ## 1.0.0
 
 * Initial release

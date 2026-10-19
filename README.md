@@ -14,6 +14,12 @@ and the Flutter guide for
 # Animated Metaballs for Flutter
 [![Pub Version](https://img.shields.io/pub/v/metaballs?color=3c90ff)](https://pub.dev/packages/metaballs) [![Live Example](https://img.shields.io/badge/Github%20Pages-Live%20Example-%236200ee?logo=github)](https://t99rots.github.io/flutter_metaballs/)
 
+> This branch contains the unfinished Flutter GPU migration for PR #12. It
+> requires Flutter 3.38.1 or later with Dart 3.10.0 or later. See the
+> [GPU migration notes](doc/flutter_gpu_migration.md) for the build-hook changes,
+> validation results, and remaining shader and renderer blockers. The usage
+> documentation below describes the released package.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/T99Rots/readme_data/main/flutter/metaballs/metaballs.webp" width="360px">
 </p>

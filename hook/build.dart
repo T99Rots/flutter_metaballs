@@ -1,12 +1,14 @@
 import 'package:flutter_gpu_shaders/build.dart';
-import 'package:native_assets_cli/native_assets_cli.dart';
+import 'package:hooks/hooks.dart';
 
-void main(List<String> args) async {
-  await build(args, (BuildConfig config, BuildOutput output) async {
+Future<void> main(List<String> args) async {
+  await build(args, (BuildInput input, BuildOutputBuilder output) async {
     await buildShaderBundleJson(
-      buildConfig: config,
+      buildInput: input,
       buildOutput: output,
       manifestFileName: 'shaders/metaballs.shaderbundle.json',
+      // Keep the asset key used by ShaderProgramProvider and pubspec.yaml.
+      assetMode: ShaderBundleAssetMode.legacyOnly,
     );
   });
 }
