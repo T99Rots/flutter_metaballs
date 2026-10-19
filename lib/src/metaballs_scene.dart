@@ -1,0 +1,219 @@
+import 'dart:math';
+
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
+import 'package:metaballs/src/effects/interface/metaballs_effect.dart';
+import 'package:metaballs/src/models/metaball.dart';
+import 'package:metaballs/src/physics/interface/metaball_physics_state.dart';
+import 'package:metaballs/src/physics/interface/metaballs_physics.dart';
+import 'package:metaballs/src/physics/interface/metaballs_physics_scene.dart';
+import 'package:metaballs/src/pointer.dart';
+import 'package:metaballs/src/scalers/metaball_scaler.dart';
+
+typedef MetaballsVisitor = void Function(Metaball metaball);
+
+class MetaballsScene with ChangeNotifier {
+  MetaballsScene({
+    required TickerProvider vsync,
+    required MetaballsEffect effect,
+    required MetaballsPhysics physics,
+    required int count,
+    required MetaballScaler metaballScaler,
+  })  : _effect = effect,
+        _effectState = effect.createState(),
+        _physics = physics,
+        _physicsScene = physics.createScene(),
+        _metaballScaler = metaballScaler {
+    _ticker = vsync.createTicker(_tick)..start();
+    _physicsScene.attach(this, physics);
+    _effectState.attach(this, effect);
+
+    for (int i = 0; i < count; i++) {
+      final Metaball metaball = _createMetaball();
+      _metaballs.add(metaball);
+      _physicsScene.adoptMetaball(metaball, null);
+    }
+  }
+
+  late final Ticker _ticker;
+  final Random _random = Random();
+  final List<Metaball> _metaballs = <Metaball>[];
+
+  MetaballScaler _metaballScaler;
+
+  MetaballsEffectStateAny _effectState;
+  MetaballsEffect _effect;
+
+  MetaballsPhysicsSceneAny _physicsScene;
+  MetaballsPhysics _physics;
+
+  Size? _viewportSize;
+  Duration _lastFrame = Duration.zero;
+  MetaballRenderStage _stage = MetaballRenderStage.none;
+
+  Metaball _createMetaball() {
+    return Metaball(
+      x: _random.nextDouble(),
+      y: _random.nextDouble(),
+      radius: _random.nextDouble(),
+      createdAt: Duration.zero,
+    );
+  }
+
+  void visitMetaballs(MetaballsVisitor visitor) {
+    for (final Metaball metaball in _metaballs) {
+      visitor(metaball);
+    }
+  }
+
+  void _applyRenderTransform(Size viewportSize) {
+    _effectState.beforeRenderTransform(this);
+    for (final Metaball metaball in _metaballs) {
+      metaball.transform.reset();
+    }
+
+    _metaballScaler.applyScaling(this);
+
+    for (final Metaball metaball in _metaballs) {
+      final double renderRadius = metaball.transform.transformRadius(metaball.radius);
+
+      metaball.transform
+        ..scalePosition(
+          viewportSize.width - renderRadius,
+          viewportSize.height - renderRadius,
+        )
+        ..translatePosition(
+          renderRadius / 2,
+          renderRadius / 2,
+        );
+    }
+    _effectState.beforeRender(this);
+    _stage = MetaballRenderStage.render;
+  }
+
+  void _tick(Duration elapsed) {
+    Duration frameTime = elapsed - _lastFrame;
+    if (frameTime > Duration(milliseconds: 100)) {
+      frameTime = Duration(milliseconds: 100);
+    }
+
+    _lastFrame = elapsed;
+    _stage = MetaballRenderStage.physics;
+    final double timeScale = _effectState.getTimeScale();
+    _effectState.beforePhysics(this);
+    _physicsScene.tick(frameTime * timeScale);
+    _effectState.afterPhysics(this);
+    _stage = MetaballRenderStage.transform;
+
+    final Size? viewportSize = _viewportSize;
+    if (viewportSize != null) {
+      _applyRenderTransform(viewportSize);
+    }
+    notifyListeners();
+  }
+
+  void update({
+    required MetaballsEffect effect,
+    required MetaballsPhysics physics,
+    required MetaballScaler metaballScaler,
+    required int count,
+  }) {
+    if (effect != _effect) {
+      if (effect.runtimeType == _effect.runtimeType) {
+        _effectState.update(effect);
+      } else {
+        _effectState.detach();
+        _effectState = effect.createState();
+        _effectState.attach(this, effect);
+      }
+    }
+
+    final int oldCount = _metaballs.length;
+    final int difference = count - oldCount;
+    if (difference != 0) {
+      if (difference > 0) {
+        for (int i = 0; i < difference; i++) {
+          final Metaball metaball = _createMetaball();
+          _metaballs.add(metaball);
+          if (physics.runtimeType == _physics.runtimeType) {
+            _physicsScene.adoptMetaball(metaball, null);
+          }
+        }
+      } else {
+        for (int i = 0; i > difference; i--) {
+          _physicsScene.dropMetaball(_metaballs.removeLast());
+        }
+      }
+    }
+
+    if (physics != _physics) {
+      if (physics.runtimeType == _physics.runtimeType) {
+        _physicsScene.update(physics);
+      } else {
+        final List<MetaballPhysicsState?> oldStates = <MetaballPhysicsState?>[];
+        final int minCount = min(_metaballs.length, oldCount);
+
+        for (int i = 0; i < minCount; i++) {
+          oldStates.add(
+            _physicsScene.dropMetaball(
+              _metaballs[i],
+            ),
+          );
+        }
+        _physicsScene.detach();
+        _physicsScene = physics.createScene();
+        _physicsScene.attach(this, physics);
+        for (int i = 0; i < _metaballs.length; i++) {
+          final MetaballPhysicsState? state = i < minCount ? oldStates[i] : null;
+          _physicsScene.adoptMetaball(_metaballs[i], state);
+        }
+      }
+    }
+
+    _effect = effect;
+    _physics = physics;
+    _metaballScaler = metaballScaler;
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  void handlePointer(Pointer pointer) {
+    _effectState.handlePointer(this, pointer);
+  }
+
+  void updateViewportSize(Size size) {
+    _viewportSize = size;
+    if (_stage == MetaballRenderStage.transform) {
+      _applyRenderTransform(size);
+    }
+  }
+
+  List<Metaball> get metaballs => _metaballs;
+
+  Duration get elapsed => _lastFrame;
+
+  Size get viewportSize {
+    assert(
+      _viewportSize != null,
+      'Tried accessing viewportSize before this was available.\n'
+      'Most likely you tried doing so from beforePhysics or afterPhysics, try '
+      'using beforeRenderTransform instead or check whether size is available '
+      'using hasSize.',
+    );
+
+    return _viewportSize!;
+  }
+
+  bool get hasSize => _viewportSize != null;
+}
+
+enum MetaballRenderStage {
+  none,
+  physics,
+  transform,
+  render,
+}

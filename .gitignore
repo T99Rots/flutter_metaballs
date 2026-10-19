@@ -29,3 +29,6 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
+
+# FVM Version Cache
+.fvm/
